@@ -40,12 +40,6 @@ export const shifts = pgTable('shifts', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
-export type User = typeof users.$inferSelect
-export type NewUser = typeof users.$inferInsert
-export type Role = (typeof roleEnum.enumValues)[number]
-export type Invite = typeof invites.$inferSelect
-export type Shift = typeof shifts.$inferSelect
-
 export const transactionTypeEnum = pgEnum('transaction_type', ['inntekt', 'utgift'])
 
 export const transactions = pgTable('transactions', {
@@ -61,4 +55,9 @@ export const transactions = pgTable('transactions', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
+export type User = typeof users.$inferSelect
+export type NewUser = typeof users.$inferInsert
+export type Role = (typeof roleEnum.enumValues)[number]
+export type Invite = typeof invites.$inferSelect
+export type Shift = typeof shifts.$inferSelect
 export type Transaction = typeof transactions.$inferSelect
