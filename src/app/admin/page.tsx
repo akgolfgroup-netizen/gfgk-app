@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { auth } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
 
@@ -11,10 +12,10 @@ export default async function AdminPage() {
           <p className="text-sm text-neutral-600">Internt panel for daglig leder</p>
         </header>
         <section className="space-y-3">
-          <div className="rounded-2xl border border-neutral-200 p-4">
+          <Link href="/admin/ansatte" className="block rounded-2xl border border-neutral-200 p-4">
             <h2 className="text-base font-medium">Ansatte</h2>
-            <p className="text-sm text-neutral-600">Inviter og administrer ansatte. Kommer i M2.</p>
-          </div>
+            <p className="text-sm text-neutral-600">Inviter og administrer ansatte.</p>
+          </Link>
           <div className="rounded-2xl border border-neutral-200 p-4">
             <h2 className="text-base font-medium">Vaktliste</h2>
             <p className="text-sm text-neutral-600">Lag og publiser vaktlister. Kommer i M3.</p>

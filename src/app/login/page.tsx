@@ -21,13 +21,20 @@ async function loginAction(formData: FormData) {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>
+  searchParams: Promise<{ error?: string; invited?: string }>
 }) {
-  const { error } = await searchParams
+  const params = await searchParams
+  const { error } = params
+  const invited = 'invited' in params
   return (
     <main className="flex min-h-dvh flex-col justify-center px-6 pt-safe pb-safe">
       <div className="mx-auto w-full max-w-sm space-y-6">
         <h1 className="text-2xl font-semibold tracking-tight">Logg inn</h1>
+        {invited && (
+          <p className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800">
+            Kontoen er opprettet! Logg inn under.
+          </p>
+        )}
         <form action={loginAction} className="space-y-4">
           <label className="block space-y-2">
             <span className="text-sm font-medium">E-post</span>
