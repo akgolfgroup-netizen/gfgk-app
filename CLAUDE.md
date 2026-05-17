@@ -23,6 +23,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `pnpm db:migrate`  | Apply pending migrations from `drizzle/`                  |
 | `pnpm db:push`     | Push schema directly to DB (dev only, skips migrations)   |
 | `pnpm db:studio`   | Open Drizzle Studio against the configured DB             |
+| `pnpm seed:admin`  | Create/update the first admin via `scripts/seed-admin.ts` |
 
 ## Architecture
 
@@ -61,17 +62,13 @@ See `.env.local.example`.
 
 ## Creating the first admin user
 
-Until M2 ships an invite flow, seed the first admin via SQL:
+Until M2 ships an invite flow, seed the first admin via the script:
 
-```sql
-INSERT INTO users (email, password_hash, name, role)
-VALUES (
-  'admin@example.com',
-  -- bcryptjs hash of the chosen password, cost 10
-  '$2b$10$...',
-  'Daglig leder',
-  'admin'
-);
+```bash
+ADMIN_EMAIL=daglig.leder@gfgk.no \
+ADMIN_PASSWORD='velg-et-sterkt-passord' \
+ADMIN_NAME='Daglig leder' \
+pnpm seed:admin
 ```
 
-Generate the hash with `node -e "import('bcryptjs').then(b => b.hash('PASSWORD', 10).then(console.log))"`.
+`scripts/seed-admin.ts` is idempotent — re-running with the same email updates the existing row.
