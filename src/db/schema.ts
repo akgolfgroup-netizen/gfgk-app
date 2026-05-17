@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { boolean, date, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 
 export const roleEnum = pgEnum('user_role', ['admin', 'ansatt'])
 
@@ -24,7 +24,24 @@ export const invites = pgTable('invites', {
   usedAt: timestamp('used_at', { withTimezone: true }),
 })
 
+export const shifts = pgTable('shifts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id),
+  date: date('date').notNull(),
+  startTime: text('start_time').notNull(),
+  endTime: text('end_time').notNull(),
+  note: text('note'),
+  published: boolean('published').notNull().default(false),
+  createdBy: uuid('created_by')
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
 export type User = typeof users.$inferSelect
 export type NewUser = typeof users.$inferInsert
 export type Role = (typeof roleEnum.enumValues)[number]
 export type Invite = typeof invites.$inferSelect
+export type Shift = typeof shifts.$inferSelect

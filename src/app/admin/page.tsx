@@ -16,10 +16,10 @@ export default async function AdminPage() {
             <h2 className="text-base font-medium">Ansatte</h2>
             <p className="text-sm text-neutral-600">Inviter og administrer ansatte.</p>
           </Link>
-          <div className="rounded-2xl border border-neutral-200 p-4">
+          <Link href="/admin/vaktliste" className="block rounded-2xl border border-neutral-200 p-4">
             <h2 className="text-base font-medium">Vaktliste</h2>
-            <p className="text-sm text-neutral-600">Lag og publiser vaktlister. Kommer i M3.</p>
-          </div>
+            <p className="text-sm text-neutral-600">Lag og publiser vaktlister.</p>
+          </Link>
           <div className="rounded-2xl border border-neutral-200 p-4">
             <h2 className="text-base font-medium">Budsjett</h2>
             <p className="text-sm text-neutral-600">Inntekter, utgifter og rapporter. Kommer i M4.</p>
