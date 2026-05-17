@@ -11,19 +11,19 @@ export function TransactionForm({ defaultDate }: { defaultDate: string }) {
   const [type, setType] = useState<'inntekt' | 'utgift'>('inntekt')
 
   return (
-    <form action={createTransaction} className="space-y-4 rounded-2xl border border-neutral-200 p-4">
+    <form action={createTransaction} className="space-y-4 rounded-lg border border-gfgk-border bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,.06)]">
       <div className="grid grid-cols-2 gap-2">
         {(['inntekt', 'utgift'] as const).map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setType(t)}
-            className={`rounded-xl py-2.5 text-sm font-medium capitalize transition-colors ${
+            className={`rounded-md py-2.5 text-sm font-bold capitalize transition-colors ${
               type === t
                 ? t === 'inntekt'
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
-                : 'border border-neutral-200 text-neutral-500'
+                  ? 'bg-gfgk-teal-light text-gfgk-teal-deep'
+                  : 'bg-gfgk-red-light text-gfgk-red-deep'
+                : 'border border-gfgk-border text-gfgk-text-2 hover:bg-gfgk-cream-deep'
             }`}
           >
             {t}
@@ -32,24 +32,21 @@ export function TransactionForm({ defaultDate }: { defaultDate: string }) {
       </div>
       <input type="hidden" name="type" value={type} />
 
-      <label className="block space-y-2">
-        <span className="text-sm font-medium">Beløp (kr)</span>
+      <label className="block space-y-1.5">
+        <span className="text-sm font-semibold text-gfgk-text">Beløp (kr)</span>
         <input
           name="amount"
           type="number"
           required
           min="1"
           inputMode="numeric"
-          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-base outline-none focus:border-neutral-900"
+          className="w-full"
         />
       </label>
 
-      <label className="block space-y-2">
-        <span className="text-sm font-medium">Kategori</span>
-        <select
-          name="category"
-          className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-base outline-none focus:border-neutral-900"
-        >
+      <label className="block space-y-1.5">
+        <span className="text-sm font-semibold text-gfgk-text">Kategori</span>
+        <select name="category" className="w-full">
           {KATEGORIER[type].map((k) => (
             <option key={k} value={k}>
               {k}
@@ -58,29 +55,25 @@ export function TransactionForm({ defaultDate }: { defaultDate: string }) {
         </select>
       </label>
 
-      <label className="block space-y-2">
-        <span className="text-sm font-medium">Dato</span>
+      <label className="block space-y-1.5">
+        <span className="text-sm font-semibold text-gfgk-text">Dato</span>
         <input
           name="date"
           type="date"
           required
           defaultValue={defaultDate}
-          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-base outline-none focus:border-neutral-900"
+          className="w-full"
         />
       </label>
 
-      <label className="block space-y-2">
-        <span className="text-sm font-medium">Beskrivelse (valgfritt)</span>
-        <input
-          name="description"
-          type="text"
-          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-base outline-none focus:border-neutral-900"
-        />
+      <label className="block space-y-1.5">
+        <span className="text-sm font-semibold text-gfgk-text">Beskrivelse (valgfritt)</span>
+        <input name="description" type="text" className="w-full" />
       </label>
 
       <button
         type="submit"
-        className="w-full rounded-full bg-neutral-900 py-3 text-sm font-medium text-white"
+        className="w-full rounded-md bg-gfgk-gold py-3 text-sm font-bold text-gfgk-black hover:bg-gfgk-gold-deep transition-colors"
       >
         Legg til
       </button>

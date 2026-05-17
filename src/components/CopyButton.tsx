@@ -14,7 +14,11 @@ export function CopyButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={handleClick}
-      className="rounded-full border border-neutral-300 px-3 py-1.5 text-xs font-medium"
+      className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
+        copied
+          ? 'bg-gfgk-teal-light text-gfgk-teal-deep'
+          : 'bg-gfgk-gold text-gfgk-black hover:bg-gfgk-gold-deep'
+      }`}
     >
       {copied ? 'Kopiert!' : 'Kopier lenke'}
     </button>
