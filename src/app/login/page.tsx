@@ -1,61 +1,67 @@
-'use client'
+import { AuthError } from 'next-auth'
+import { redirect } from 'next/navigation'
+import { signIn } from '@/auth'
 
-import { useState } from 'react'
-import { createBrowserSupabase } from '@/lib/supabase/browser'
-
-export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
-  const [error, setError] = useState<string | null>(null)
-
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setStatus('sending')
-    setError(null)
-    const supabase = createBrowserSupabase()
-    const redirectTo = `${window.location.origin}/auth/callback`
-    const { error: signInError } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: redirectTo },
+async function loginAction(formData: FormData) {
+  'use server'
+  try {
+    await signIn('credentials', {
+      email: formData.get('email'),
+      password: formData.get('password'),
+      redirectTo: '/dashboard',
     })
-    if (signInError) {
-      setError(signInError.message)
-      setStatus('error')
-      return
+  } catch (error) {
+    if (error instanceof AuthError) {
+      redirect(`/login?error=${error.type}`)
     }
-    setStatus('sent')
+    throw error
   }
+}
 
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>
+}) {
+  const { error } = await searchParams
   return (
     <main className="flex min-h-dvh flex-col justify-center px-6 pt-safe pb-safe">
       <div className="mx-auto w-full max-w-sm space-y-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
-        {status === 'sent' ? (
-          <p className="text-sm text-neutral-700">Check your email for a magic link.</p>
-        ) : (
-          <form onSubmit={onSubmit} className="space-y-4">
-            <label className="block space-y-2">
-              <span className="text-sm font-medium">Email</span>
-              <input
-                type="email"
-                required
-                autoComplete="email"
-                inputMode="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-base outline-none focus:border-neutral-900"
-              />
-            </label>
-            <button
-              type="submit"
-              disabled={status === 'sending'}
-              className="w-full rounded-full bg-neutral-900 py-3 text-sm font-medium text-white disabled:opacity-50"
-            >
-              {status === 'sending' ? 'Sending…' : 'Send magic link'}
-            </button>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-          </form>
-        )}
+        <h1 className="text-2xl font-semibold tracking-tight">Logg inn</h1>
+        <form action={loginAction} className="space-y-4">
+          <label className="block space-y-2">
+            <span className="text-sm font-medium">E-post</span>
+            <input
+              name="email"
+              type="email"
+              required
+              autoComplete="email"
+              inputMode="email"
+              className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-base outline-none focus:border-neutral-900"
+            />
+          </label>
+          <label className="block space-y-2">
+            <span className="text-sm font-medium">Passord</span>
+            <input
+              name="password"
+              type="password"
+              required
+              autoComplete="current-password"
+              className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-base outline-none focus:border-neutral-900"
+            />
+          </label>
+          <button
+            type="submit"
+            className="w-full rounded-full bg-neutral-900 py-3 text-sm font-medium text-white"
+          >
+            Logg inn
+          </button>
+          {error && (
+            <p className="text-sm text-red-600">
+              {error === 'CredentialsSignin' ? 'Feil e-post eller passord.' : 'Innloggingsfeil.'}
+            </p>
+          )}
+        </form>
       </div>
     </main>
   )
