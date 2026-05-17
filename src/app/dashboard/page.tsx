@@ -1,24 +1,34 @@
 import { redirect } from 'next/navigation'
-import { createServerSupabase } from '@/lib/supabase/server'
+import { auth, signOut } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
 
-export default async function DashboardPage() {
-  const supabase = await createServerSupabase()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+async function signOutAction() {
+  'use server'
+  await signOut({ redirectTo: '/login' })
+}
 
-  if (!user) redirect('/login')
+export default async function DashboardPage() {
+  const session = await auth()
+  if (!session?.user) redirect('/login')
 
   return (
     <>
       <main className="min-h-dvh px-6 pt-safe pb-24">
         <header className="py-6">
-          <h1 className="text-2xl font-semibold tracking-tight">Welcome</h1>
-          <p className="text-sm text-neutral-600">{user.email}</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Velkommen</h1>
+          <p className="text-sm text-neutral-600">{session.user.email}</p>
+          <p className="text-xs text-neutral-500">Rolle: {session.user.role}</p>
         </header>
+        <form action={signOutAction}>
+          <button
+            type="submit"
+            className="rounded-full border border-neutral-300 px-4 py-2 text-sm"
+          >
+            Logg ut
+          </button>
+        </form>
       </main>
-      <BottomNav />
+      <BottomNav role={session.user.role} />
     </>
   )
 }
