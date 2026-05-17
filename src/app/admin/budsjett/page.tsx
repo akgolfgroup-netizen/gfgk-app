@@ -60,7 +60,6 @@ export default async function BudsjettPage({
   const totalUtgift = rows.filter((r) => r.type === 'utgift').reduce((s, r) => s + r.amount, 0)
   const resultat = totalInntekt - totalUtgift
 
-  // Group by date descending
   const byDate = new Map<string, typeof rows>()
   for (const row of [...rows].reverse()) {
     const existing = byDate.get(row.date) ?? []
@@ -71,106 +70,120 @@ export default async function BudsjettPage({
 
   return (
     <>
-      <main className="min-h-dvh px-6 pt-safe pb-24">
-        <header className="py-6">
-          <a href="/admin" className="text-sm text-neutral-500">
-            ← Admin
-          </a>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">Budsjett</h1>
+      <main className="min-h-dvh pb-24">
+        <header className="bg-gfgk-black px-6 pt-safe pb-6">
+          <div className="pt-4">
+            <a href="/admin" className="text-sm text-white/50 hover:text-white/80 transition-colors">
+              ← Admin
+            </a>
+            <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-gfgk-gold">Budsjett</h1>
+          </div>
         </header>
 
-        <div className="mb-6 flex items-center justify-between">
-          <Link
-            href={`/admin/budsjett?mnd=${prevMonth(year, month)}`}
-            className="rounded-full border border-neutral-200 px-4 py-2 text-sm"
-          >
-            ←
-          </Link>
-          <span className="text-sm font-medium capitalize">{monthLabel}</span>
-          <Link
-            href={`/admin/budsjett?mnd=${nextMonth(year, month)}`}
-            className="rounded-full border border-neutral-200 px-4 py-2 text-sm"
-          >
-            →
-          </Link>
-        </div>
-
-        <div className="mb-8 grid grid-cols-3 gap-3">
-          <div className="rounded-2xl bg-green-50 p-3 text-center">
-            <p className="text-xs text-green-700">Inntekter</p>
-            <p className="mt-1 text-sm font-semibold text-green-900">{formatKr(totalInntekt)}</p>
-          </div>
-          <div className="rounded-2xl bg-red-50 p-3 text-center">
-            <p className="text-xs text-red-700">Utgifter</p>
-            <p className="mt-1 text-sm font-semibold text-red-900">{formatKr(totalUtgift)}</p>
-          </div>
-          <div
-            className={`rounded-2xl p-3 text-center ${resultat >= 0 ? 'bg-neutral-100' : 'bg-orange-50'}`}
-          >
-            <p className={`text-xs ${resultat >= 0 ? 'text-neutral-600' : 'text-orange-700'}`}>
-              Resultat
-            </p>
-            <p
-              className={`mt-1 text-sm font-semibold ${resultat >= 0 ? 'text-neutral-900' : 'text-orange-900'}`}
+        <div className="px-6 pt-6">
+          <div className="mb-6 flex items-center justify-between">
+            <Link
+              href={`/admin/budsjett?mnd=${prevMonth(year, month)}`}
+              className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-[0_1px_2px_rgba(0,0,0,.06)]"
             >
-              {formatKr(resultat)}
-            </p>
+              ←
+            </Link>
+            <span className="text-sm font-bold capitalize text-gfgk-text">{monthLabel}</span>
+            <Link
+              href={`/admin/budsjett?mnd=${nextMonth(year, month)}`}
+              className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+            >
+              →
+            </Link>
           </div>
-        </div>
 
-        {byDate.size > 0 && (
-          <section className="mb-8 space-y-4">
-            <h2 className="text-xs font-medium uppercase tracking-wide text-neutral-500">
-              Transaksjoner ({rows.length})
-            </h2>
-            {Array.from(byDate.entries()).map(([date, dateRows]) => (
-              <div key={date}>
-                <p className="mb-2 text-xs text-neutral-400">
-                  {new Date(date + 'T00:00:00').toLocaleDateString('nb-NO', {
-                    weekday: 'short',
-                    day: 'numeric',
-                    month: 'short',
-                  })}
-                </p>
-                <div className="space-y-2">
-                  {dateRows.map((tx) => (
-                    <div
-                      key={tx.id}
-                      className="flex items-center justify-between rounded-2xl border border-neutral-200 p-3"
-                    >
-                      <div>
-                        <p className="text-sm font-medium">
-                          {tx.category}
-                          {tx.description ? ` · ${tx.description}` : ''}
-                        </p>
-                        <p
-                          className={`text-sm font-semibold ${tx.type === 'inntekt' ? 'text-green-700' : 'text-red-700'}`}
-                        >
-                          {tx.type === 'inntekt' ? '+' : '−'} {formatKr(tx.amount)}
-                        </p>
-                      </div>
-                      <form action={deleteTransaction.bind(null, tx.id)}>
-                        <button
-                          type="submit"
-                          className="rounded-full border border-red-200 px-3 py-1 text-xs text-red-600"
-                        >
-                          Slett
-                        </button>
-                      </form>
-                    </div>
-                  ))}
-                </div>
+          <div className="mb-8 grid grid-cols-3 gap-3">
+            <div className="overflow-hidden rounded-lg border border-gfgk-border shadow-[0_1px_2px_rgba(0,0,0,.06)]">
+              <div className="bg-gfgk-teal-light px-3 py-2 text-center">
+                <p className="text-[10px] font-extrabold uppercase tracking-wide text-gfgk-teal-deep">Inntekter</p>
               </div>
-            ))}
-          </section>
-        )}
+              <div className="bg-white px-3 py-2 text-center">
+                <p className="text-sm font-bold text-gfgk-teal-deep">{formatKr(totalInntekt)}</p>
+              </div>
+            </div>
+            <div className="overflow-hidden rounded-lg border border-gfgk-border shadow-[0_1px_2px_rgba(0,0,0,.06)]">
+              <div className="bg-gfgk-red-light px-3 py-2 text-center">
+                <p className="text-[10px] font-extrabold uppercase tracking-wide text-gfgk-red-deep">Utgifter</p>
+              </div>
+              <div className="bg-white px-3 py-2 text-center">
+                <p className="text-sm font-bold text-gfgk-red-deep">{formatKr(totalUtgift)}</p>
+              </div>
+            </div>
+            <div className="overflow-hidden rounded-lg border border-gfgk-border shadow-[0_1px_2px_rgba(0,0,0,.06)]">
+              <div className="bg-gfgk-black px-3 py-2 text-center">
+                <p className="text-[10px] font-extrabold uppercase tracking-wide text-gfgk-gold">Resultat</p>
+              </div>
+              <div className="bg-white px-3 py-2 text-center">
+                <p className={`text-sm font-bold ${resultat >= 0 ? 'text-gfgk-teal-deep' : 'text-gfgk-red-deep'}`}>
+                  {formatKr(resultat)}
+                </p>
+              </div>
+            </div>
+          </div>
 
-        <section>
-          <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-neutral-500">
-            Ny transaksjon
-          </h2>
-          <TransactionForm defaultDate={today} />
-        </section>
+          {byDate.size > 0 && (
+            <section className="mb-8">
+              <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
+                <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
+                Transaksjoner ({rows.length})
+              </h2>
+              <div className="space-y-4">
+                {Array.from(byDate.entries()).map(([date, dateRows]) => (
+                  <div key={date}>
+                    <p className="mb-2 text-xs font-medium text-gfgk-text-2">
+                      {new Date(date + 'T00:00:00').toLocaleDateString('nb-NO', {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'short',
+                      })}
+                    </p>
+                    <div className="space-y-2">
+                      {dateRows.map((tx) => (
+                        <div
+                          key={tx.id}
+                          className="flex items-center justify-between rounded-lg border border-gfgk-border bg-white px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)] hover:bg-gfgk-gold-light transition-colors"
+                        >
+                          <div>
+                            <p className="text-sm font-semibold text-gfgk-text">
+                              {tx.category}
+                              {tx.description ? ` · ${tx.description}` : ''}
+                            </p>
+                            <p
+                              className={`text-sm font-bold ${tx.type === 'inntekt' ? 'text-gfgk-teal-deep' : 'text-gfgk-red-deep'}`}
+                            >
+                              {tx.type === 'inntekt' ? '+' : '−'} {formatKr(tx.amount)}
+                            </p>
+                          </div>
+                          <form action={deleteTransaction.bind(null, tx.id)}>
+                            <button
+                              type="submit"
+                              className="rounded-md border border-gfgk-red/30 bg-gfgk-red-light px-3 py-1 text-xs font-semibold text-gfgk-red-deep hover:bg-gfgk-red/20 transition-colors"
+                            >
+                              Slett
+                            </button>
+                          </form>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section>
+            <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
+              <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
+              Ny transaksjon
+            </h2>
+            <TransactionForm defaultDate={today} />
+          </section>
+        </div>
       </main>
       <BottomNav role={session!.user.role} />
     </>

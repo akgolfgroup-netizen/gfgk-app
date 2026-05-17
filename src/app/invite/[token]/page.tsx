@@ -20,9 +20,9 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
   return (
     <main className="flex min-h-dvh flex-col justify-center px-6 pt-safe pb-safe">
       <div className="mx-auto w-full max-w-sm space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Opprett konto</h1>
-          <p className="mt-1 text-sm text-neutral-600">{invite.email}</p>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-extrabold tracking-tight text-gfgk-text">Opprett konto</h1>
+          <p className="text-sm text-gfgk-text-2">{invite.email}</p>
         </div>
         <AcceptForm token={token} />
       </div>

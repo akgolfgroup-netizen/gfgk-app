@@ -26,88 +26,102 @@ export default async function AnsattePage() {
 
   return (
     <>
-      <main className="min-h-dvh px-6 pt-safe pb-24">
-        <header className="py-6">
-          <a href="/admin" className="text-sm text-neutral-500">
-            ← Admin
-          </a>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">Ansatte</h1>
+      <main className="min-h-dvh pb-24">
+        <header className="bg-gfgk-black px-6 pt-safe pb-6">
+          <div className="pt-4">
+            <a href="/admin" className="text-sm text-white/50 hover:text-white/80 transition-colors">
+              ← Admin
+            </a>
+            <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-gfgk-gold">Ansatte</h1>
+          </div>
         </header>
 
-        <section className="mb-8 space-y-3">
-          <h2 className="text-xs font-medium uppercase tracking-wide text-neutral-500">
-            Brukere ({allUsers.length})
-          </h2>
-          {allUsers.map((user) => (
-            <div key={user.id} className="rounded-2xl border border-neutral-200 p-4">
-              <p className="font-medium">{user.name ?? user.email}</p>
-              {user.name && <p className="text-sm text-neutral-500">{user.email}</p>}
-              <p className="mt-1 text-xs text-neutral-400">{user.role}</p>
-            </div>
-          ))}
-        </section>
-
-        {pendingInvites.length > 0 && (
-          <section className="mb-8 space-y-3">
-            <h2 className="text-xs font-medium uppercase tracking-wide text-neutral-500">
-              Ventende invitasjoner ({pendingInvites.length})
+        <div className="px-6 pt-6 space-y-8">
+          <section>
+            <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
+              <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
+              Brukere ({allUsers.length})
             </h2>
-            {pendingInvites.map((invite) => (
-              <div key={invite.id} className="rounded-2xl border border-neutral-200 p-4 space-y-2">
-                <p className="font-medium">{invite.email}</p>
-                <p className="text-xs text-neutral-400">
-                  {invite.role} · utløper {invite.expiresAt.toLocaleDateString('nb-NO')}
-                </p>
-                <div className="flex gap-2 pt-1">
-                  <CopyButton text={`${baseUrl}/invite/${invite.token}`} />
-                  <form action={revokeInvite.bind(null, invite.id)}>
-                    <button
-                      type="submit"
-                      className="rounded-full border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600"
-                    >
-                      Trekk tilbake
-                    </button>
-                  </form>
+            <div className="space-y-2">
+              {allUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="rounded-lg border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+                >
+                  <p className="font-semibold text-gfgk-text">{user.name ?? user.email}</p>
+                  {user.name && <p className="text-sm text-gfgk-text-2">{user.email}</p>}
+                  <p className="mt-1 text-xs text-gfgk-text-3 uppercase tracking-wide">{user.role}</p>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </section>
-        )}
 
-        <section>
-          <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-neutral-500">
-            Ny invitasjon
-          </h2>
-          <form action={createInvite} className="space-y-4 rounded-2xl border border-neutral-200 p-4">
-            <label className="block space-y-2">
-              <span className="text-sm font-medium">E-post</span>
-              <input
-                name="email"
-                type="email"
-                required
-                inputMode="email"
-                autoComplete="off"
-                className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-base outline-none focus:border-neutral-900"
-              />
-            </label>
-            <label className="block space-y-2">
-              <span className="text-sm font-medium">Rolle</span>
-              <select
-                name="role"
-                className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-base outline-none focus:border-neutral-900"
+          {pendingInvites.length > 0 && (
+            <section>
+              <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
+                <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
+                Ventende invitasjoner ({pendingInvites.length})
+              </h2>
+              <div className="space-y-2">
+                {pendingInvites.map((invite) => (
+                  <div
+                    key={invite.id}
+                    className="rounded-lg border border-gfgk-border bg-gfgk-gold-light px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)] space-y-2"
+                  >
+                    <p className="font-semibold text-gfgk-text">{invite.email}</p>
+                    <p className="text-xs text-gfgk-text-2 uppercase tracking-wide">
+                      {invite.role} · utløper {invite.expiresAt.toLocaleDateString('nb-NO')}
+                    </p>
+                    <div className="flex gap-2 pt-1">
+                      <CopyButton text={`${baseUrl}/invite/${invite.token}`} />
+                      <form action={revokeInvite.bind(null, invite.id)}>
+                        <button
+                          type="submit"
+                          className="rounded-md bg-gfgk-red-light px-3 py-1.5 text-xs font-semibold text-gfgk-red-deep hover:bg-gfgk-red/20 transition-colors"
+                        >
+                          Trekk tilbake
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section>
+            <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
+              <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
+              Ny invitasjon
+            </h2>
+            <form action={createInvite} className="space-y-4 rounded-lg border border-gfgk-border bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,.06)]">
+              <label className="block space-y-1.5">
+                <span className="text-sm font-semibold text-gfgk-text">E-post</span>
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  inputMode="email"
+                  autoComplete="off"
+                  className="w-full"
+                />
+              </label>
+              <label className="block space-y-1.5">
+                <span className="text-sm font-semibold text-gfgk-text">Rolle</span>
+                <select name="role" className="w-full">
+                  <option value="ansatt">Ansatt</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </label>
+              <button
+                type="submit"
+                className="w-full rounded-md bg-gfgk-gold py-3 text-sm font-bold text-gfgk-black hover:bg-gfgk-gold-deep transition-colors"
               >
-                <option value="ansatt">Ansatt</option>
-                <option value="admin">Admin</option>
-              </select>
-            </label>
-            <button
-              type="submit"
-              className="w-full rounded-full bg-neutral-900 py-3 text-sm font-medium text-white"
-            >
-              Generer invitasjonslenke
-            </button>
-          </form>
-        </section>
+                Generer invitasjonslenke
+              </button>
+            </form>
+          </section>
+        </div>
       </main>
       <BottomNav role={session!.user.role} />
     </>
