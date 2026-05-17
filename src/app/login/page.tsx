@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { AuthError } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { signIn } from '@/auth'
@@ -29,9 +30,12 @@ export default async function LoginPage({
   return (
     <main className="flex min-h-dvh flex-col justify-center px-6 pt-safe pb-safe">
       <div className="mx-auto w-full max-w-sm space-y-6">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-extrabold tracking-tight text-gfgk-text">Logg inn</h1>
-          <p className="text-sm text-gfgk-text-2">GFGK — Gamle Fredrikstad Golfklubb</p>
+        <div className="flex items-center gap-3">
+          <Image src="/logo.png" alt="GFGK" width={48} height={48} priority />
+          <div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-gfgk-text">Logg inn</h1>
+            <p className="text-sm text-gfgk-text-2">Gamle Fredrikstad Golfklubb</p>
+          </div>
         </div>
         {invited && (
           <p className="rounded-xl bg-gfgk-teal-light px-4 py-3 text-sm text-gfgk-teal-deep font-medium">
