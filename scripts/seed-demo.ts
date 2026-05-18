@@ -13,18 +13,18 @@ import { users } from '@/db/schema'
 async function main() {
   const email = 'demo@gfgk.no'
   const password = 'Demo1234!'
-  const name = 'Demo Ansatt'
+  const name = 'Demo Admin'
 
   const passwordHash = await hash(password, 10)
   const db = getDb()
 
   const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1)
   if (existing) {
-    await db.update(users).set({ passwordHash, name, role: 'ansatt' }).where(eq(users.email, email))
+    await db.update(users).set({ passwordHash, name, role: 'admin' }).where(eq(users.email, email))
     console.log(`Updated demo user: ${email}`)
   } else {
-    await db.insert(users).values({ email, passwordHash, name, role: 'ansatt' })
-    console.log(`Created demo user: ${email} / ${password}`)
+    await db.insert(users).values({ email, passwordHash, name, role: 'admin' })
+    console.log(`Created demo admin: ${email} / ${password}`)
   }
 }
 

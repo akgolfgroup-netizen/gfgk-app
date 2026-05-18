@@ -7,7 +7,7 @@ export default async function DemoPage() {
     await signIn('credentials', {
       email: 'demo@gfgk.no',
       password: 'Demo1234!',
-      redirectTo: '/dashboard',
+      redirectTo: '/admin',
     })
   } catch (error) {
     if (error instanceof AuthError) {
