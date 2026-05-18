@@ -59,10 +59,20 @@ export default async function RapporterPage() {
     <>
       <main className="min-h-dvh pb-24">
         <header className="bg-gfgk-black px-6 pt-safe pb-6">
-          <div className="pt-4">
-            <a href="/admin" className="text-sm text-white/50 hover:text-white/80 transition-colors">← Admin</a>
-            <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-gfgk-gold">Rapporter</h1>
-            <p className="text-sm text-white/50 mt-0.5">Siste 6 måneder</p>
+          <div className="pt-4 flex items-start justify-between gap-3">
+            <div>
+              <a href="/admin" className="text-sm text-white/50 hover:text-white/80 transition-colors">← Admin</a>
+              <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-gfgk-gold">Rapporter</h1>
+              <p className="text-sm text-white/50 mt-0.5">Siste 6 måneder</p>
+            </div>
+            {first && last && (
+              <a
+                href={`/api/rapporter/export?from=${first.start}&to=${last.end}`}
+                className="rounded-md bg-gfgk-gold px-3 py-1.5 text-xs font-bold text-gfgk-black hover:bg-gfgk-gold-deep transition-colors whitespace-nowrap"
+              >
+                ↓ CSV
+              </a>
+            )}
           </div>
         </header>
 

@@ -5,6 +5,7 @@ import type { Role } from '@/db/schema'
 
 const baseItems = [
   { href: '/dashboard', label: 'Hjem' },
+  { href: '/vakter', label: 'Vakter' },
   { href: '/prosjekter', label: 'Prosjekter' },
   { href: '/profil', label: 'Profil' },
 ] as const

@@ -3,6 +3,7 @@ import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { projects, tasks, users } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
+import { ConfirmButton } from '@/components/ConfirmButton'
 import { createProject, createTask, deleteProject, deleteTask, updateProjectStatus } from '@/lib/projects'
 
 const STATUS_LABEL: Record<string, string> = {
@@ -119,9 +120,12 @@ export default async function AdminProsjekterPage() {
                         </button>
                       </form>
                       <form action={deleteProject.bind(null, project.id)}>
-                        <button type="submit" className="rounded-md bg-gfgk-red-light px-3 py-1.5 text-xs font-semibold text-gfgk-red-deep hover:bg-gfgk-red/20 transition-colors">
+                        <ConfirmButton
+                          message={`Slette prosjektet "${project.name}" og alle oppgavene?`}
+                          className="rounded-md bg-gfgk-red-light px-3 py-1.5 text-xs font-semibold text-gfgk-red-deep hover:bg-gfgk-red/20 transition-colors"
+                        >
                           Slett prosjekt
-                        </button>
+                        </ConfirmButton>
                       </form>
                     </div>
                   </div>
