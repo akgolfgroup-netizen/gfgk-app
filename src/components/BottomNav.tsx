@@ -3,7 +3,13 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { Role } from '@/db/schema'
 
-const baseItems = [{ href: '/dashboard', label: 'Hjem' }] as const
+const baseItems = [
+  { href: '/dashboard', label: 'Hjem' },
+  { href: '/vakter', label: 'Vakter' },
+  { href: '/prosjekter', label: 'Prosjekter' },
+  { href: '/profil', label: 'Profil' },
+] as const
+
 const adminItems = [{ href: '/admin', label: 'Admin' }] as const
 
 export function BottomNav({ role }: { role: Role }) {

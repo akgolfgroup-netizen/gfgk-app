@@ -1,9 +1,20 @@
 'use server'
-import { and, eq, gte, lte } from 'drizzle-orm'
+import { and, eq, gte, inArray, lte } from 'drizzle-orm'
+import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
 import { getDb } from '@/db'
-import { shifts } from '@/db/schema'
+import { shifts, users } from '@/db/schema'
+import { sendEmail, shiftPublishedEmailHtml } from '@/lib/email'
+
+function getWeekNum(d: Date) {
+  const target = new Date(d.valueOf())
+  const dayNr = (d.getDay() + 6) % 7
+  target.setDate(target.getDate() - dayNr + 3)
+  const firstThursday = new Date(target.getFullYear(), 0, 4)
+  const diff = (target.getTime() - firstThursday.getTime()) / 86400000
+  return 1 + Math.round((diff - 3 + ((firstThursday.getDay() + 6) % 7)) / 7)
+}
 
 export async function createShift(formData: FormData) {
   const session = await auth()
@@ -46,10 +57,40 @@ export async function publishWeek(weekStart: string, _formData: FormData) {
   end.setDate(end.getDate() + 6)
   const weekEnd = end.toISOString().slice(0, 10)
 
-  await getDb()
+  const db = getDb()
+  const weekShifts = await db
+    .select({ userId: shifts.userId })
+    .from(shifts)
+    .where(and(gte(shifts.date, weekStart), lte(shifts.date, weekEnd), eq(shifts.published, false)))
+
+  await db
     .update(shifts)
     .set({ published: true })
     .where(and(gte(shifts.date, weekStart), lte(shifts.date, weekEnd)))
+
+  const affectedUserIds = [...new Set(weekShifts.map((s) => s.userId))]
+  if (affectedUserIds.length > 0) {
+    const recipients = await db
+      .select({ email: users.email, name: users.name })
+      .from(users)
+      .where(inArray(users.id, affectedUserIds))
+
+    const h = await headers()
+    const host = h.get('host') ?? 'localhost:3000'
+    const protocol = host.includes('localhost') ? 'http' : 'https'
+    const appUrl = `${protocol}://${host}`
+    const weekNum = getWeekNum(new Date(weekStart + 'T00:00:00'))
+
+    await Promise.all(
+      recipients.map((r) =>
+        sendEmail({
+          to: r.email,
+          subject: `Vaktliste uke ${weekNum} er publisert`,
+          html: shiftPublishedEmailHtml({ name: r.name ?? '', weekNum, appUrl }),
+        }),
+      ),
+    )
+  }
 
   revalidatePath('/admin/vaktliste')
   revalidatePath('/dashboard')

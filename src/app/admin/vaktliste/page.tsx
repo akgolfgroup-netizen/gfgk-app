@@ -12,6 +12,7 @@ import {
   getWeekNumber,
   toDateString,
 } from '@/lib/dates'
+import { ConfirmButton } from '@/components/ConfirmButton'
 import { createShift, deleteShift, publishWeek } from '@/lib/shifts'
 
 export default async function VaktlistePage({
@@ -130,12 +131,12 @@ export default async function VaktlistePage({
                             )}
                           </div>
                           <form action={deleteShift.bind(null, shift.id)}>
-                            <button
-                              type="submit"
+                            <ConfirmButton
+                              message="Er du sikker på at du vil slette denne vakten?"
                               className="rounded-md border border-gfgk-red/30 bg-gfgk-red-light px-3 py-1 text-xs font-semibold text-gfgk-red-deep hover:bg-gfgk-red/20 transition-colors"
                             >
                               Slett
-                            </button>
+                            </ConfirmButton>
                           </form>
                         </div>
                       ))}

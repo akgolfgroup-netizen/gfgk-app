@@ -5,6 +5,7 @@ import { getDb } from '@/db'
 import { transactions } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
 import { toDateString } from '@/lib/dates'
+import { ConfirmButton } from '@/components/ConfirmButton'
 import { deleteTransaction } from '@/lib/transactions'
 import { TransactionForm } from './TransactionForm'
 
@@ -160,12 +161,12 @@ export default async function BudsjettPage({
                             </p>
                           </div>
                           <form action={deleteTransaction.bind(null, tx.id)}>
-                            <button
-                              type="submit"
+                            <ConfirmButton
+                              message="Slette denne transaksjonen?"
                               className="rounded-md border border-gfgk-red/30 bg-gfgk-red-light px-3 py-1 text-xs font-semibold text-gfgk-red-deep hover:bg-gfgk-red/20 transition-colors"
                             >
                               Slett
-                            </button>
+                            </ConfirmButton>
                           </form>
                         </div>
                       ))}
