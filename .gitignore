@@ -1,3 +1,6 @@
+# pnpm workspace file (auto-generated, not needed)
+pnpm-workspace.yaml
+
 # dependencies
 node_modules/
 .pnp
