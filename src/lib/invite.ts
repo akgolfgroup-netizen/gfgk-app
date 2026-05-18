@@ -2,11 +2,13 @@
 import { randomBytes } from 'crypto'
 import { and, eq, isNull } from 'drizzle-orm'
 import { hash } from 'bcryptjs'
+import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { invites, users } from '@/db/schema'
+import { inviteEmailHtml, sendEmail } from '@/lib/email'
 
 export async function createInvite(formData: FormData) {
   const session = await auth()
@@ -20,6 +22,13 @@ export async function createInvite(formData: FormData) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 
   await getDb().insert(invites).values({ email, role, token, createdBy: session.user.id, expiresAt })
+
+  const h = await headers()
+  const host = h.get('host') ?? 'localhost:3000'
+  const protocol = host.includes('localhost') ? 'http' : 'https'
+  const url = `${protocol}://${host}/invite/${token}`
+  await sendEmail({ to: email, subject: 'Invitasjon til GFGK', html: inviteEmailHtml({ url, role }) })
+
   revalidatePath('/admin/ansatte')
 }
 

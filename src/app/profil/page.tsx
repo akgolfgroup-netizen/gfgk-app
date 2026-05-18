@@ -5,6 +5,7 @@ import { getDb } from '@/db'
 import { timeEntries } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
 import { toDateString } from '@/lib/dates'
+import { ConfirmButton } from '@/components/ConfirmButton'
 import { updateProfile, changePassword } from '@/lib/profile'
 import { createTimeEntry, deleteTimeEntry } from '@/lib/timeEntries'
 
@@ -117,9 +118,9 @@ export default async function ProfilPage() {
                       </p>
                     </div>
                     <form action={deleteTimeEntry.bind(null, entry.id)}>
-                      <button type="submit" className="rounded-md bg-gfgk-red-light px-3 py-1 text-xs font-semibold text-gfgk-red-deep hover:bg-gfgk-red/20 transition-colors">
+                      <ConfirmButton message="Slette denne timeregistreringen?" className="rounded-md bg-gfgk-red-light px-3 py-1 text-xs font-semibold text-gfgk-red-deep hover:bg-gfgk-red/20 transition-colors">
                         Slett
-                      </button>
+                      </ConfirmButton>
                     </form>
                   </div>
                 ))}

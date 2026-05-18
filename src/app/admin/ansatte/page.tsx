@@ -4,6 +4,7 @@ import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { invites, users } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
+import { ConfirmButton } from '@/components/ConfirmButton'
 import { CopyButton } from '@/components/CopyButton'
 import { createInvite, revokeInvite } from '@/lib/invite'
 
@@ -75,12 +76,12 @@ export default async function AnsattePage() {
                     <div className="flex gap-2 pt-1">
                       <CopyButton text={`${baseUrl}/invite/${invite.token}`} />
                       <form action={revokeInvite.bind(null, invite.id)}>
-                        <button
-                          type="submit"
+                        <ConfirmButton
+                          message={`Trekke tilbake invitasjon til ${invite.email}?`}
                           className="rounded-md bg-gfgk-red-light px-3 py-1.5 text-xs font-semibold text-gfgk-red-deep hover:bg-gfgk-red/20 transition-colors"
                         >
                           Trekk tilbake
-                        </button>
+                        </ConfirmButton>
                       </form>
                     </div>
                   </div>
