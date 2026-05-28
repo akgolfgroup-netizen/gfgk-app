@@ -3,6 +3,17 @@ import { del, put } from '@vercel/blob'
 const MAX_AVATAR_BYTES = 5 * 1024 * 1024 // 5 MB
 const ALLOWED_AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const
 
+const MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024 // 25 MB
+const ALLOWED_ATTACHMENT_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'video/mp4',
+  'video/quicktime',
+  'application/pdf',
+] as const
+
 export class BlobValidationError extends Error {
   constructor(message: string) {
     super(message)
@@ -33,6 +44,39 @@ export async function uploadAvatar(file: File, userId: string): Promise<string> 
     contentType: file.type,
   })
   return blob.url
+}
+
+/**
+ * Last opp et task-vedlegg (bilde, video, PDF). Returnerer URL.
+ */
+export async function uploadTaskAttachment(
+  file: File,
+  taskId: string,
+): Promise<{ url: string }> {
+  if (file.size > MAX_ATTACHMENT_BYTES) {
+    throw new BlobValidationError(
+      `Filen er for stor (maks ${MAX_ATTACHMENT_BYTES / 1024 / 1024} MB).`,
+    )
+  }
+  if (
+    !ALLOWED_ATTACHMENT_TYPES.includes(
+      file.type as (typeof ALLOWED_ATTACHMENT_TYPES)[number],
+    )
+  ) {
+    throw new BlobValidationError(
+      'Filtypen støttes ikke. Tillatt: bilder, video (mp4/mov) og PDF.',
+    )
+  }
+
+  const safeName = file.name.replace(/[^\w.\-]+/g, '-')
+  const key = `tasks/${taskId}/${Date.now()}-${safeName}`
+
+  const blob = await put(key, file, {
+    access: 'public',
+    addRandomSuffix: true,
+    contentType: file.type,
+  })
+  return { url: blob.url }
 }
 
 /**

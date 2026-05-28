@@ -86,6 +86,19 @@ export async function toggleEmployeeActive(userId: string): Promise<void> {
 }
 
 /**
+ * Sett timesats for en ansatt (kr/t). Brukes på /admin/lonn-siden.
+ */
+export async function setHourlyRate(userId: string, formData: FormData): Promise<void> {
+  const admin = await requireAdmin()
+  if (!admin) return
+
+  const rate = parseInt0(formData.get('hourlyRate') as string | null)
+  await getDb().update(users).set({ hourlyRate: rate }).where(eq(users.id, userId))
+
+  revalidatePath('/admin/lonn')
+}
+
+/**
  * Slett en ansatt permanent. Vil feile hvis brukeren har relaterte data
  * (shifts, timeEntries, etc.) — i så fall bør admin deaktivere i stedet.
  */

@@ -47,6 +47,38 @@ export function inviteEmailHtml(opts: { url: string; role: string }) {
   `
 }
 
+export function taskAssignedEmailHtml(opts: {
+  name: string
+  title: string
+  dueDate: string | null
+  appUrl: string
+  taskId: string
+}) {
+  const dueLine = opts.dueDate
+    ? `<p style="color: #5A5A5A; margin: 0 0 8px;">Frist: <strong>${new Date(opts.dueDate).toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long' })}</strong></p>`
+    : ''
+  return `
+    <div style="font-family: -apple-system, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
+      <div style="background: #0A0A0A; padding: 20px; border-radius: 8px; text-align: center;">
+        <h1 style="color: #F5C518; margin: 0; font-size: 22px; font-weight: 800;">GFGK</h1>
+      </div>
+      <div style="padding: 24px 4px;">
+        <h2 style="color: #1B1B1B; font-size: 18px; margin: 0 0 12px;">Hei ${opts.name}!</h2>
+        <p style="color: #5A5A5A; line-height: 1.5; margin: 0 0 12px;">
+          Du har fått en ny oppgave:
+        </p>
+        <div style="background: #FAF7EE; border-left: 4px solid #F5C518; padding: 12px 16px; margin: 0 0 16px; border-radius: 4px;">
+          <p style="color: #1B1B1B; font-size: 15px; font-weight: 600; margin: 0 0 4px;">${opts.title}</p>
+          ${dueLine}
+        </div>
+        <a href="${opts.appUrl}/oppgaver/${opts.taskId}" style="display: inline-block; background: #F5C518; color: #0A0A0A; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 14px;">
+          Åpne oppgave
+        </a>
+      </div>
+    </div>
+  `
+}
+
 export function shiftPublishedEmailHtml(opts: { name: string; weekNum: number; appUrl: string }) {
   return `
     <div style="font-family: -apple-system, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">

@@ -3,7 +3,7 @@ import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { users, timeEntries } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
-import { setHourlyRate } from '@/lib/projects'
+import { setHourlyRate } from '@/lib/users-admin'
 
 function formatKr(amount: number) {
   return new Intl.NumberFormat('nb-NO', { style: 'currency', currency: 'NOK', maximumFractionDigits: 0 }).format(amount)
