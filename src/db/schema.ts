@@ -1,4 +1,15 @@
-import { boolean, date, decimal, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  date,
+  decimal,
+  integer,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core'
 
 export const roleEnum = pgEnum('user_role', ['admin', 'ansatt'])
 
@@ -104,6 +115,169 @@ export const tasks = pgTable('tasks', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
+// ============================================================
+// Sub-prosjekt F: Daglig drift
+// ============================================================
+
+// 1. Innstempling
+export const shiftClocks = pgTable('shift_clocks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id),
+  shiftId: uuid('shift_id').references(() => shifts.id),
+  clockedInAt: timestamp('clocked_in_at', { withTimezone: true }).notNull(),
+  clockedOutAt: timestamp('clocked_out_at', { withTimezone: true }),
+  hours: decimal('hours', { precision: 4, scale: 2 }),
+  note: text('note'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+// 2. Sjekklister
+export const checklistRepeatEnum = pgEnum('checklist_repeat', ['daglig', 'ukentlig', 'manedlig'])
+export const checklistRoleEnum = pgEnum('checklist_role', ['ansatt', 'admin', 'alle'])
+
+export const checklists = pgTable('checklists', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  description: text('description'),
+  repeat: checklistRepeatEnum('repeat').notNull().default('daglig'),
+  weekdays: text('weekdays').array(), // ['man','tir',...] når repeat=ukentlig
+  assignedRole: checklistRoleEnum('assigned_role').notNull().default('ansatt'),
+  createdBy: uuid('created_by')
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const checklistItems = pgTable('checklist_items', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  checklistId: uuid('checklist_id')
+    .notNull()
+    .references(() => checklists.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description'),
+  orderIndex: integer('order_index').notNull().default(0),
+})
+
+export const checklistRuns = pgTable(
+  'checklist_runs',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    checklistId: uuid('checklist_id')
+      .notNull()
+      .references(() => checklists.id, { onDelete: 'cascade' }),
+    date: date('date').notNull(),
+    completedBy: uuid('completed_by').references(() => users.id),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+  },
+  (t) => [primaryKey({ columns: [t.checklistId, t.date] })],
+)
+
+export const checklistRunItems = pgTable('checklist_run_items', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  runId: uuid('run_id')
+    .notNull()
+    .references(() => checklistRuns.id, { onDelete: 'cascade' }),
+  itemId: uuid('item_id')
+    .notNull()
+    .references(() => checklistItems.id),
+  done: boolean('done').notNull().default(false),
+  doneAt: timestamp('done_at', { withTimezone: true }),
+  doneBy: uuid('done_by').references(() => users.id),
+  note: text('note'),
+})
+
+// 3. Annonseringer
+export const announcementAudienceEnum = pgEnum('announcement_audience', [
+  'alle',
+  'admin',
+  'ansatt',
+])
+
+export const announcements = pgTable('announcements', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  body: text('body').notNull(), // markdown
+  audience: announcementAudienceEnum('audience').notNull().default('alle'),
+  pinned: boolean('pinned').notNull().default(false),
+  expiresAt: timestamp('expires_at', { withTimezone: true }),
+  createdBy: uuid('created_by')
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const announcementReads = pgTable(
+  'announcement_reads',
+  {
+    announcementId: uuid('announcement_id')
+      .notNull()
+      .references(() => announcements.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    readAt: timestamp('read_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.announcementId, t.userId] })],
+)
+
+// 4. Hendelseslogg
+export const shiftEventCategoryEnum = pgEnum('shift_event_category', [
+  'hendelse',
+  'klage',
+  'maskin',
+  'observasjon',
+  'annet',
+])
+
+export const shiftEventSeverityEnum = pgEnum('shift_event_severity', [
+  'info',
+  'medium',
+  'hoy',
+])
+
+export const shiftEvents = pgTable('shift_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  shiftId: uuid('shift_id').references(() => shifts.id),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id),
+  category: shiftEventCategoryEnum('category').notNull(),
+  body: text('body').notNull(),
+  severity: shiftEventSeverityEnum('severity').notNull().default('info'),
+  attachments: text('attachments').array(), // blob URLs
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+// 5. Dokumenter
+export const documentCategoryEnum = pgEnum('document_category', [
+  'kontrakt',
+  'ferieattest',
+  'sykmelding',
+  'kvittering',
+  'annet',
+])
+
+export const documents = pgTable('documents', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }), // null = felles
+  category: documentCategoryEnum('category').notNull(),
+  name: text('name').notNull(),
+  blobUrl: text('blob_url').notNull(),
+  mimeType: text('mime_type').notNull(),
+  sizeBytes: integer('size_bytes').notNull(),
+  uploadedBy: uuid('uploaded_by')
+    .notNull()
+    .references(() => users.id),
+  uploadedAt: timestamp('uploaded_at', { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: date('expires_at'),
+})
+
+// ============================================================
+// Types
+// ============================================================
+
 export type User = typeof users.$inferSelect
 export type NewUser = typeof users.$inferInsert
 export type Role = (typeof roleEnum.enumValues)[number]
@@ -113,3 +287,18 @@ export type Transaction = typeof transactions.$inferSelect
 export type TimeEntry = typeof timeEntries.$inferSelect
 export type Project = typeof projects.$inferSelect
 export type Task = typeof tasks.$inferSelect
+
+// F-types
+export type ShiftClock = typeof shiftClocks.$inferSelect
+export type Checklist = typeof checklists.$inferSelect
+export type ChecklistRepeat = (typeof checklistRepeatEnum.enumValues)[number]
+export type ChecklistItem = typeof checklistItems.$inferSelect
+export type ChecklistRun = typeof checklistRuns.$inferSelect
+export type ChecklistRunItem = typeof checklistRunItems.$inferSelect
+export type Announcement = typeof announcements.$inferSelect
+export type AnnouncementAudience = (typeof announcementAudienceEnum.enumValues)[number]
+export type ShiftEvent = typeof shiftEvents.$inferSelect
+export type ShiftEventCategory = (typeof shiftEventCategoryEnum.enumValues)[number]
+export type ShiftEventSeverity = (typeof shiftEventSeverityEnum.enumValues)[number]
+export type Document = typeof documents.$inferSelect
+export type DocumentCategory = (typeof documentCategoryEnum.enumValues)[number]
