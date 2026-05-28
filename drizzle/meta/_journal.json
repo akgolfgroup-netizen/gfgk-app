@@ -15,6 +15,13 @@
       "when": 1779957781057,
       "tag": "0001_users_extended",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780000982514,
+      "tag": "0002_vakt_kalender",
+      "breakpoints": true
     }
   ]
 }

@@ -104,6 +104,64 @@ export const tasks = pgTable('tasks', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
+// ============================================================
+// Sub-prosjekt C: Vaktliste 2.0 + kalender
+// ============================================================
+
+export const timeOffTypeEnum = pgEnum('time_off_type', ['ferie', 'sykemelding', 'permisjon'])
+export const timeOffStatusEnum = pgEnum('time_off_status', ['pending', 'approved', 'declined'])
+
+export const timeOff = pgTable('time_off', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id),
+  startDate: date('start_date').notNull(),
+  endDate: date('end_date').notNull(),
+  type: timeOffTypeEnum('type').notNull().default('ferie'),
+  status: timeOffStatusEnum('status').notNull().default('pending'),
+  note: text('note'),
+  approvedBy: uuid('approved_by').references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const shiftTemplates = pgTable('shift_templates', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  startTime: text('start_time').notNull(), // '07:00'
+  endTime: text('end_time').notNull(),     // '14:00'
+  hours: decimal('hours', { precision: 4, scale: 1 }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const activityTypeEnum = pgEnum('activity_type', [
+  'turnering',
+  'kurs',
+  'intern',
+  'sosial',
+])
+
+export const activitySourceEnum = pgEnum('activity_source', ['gfgk', 'ak_golf'])
+
+export const activities = pgTable('activities', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  description: text('description'),
+  type: activityTypeEnum('type').notNull().default('intern'),
+  source: activitySourceEnum('source').notNull().default('gfgk'),
+  externalId: text('external_id'),
+  startAt: timestamp('start_at', { withTimezone: true }).notNull(),
+  endAt: timestamp('end_at', { withTimezone: true }).notNull(),
+  location: text('location'),
+  url: text('url'),
+  createdBy: uuid('created_by').references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+// ============================================================
+// Types
+// ============================================================
+
 export type User = typeof users.$inferSelect
 export type NewUser = typeof users.$inferInsert
 export type Role = (typeof roleEnum.enumValues)[number]
@@ -113,3 +171,12 @@ export type Transaction = typeof transactions.$inferSelect
 export type TimeEntry = typeof timeEntries.$inferSelect
 export type Project = typeof projects.$inferSelect
 export type Task = typeof tasks.$inferSelect
+
+// C-types
+export type TimeOff = typeof timeOff.$inferSelect
+export type TimeOffType = (typeof timeOffTypeEnum.enumValues)[number]
+export type TimeOffStatus = (typeof timeOffStatusEnum.enumValues)[number]
+export type ShiftTemplate = typeof shiftTemplates.$inferSelect
+export type Activity = typeof activities.$inferSelect
+export type ActivityType = (typeof activityTypeEnum.enumValues)[number]
+export type ActivitySource = (typeof activitySourceEnum.enumValues)[number]

@@ -47,6 +47,46 @@ export async function deleteShift(id: string, _formData: FormData) {
 
   await getDb().delete(shifts).where(eq(shifts.id, id))
   revalidatePath('/admin/vaktliste')
+  revalidatePath('/vakter')
+}
+
+export async function updateShift(id: string, formData: FormData) {
+  const session = await auth()
+  if (session?.user.role !== 'admin') throw new Error('Unauthorized')
+
+  const startTime = (formData.get('startTime') as string | null)?.trim()
+  const endTime = (formData.get('endTime') as string | null)?.trim()
+  const note = (formData.get('note') as string | null)?.trim() || null
+
+  if (!startTime || !endTime) return
+
+  await getDb()
+    .update(shifts)
+    .set({ startTime, endTime, note })
+    .where(eq(shifts.id, id))
+
+  revalidatePath('/admin/vaktliste')
+  revalidatePath('/vakter')
+}
+
+export async function toggleShiftPublished(id: string): Promise<void> {
+  const session = await auth()
+  if (session?.user.role !== 'admin') throw new Error('Unauthorized')
+
+  const [shift] = await getDb()
+    .select({ published: shifts.published })
+    .from(shifts)
+    .where(eq(shifts.id, id))
+    .limit(1)
+  if (!shift) return
+
+  await getDb()
+    .update(shifts)
+    .set({ published: !shift.published })
+    .where(eq(shifts.id, id))
+
+  revalidatePath('/admin/vaktliste')
+  revalidatePath('/vakter')
 }
 
 export async function publishWeek(weekStart: string, _formData: FormData) {
