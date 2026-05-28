@@ -1,145 +1,274 @@
-import { eq, desc } from 'drizzle-orm'
+import { and, count, eq, inArray, ne, sql } from 'drizzle-orm'
+import { FolderPlus, Plus } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { getDb } from '@/db'
-import { projects, tasks, users } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
-import { toggleTask } from '@/lib/projects'
+import { ProjectCard, type ProjectCardData } from '@/components/blocks/ProjectCard'
+import { Button } from '@/components/ui/Button'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetClose,
+  BottomSheetTitle,
+  BottomSheetTrigger,
+} from '@/components/ui/BottomSheet'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { FAB } from '@/components/ui/FAB'
+import { Input } from '@/components/ui/Input'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { Select } from '@/components/ui/Select'
+import { Textarea } from '@/components/ui/Textarea'
+import { getDb } from '@/db'
+import {
+  projectMembers,
+  projects,
+  tasks,
+  users,
+  type ProjectCover,
+  type ProjectStatus,
+} from '@/db/schema'
+import { cn } from '@/lib/cn'
+import { createProject } from '@/lib/projects'
 
-const STATUS_LABEL: Record<string, string> = {
-  aktiv: 'Aktiv',
-  fullfort: 'Fullført',
-  pause: 'Pause',
+type TabKey = 'mine' | 'alle' | 'arkiv'
+
+interface PageProps {
+  searchParams: Promise<{ tab?: string }>
 }
 
-const STATUS_COLOR: Record<string, string> = {
-  aktiv: 'bg-gfgk-teal-light text-gfgk-teal-deep',
-  fullfort: 'bg-gfgk-gold-light text-gfgk-gold-deep',
-  pause: 'bg-gfgk-cream-deep text-gfgk-text-2',
+const TABS: Array<{ key: TabKey; label: string }> = [
+  { key: 'mine', label: 'Mine' },
+  { key: 'alle', label: 'Alle' },
+  { key: 'arkiv', label: 'Arkiv' },
+]
+
+async function loadProjectsForTab(
+  userId: string,
+  tab: TabKey,
+): Promise<ProjectCardData[]> {
+  const db = getDb()
+
+  // Velg projekter basert på tab
+  let projectRows: Array<{
+    id: string
+    name: string
+    status: ProjectStatus
+    coverColor: ProjectCover
+    deadline: string | null
+  }>
+
+  if (tab === 'mine') {
+    projectRows = await db
+      .select({
+        id: projects.id,
+        name: projects.name,
+        status: projects.status,
+        coverColor: projects.coverColor,
+        deadline: projects.deadline,
+      })
+      .from(projects)
+      .innerJoin(projectMembers, eq(projectMembers.projectId, projects.id))
+      .where(and(eq(projectMembers.userId, userId), ne(projects.status, 'arkivert')))
+      .orderBy(projects.name)
+  } else if (tab === 'arkiv') {
+    projectRows = await db
+      .select({
+        id: projects.id,
+        name: projects.name,
+        status: projects.status,
+        coverColor: projects.coverColor,
+        deadline: projects.deadline,
+      })
+      .from(projects)
+      .where(eq(projects.status, 'arkivert'))
+      .orderBy(projects.name)
+  } else {
+    projectRows = await db
+      .select({
+        id: projects.id,
+        name: projects.name,
+        status: projects.status,
+        coverColor: projects.coverColor,
+        deadline: projects.deadline,
+      })
+      .from(projects)
+      .where(ne(projects.status, 'arkivert'))
+      .orderBy(projects.name)
+  }
+
+  if (projectRows.length === 0) return []
+
+  const projectIds = projectRows.map((p) => p.id)
+
+  // Hent task-counts per prosjekt
+  const taskCounts = await db
+    .select({
+      projectId: tasks.projectId,
+      total: count(),
+      done: sql<number>`SUM(CASE WHEN ${tasks.status} = 'done' THEN 1 ELSE 0 END)::int`,
+    })
+    .from(tasks)
+    .where(inArray(tasks.projectId, projectIds))
+    .groupBy(tasks.projectId)
+
+  // Hent medlemmer per prosjekt
+  const memberRows = await db
+    .select({
+      projectId: projectMembers.projectId,
+      userId: users.id,
+      name: users.name,
+      email: users.email,
+      avatarUrl: users.avatarUrl,
+    })
+    .from(projectMembers)
+    .innerJoin(users, eq(projectMembers.userId, users.id))
+    .where(inArray(projectMembers.projectId, projectIds))
+
+  return projectRows.map((p) => {
+    const tc = taskCounts.find((t) => t.projectId === p.id)
+    const members = memberRows
+      .filter((m) => m.projectId === p.id)
+      .map((m) => ({ name: m.name, email: m.email, src: m.avatarUrl }))
+    return {
+      id: p.id,
+      name: p.name,
+      status: p.status,
+      coverColor: p.coverColor,
+      deadline: p.deadline,
+      taskCount: tc?.total ?? 0,
+      doneCount: tc?.done ?? 0,
+      members,
+    }
+  })
 }
 
-export default async function ProsjekterPage() {
+export default async function ProsjekterPage({ searchParams }: PageProps) {
   const session = await auth()
   if (!session?.user) redirect('/login')
 
-  const db = getDb()
-  const allProjects = await db
-    .select()
-    .from(projects)
-    .orderBy(desc(projects.createdAt))
+  const { tab: tabParam } = await searchParams
+  const tab: TabKey =
+    tabParam === 'alle' || tabParam === 'arkiv' ? tabParam : 'mine'
 
-  const allTasks = await db
-    .select({
-      id: tasks.id,
-      projectId: tasks.projectId,
-      title: tasks.title,
-      done: tasks.done,
-      assignedTo: tasks.assignedTo,
-      assignedName: users.name,
-      assignedEmail: users.email,
-    })
-    .from(tasks)
-    .leftJoin(users, eq(tasks.assignedTo, users.id))
-    .orderBy(tasks.createdAt)
+  const projectList = await loadProjectsForTab(session.user.id, tab)
 
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <header className="bg-gfgk-black px-6 pt-safe pb-6">
-          <div className="pt-4">
-            <h1 className="text-2xl font-extrabold tracking-tight text-gfgk-gold">Prosjekter</h1>
-            <p className="text-sm text-white/50 mt-0.5">Oppgaver og fremdrift</p>
-          </div>
-        </header>
+        <PageHeader title="Prosjekter" />
 
-        <div className="px-6 pt-6 space-y-4">
-          {allProjects.length === 0 ? (
-            <p className="text-sm text-gfgk-text-3">Ingen prosjekter ennå.</p>
-          ) : (
-            allProjects.map((project) => {
-              const projectTasks = allTasks.filter((t) => t.projectId === project.id)
-              const doneTasks = projectTasks.filter((t) => t.done).length
-              const progress = projectTasks.length > 0
-                ? Math.round((doneTasks / projectTasks.length) * 100)
-                : 0
-
+        {/* Tab-bar */}
+        <div className="px-6 pt-4">
+          <div className="flex gap-6 border-b border-gfgk-border">
+            {TABS.map((t) => {
+              const active = tab === t.key
               return (
-                <div key={project.id} className="overflow-hidden rounded-lg border border-gfgk-border shadow-[0_1px_2px_rgba(0,0,0,.06)]">
-                  <div className="bg-gfgk-black px-4 py-3 flex items-center justify-between">
-                    <div>
-                      <h2 className="text-sm font-extrabold text-white">{project.name}</h2>
-                      {project.deadline && (
-                        <p className="text-xs text-white/40 mt-0.5">
-                          Frist: {new Date(project.deadline + 'T00:00:00').toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })}
-                        </p>
-                      )}
-                    </div>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide ${STATUS_COLOR[project.status]}`}>
-                      {STATUS_LABEL[project.status]}
-                    </span>
-                  </div>
-
-                  <div className="bg-white px-4 pt-3 pb-4 space-y-3">
-                    {project.description && (
-                      <p className="text-sm text-gfgk-text-2">{project.description}</p>
-                    )}
-
-                    {projectTasks.length > 0 && (
-                      <>
-                        <div className="flex items-center justify-between text-xs text-gfgk-text-2">
-                          <span>{doneTasks}/{projectTasks.length} oppgaver</span>
-                          <span className="font-semibold text-gfgk-gold-deep">{progress}%</span>
-                        </div>
-                        <div className="h-1.5 w-full rounded-full bg-gfgk-cream-deep overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-gfgk-gold transition-all"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                      </>
-                    )}
-
-                    <div className="space-y-2 pt-1">
-                      {projectTasks.map((task) => (
-                        <form key={task.id} action={toggleTask.bind(null, task.id)}>
-                          <button
-                            type="submit"
-                            className="flex w-full items-start gap-3 text-left"
-                          >
-                            <span className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors ${
-                              task.done
-                                ? 'border-gfgk-gold bg-gfgk-gold'
-                                : 'border-gfgk-border-strong bg-white'
-                            }`}>
-                              {task.done && (
-                                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                                  <path d="M1 4L3.5 6.5L9 1" stroke="#0A0A0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
-                              )}
-                            </span>
-                            <div className="flex-1 min-w-0">
-                              <p className={`text-sm ${task.done ? 'line-through text-gfgk-text-3' : 'text-gfgk-text font-medium'}`}>
-                                {task.title}
-                              </p>
-                              {task.assignedName && (
-                                <p className="text-xs text-gfgk-text-3">{task.assignedName}</p>
-                              )}
-                            </div>
-                          </button>
-                        </form>
-                      ))}
-
-                      {projectTasks.length === 0 && (
-                        <p className="text-sm text-gfgk-text-3">Ingen oppgaver ennå.</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                <a
+                  key={t.key}
+                  href={`/prosjekter?tab=${t.key}`}
+                  className={cn(
+                    'border-b-2 pb-3 text-sm font-medium transition-colors',
+                    active
+                      ? 'border-gfgk-gold font-semibold text-gfgk-text'
+                      : 'border-transparent text-gfgk-text-2',
+                  )}
+                >
+                  {t.label}
+                </a>
               )
-            })
+            })}
+          </div>
+        </div>
+
+        <div className="px-6 pt-6">
+          {projectList.length === 0 ? (
+            <EmptyState
+              icon={FolderPlus}
+              title={
+                tab === 'arkiv'
+                  ? 'Ingen arkiverte prosjekter'
+                  : tab === 'mine'
+                    ? 'Ingen prosjekter enda'
+                    : 'Ingen prosjekter'
+              }
+              description={
+                tab === 'arkiv'
+                  ? 'Arkiverte prosjekter dukker opp her.'
+                  : 'Lag det første prosjektet med + nede til høyre.'
+              }
+            />
+          ) : (
+            <div className="space-y-3">
+              {projectList.map((p) => (
+                <ProjectCard key={p.id} project={p} />
+              ))}
+            </div>
           )}
         </div>
       </main>
+
+      {tab !== 'arkiv' && (
+        <BottomSheet>
+          <BottomSheetTrigger asChild>
+            <FAB aria-label="Nytt prosjekt">
+              <Plus className="h-6 w-6" strokeWidth={2.5} />
+            </FAB>
+          </BottomSheetTrigger>
+          <BottomSheetContent>
+            <BottomSheetTitle>Nytt prosjekt</BottomSheetTitle>
+            <form action={createProject} className="space-y-3">
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                  Navn
+                </label>
+                <Input
+                  name="name"
+                  type="text"
+                  required
+                  autoFocus
+                  placeholder="F.eks. Sommerturnering 2026"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                  Beskrivelse (valgfri)
+                </label>
+                <Textarea name="description" rows={3} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                    Frist
+                  </label>
+                  <Input name="deadline" type="date" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                    Farge
+                  </label>
+                  <Select name="coverColor" defaultValue="gold">
+                    <option value="gold">Gull</option>
+                    <option value="teal">Turkis</option>
+                    <option value="red">Rød</option>
+                    <option value="black">Sort</option>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex gap-2 pt-2">
+                <BottomSheetClose asChild>
+                  <Button type="button" variant="secondary" fullWidth>
+                    Avbryt
+                  </Button>
+                </BottomSheetClose>
+                <Button type="submit" variant="primary" fullWidth>
+                  Opprett
+                </Button>
+              </div>
+            </form>
+          </BottomSheetContent>
+        </BottomSheet>
+      )}
+
       <BottomNav role={session.user.role} />
     </>
   )
