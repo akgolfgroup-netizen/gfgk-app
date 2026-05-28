@@ -19,10 +19,12 @@ export default async function AdminPage() {
             {[
               { href: '/admin/ansatte', title: 'Ansatte', desc: 'Inviter og administrer ansatte.' },
               { href: '/admin/vaktliste', title: 'Vaktliste', desc: 'Lag og publiser vaktlister.' },
+              { href: '/admin/sjekklister', title: 'Sjekklister', desc: 'Daglige rutiner og protokoller.' },
+              { href: '/admin/annonseringer', title: 'Annonseringer', desc: 'Beskjeder til alle eller utvalgte.' },
+              { href: '/admin/hendelser', title: 'Hendelser', desc: 'Klager, maskinfeil og observasjoner fra vakter.' },
               { href: '/admin/budsjett', title: 'Budsjett', desc: 'Inntekter, utgifter og rapporter.' },
               { href: '/admin/lonn', title: 'Lønn', desc: 'Timesatser og lønnskostnader.' },
               { href: '/admin/rapporter', title: 'Rapporter', desc: 'Statistikk og månedlig oversikt.' },
-              { href: '/admin/prosjekter', title: 'Prosjekter', desc: 'Prosjekter og oppgaver.' },
             ].map((item) => (
               <Link
                 key={item.href}
