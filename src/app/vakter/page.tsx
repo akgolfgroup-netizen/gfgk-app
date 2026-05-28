@@ -1,135 +1,227 @@
 import { and, asc, eq, gte, lte } from 'drizzle-orm'
-import Link from 'next/link'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { getDb } from '@/db'
-import { shifts } from '@/db/schema'
+import { shifts, timeOff } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
-import { toDateString } from '@/lib/dates'
+import { CalendarDay } from '@/components/calendar/CalendarDay'
+import { CalendarMonth, type CalendarEvent } from '@/components/calendar/CalendarMonth'
+import { CalendarWeek, type CalendarTimedEvent } from '@/components/calendar/CalendarWeek'
+import { CalendarYear } from '@/components/calendar/CalendarYear'
+import {
+  ViewToggle,
+  parseView,
+  type CalendarView,
+} from '@/components/calendar/ViewToggle'
+import { PageHeader } from '@/components/ui/PageHeader'
+import {
+  endOfMonth,
+  endOfWeek,
+  endOfYear,
+  formatNorwegianMonthYear,
+  isoWeek,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+  toDateString,
+} from '@/lib/calendar'
 
-const WEEKDAYS = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn']
-const MONTHS = ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember']
+interface PageProps {
+  searchParams: Promise<{ view?: string; date?: string }>
+}
 
-export default async function VakterPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ mnd?: string }>
-}) {
-  const [{ mnd }, session] = await Promise.all([searchParams, auth()])
+export default async function VakterPage({ searchParams }: PageProps) {
+  const session = await auth()
   if (!session?.user) redirect('/login')
 
-  const now = new Date()
-  const [year, month] = ((): [number, number] => {
-    if (mnd) {
-      const parts = mnd.split('-')
-      return [Number(parts[0]), Number(parts[1])]
-    }
-    return [now.getFullYear(), now.getMonth() + 1]
-  })()
+  const { view: viewParam, date: dateParam } = await searchParams
+  const view: CalendarView = parseView(viewParam)
+  const refDate = dateParam ? new Date(dateParam + 'T00:00:00') : new Date()
 
-  const monthStart = `${year}-${String(month).padStart(2, '0')}-01`
-  const lastDay = new Date(year, month, 0).getDate()
-  const monthEnd = `${year}-${String(month).padStart(2, '0')}-${lastDay}`
-
-  const prevMnd = (() => { const d = new Date(year, month - 2, 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` })()
-  const nextMnd = (() => { const d = new Date(year, month, 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` })()
-
-  const myShifts = await getDb()
-    .select({
-      id: shifts.id,
-      date: shifts.date,
-      startTime: shifts.startTime,
-      endTime: shifts.endTime,
-      note: shifts.note,
-    })
-    .from(shifts)
-    .where(and(eq(shifts.userId, session.user.id), eq(shifts.published, true), gte(shifts.date, monthStart), lte(shifts.date, monthEnd)))
-    .orderBy(asc(shifts.date), asc(shifts.startTime))
-
-  const firstWeekday = (new Date(year, month - 1, 1).getDay() + 6) % 7
-  const cells: Array<{ day: number | null; date: string | null; shiftsForDay: typeof myShifts }> = []
-  for (let i = 0; i < firstWeekday; i++) cells.push({ day: null, date: null, shiftsForDay: [] })
-  for (let d = 1; d <= lastDay; d++) {
-    const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-    cells.push({ day: d, date: dateStr, shiftsForDay: myShifts.filter((s) => s.date === dateStr) })
+  let from: Date
+  let to: Date
+  if (view === 'dag') {
+    from = new Date(refDate)
+    from.setHours(0, 0, 0, 0)
+    to = new Date(refDate)
+    to.setHours(23, 59, 59, 999)
+  } else if (view === 'uke') {
+    from = startOfWeek(refDate)
+    to = endOfWeek(refDate)
+  } else if (view === 'ar') {
+    from = startOfYear(refDate)
+    to = endOfYear(refDate)
+  } else {
+    from = startOfMonth(refDate)
+    to = endOfMonth(refDate)
   }
-  while (cells.length % 7 !== 0) cells.push({ day: null, date: null, shiftsForDay: [] })
 
-  const today = toDateString(now)
-  const totalShifts = myShifts.length
-  const monthName = MONTHS[month - 1]
+  const fromStr = toDateString(from)
+  const toStr = toDateString(to)
+
+  const db = getDb()
+  const [myShifts, myTimeOff] = await Promise.all([
+    db
+      .select()
+      .from(shifts)
+      .where(
+        and(
+          eq(shifts.userId, session.user.id),
+          eq(shifts.published, true),
+          gte(shifts.date, fromStr),
+          lte(shifts.date, toStr),
+        ),
+      )
+      .orderBy(asc(shifts.date), asc(shifts.startTime)),
+    db
+      .select()
+      .from(timeOff)
+      .where(
+        and(
+          eq(timeOff.userId, session.user.id),
+          eq(timeOff.status, 'approved'),
+          lte(timeOff.startDate, toStr),
+          gte(timeOff.endDate, fromStr),
+        ),
+      ),
+  ])
+
+  // Beregn forrige/neste
+  const prev = new Date(refDate)
+  const next = new Date(refDate)
+  if (view === 'dag') {
+    prev.setDate(prev.getDate() - 1)
+    next.setDate(next.getDate() + 1)
+  } else if (view === 'uke') {
+    prev.setDate(prev.getDate() - 7)
+    next.setDate(next.getDate() + 7)
+  } else if (view === 'ar') {
+    prev.setFullYear(prev.getFullYear() - 1)
+    next.setFullYear(next.getFullYear() + 1)
+  } else {
+    prev.setMonth(prev.getMonth() - 1)
+    next.setMonth(next.getMonth() + 1)
+  }
+
+  const title =
+    view === 'dag'
+      ? refDate.toLocaleDateString('nb-NO', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+        })
+      : view === 'uke'
+        ? `Uke ${isoWeek(refDate)} · ${refDate.getFullYear()}`
+        : view === 'ar'
+          ? String(refDate.getFullYear())
+          : formatNorwegianMonthYear(refDate)
+
+  // Bygg events for kalender-komponentene
+  const monthEvents: CalendarEvent[] = []
+  for (const s of myShifts) {
+    monthEvents.push({ id: s.id, date: s.date, tone: 'gold' })
+  }
+  for (const t of myTimeOff) {
+    // Expand ferie-periode til dager
+    const start = new Date(t.startDate + 'T00:00:00')
+    const end = new Date(t.endDate + 'T00:00:00')
+    for (
+      const d = new Date(start);
+      d <= end;
+      d.setDate(d.getDate() + 1)
+    ) {
+      monthEvents.push({ id: `${t.id}-${toDateString(d)}`, date: toDateString(d), tone: 'red' })
+    }
+  }
+
+  const timedEvents: CalendarTimedEvent[] = myShifts.map((s) => ({
+    id: s.id,
+    date: s.date,
+    startTime: s.startTime,
+    endTime: s.endTime,
+    title: s.note ?? 'Vakt',
+    tone: 'gold' as const,
+  }))
 
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <header className="bg-gfgk-black px-6 pt-safe pb-6">
-          <div className="pt-4">
-            <h1 className="text-2xl font-extrabold tracking-tight text-gfgk-gold">Mine vakter</h1>
-            <p className="text-sm text-white/50 mt-0.5 capitalize">{monthName} {year} · {totalShifts} {totalShifts === 1 ? 'vakt' : 'vakter'}</p>
-          </div>
-        </header>
+        <PageHeader title="Mine vakter" subtitle={`${myShifts.length} vakter`} />
 
-        <div className="px-6 pt-6 space-y-6">
-          <div className="flex items-center justify-between">
-            <Link href={`/vakter?mnd=${prevMnd}`} className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-[0_1px_2px_rgba(0,0,0,.06)]">←</Link>
-            <span className="text-sm font-bold capitalize text-gfgk-text">{monthName} {year}</span>
-            <Link href={`/vakter?mnd=${nextMnd}`} className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-[0_1px_2px_rgba(0,0,0,.06)]">→</Link>
-          </div>
-
-          <div className="overflow-hidden rounded-lg border border-gfgk-border bg-white shadow-[0_1px_2px_rgba(0,0,0,.06)]">
-            <div className="grid grid-cols-7 bg-gfgk-black">
-              {WEEKDAYS.map((d) => (
-                <div key={d} className="text-center py-2 text-[10px] font-extrabold uppercase tracking-wide text-gfgk-gold">
-                  {d}
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7">
-              {cells.map((cell, i) => {
-                const isToday = cell.date === today
-                const hasShifts = cell.shiftsForDay.length > 0
-                return (
-                  <div
-                    key={i}
-                    className={`min-h-[64px] border-b border-r border-gfgk-border p-1.5 ${
-                      cell.day === null ? 'bg-gfgk-cream-deep/40' : ''
-                    } ${isToday ? 'bg-gfgk-gold-light' : ''}`}
-                  >
-                    {cell.day !== null && (
-                      <>
-                        <div className={`text-xs font-semibold ${isToday ? 'text-gfgk-gold-deep' : 'text-gfgk-text-2'}`}>
-                          {cell.day}
-                        </div>
-                        {hasShifts && (
-                          <div className="mt-1 space-y-0.5">
-                            {cell.shiftsForDay.map((s) => (
-                              <div key={s.id} className="rounded bg-gfgk-gold px-1 py-0.5 text-[9px] font-bold text-gfgk-black truncate">
-                                {s.startTime.slice(0, 5)}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                )
-              })}
+        <div className="space-y-4 px-6 pt-4">
+          <div className="flex items-center justify-between gap-3">
+            <ViewToggle current={view} baseHref="/vakter" />
+            <div className="flex items-center gap-1">
+              <a
+                href={`/vakter?view=${view}&date=${toDateString(prev)}`}
+                className="rounded-md border border-gfgk-border bg-white p-2 text-gfgk-text-2 hover:bg-gfgk-cream-deep"
+                aria-label="Forrige"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </a>
+              <a
+                href={`/vakter?view=${view}&date=${toDateString(new Date())}`}
+                className="rounded-md border border-gfgk-border bg-white px-3 py-1.5 text-xs font-semibold text-gfgk-text hover:bg-gfgk-cream-deep"
+              >
+                I dag
+              </a>
+              <a
+                href={`/vakter?view=${view}&date=${toDateString(next)}`}
+                className="rounded-md border border-gfgk-border bg-white p-2 text-gfgk-text-2 hover:bg-gfgk-cream-deep"
+                aria-label="Neste"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </a>
             </div>
           </div>
 
-          {myShifts.length > 0 && (
+          <h2 className="text-sm font-bold capitalize text-gfgk-text">{title}</h2>
+
+          {view === 'dag' && <CalendarDay date={refDate} events={timedEvents} />}
+          {view === 'uke' && (
+            <CalendarWeek
+              weekStart={startOfWeek(refDate)}
+              events={timedEvents}
+              baseHref="/vakter"
+            />
+          )}
+          {view === 'maned' && (
+            <CalendarMonth
+              year={refDate.getFullYear()}
+              month={refDate.getMonth() + 1}
+              events={monthEvents}
+              baseHref="/vakter"
+            />
+          )}
+          {view === 'ar' && (
+            <CalendarYear
+              year={refDate.getFullYear()}
+              events={monthEvents}
+              baseHref="/vakter"
+            />
+          )}
+
+          {(view === 'maned' || view === 'ar') && myShifts.length > 0 && (
             <section>
-              <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
+              <h3 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
                 <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
                 Detaljer
-              </h2>
+              </h3>
               <div className="space-y-2">
                 {myShifts.map((s) => (
-                  <div key={s.id} className="rounded-lg border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)]">
-                    <p className="text-sm font-semibold text-gfgk-text capitalize">
-                      {new Date(s.date + 'T00:00:00').toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long' })}
+                  <div
+                    key={s.id}
+                    className="rounded-lg border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+                  >
+                    <p className="text-sm font-semibold capitalize text-gfgk-text">
+                      {new Date(s.date + 'T00:00:00').toLocaleDateString('nb-NO', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                      })}
                     </p>
-                    <p className="text-sm text-gfgk-text-2 mt-0.5">
+                    <p className="mt-0.5 text-sm text-gfgk-text-2">
                       {s.startTime}–{s.endTime}
                       {s.note ? ` · ${s.note}` : ''}
                     </p>

@@ -22,6 +22,9 @@ import {
   uploadAvatarAction,
 } from '@/lib/profile'
 import { createTimeEntry, deleteTimeEntry } from '@/lib/timeEntries'
+import { cancelTimeOff, listUpcomingTimeOff, requestTimeOff } from '@/lib/time-off'
+import { Pill } from '@/components/ui/Pill'
+import { Select } from '@/components/ui/Select'
 
 async function signOutAction() {
   'use server'
@@ -59,6 +62,7 @@ export default async function ProfilPage() {
 
   const totalHours = myMonthEntries.reduce((s, e) => s + parseFloat(e.hours), 0)
   const preferredShifts = me.preferredShifts ?? []
+  const upcomingTimeOff = await listUpcomingTimeOff(me.id)
 
   return (
     <>
@@ -292,6 +296,92 @@ export default async function ProfilPage() {
                 </div>
                 <Button type="submit" fullWidth size="lg">
                   Registrer timer
+                </Button>
+              </form>
+            </Card>
+          </section>
+
+          {/* Ferie */}
+          <section>
+            <SectionLabel>Ferie og fri</SectionLabel>
+            <Card padding="md" className="space-y-3">
+              {upcomingTimeOff.length > 0 && (
+                <div className="space-y-2">
+                  {upcomingTimeOff.map((t) => {
+                    const start = new Date(t.startDate + 'T00:00:00')
+                    const end = new Date(t.endDate + 'T00:00:00')
+                    const tone =
+                      t.status === 'approved'
+                        ? 'teal'
+                        : t.status === 'declined'
+                          ? 'red'
+                          : 'gold'
+                    const label =
+                      t.status === 'approved'
+                        ? 'Godkjent'
+                        : t.status === 'declined'
+                          ? 'Avvist'
+                          : 'Venter'
+                    return (
+                      <div
+                        key={t.id}
+                        className="flex items-center justify-between gap-2 rounded-lg border border-gfgk-border bg-white p-2"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-gfgk-text">
+                            {start.toLocaleDateString('nb-NO', {
+                              day: 'numeric',
+                              month: 'short',
+                            })}
+                            {' – '}
+                            {end.toLocaleDateString('nb-NO', {
+                              day: 'numeric',
+                              month: 'short',
+                            })}
+                          </p>
+                          <p className="text-xs text-gfgk-text-2 capitalize">
+                            {t.type}
+                            {t.note ? ` · ${t.note}` : ''}
+                          </p>
+                        </div>
+                        <Pill tone={tone} size="sm">
+                          {label}
+                        </Pill>
+                        {t.status === 'pending' && (
+                          <form
+                            action={async () => {
+                              'use server'
+                              await cancelTimeOff(t.id)
+                            }}
+                          >
+                            <ConfirmButton
+                              message="Avbryt forespørsel?"
+                              className="rounded-md px-2 py-1 text-xs font-semibold text-gfgk-red-deep hover:bg-gfgk-red-light"
+                            >
+                              Avbryt
+                            </ConfirmButton>
+                          </form>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              <form action={requestTimeOff} className="space-y-2">
+                <p className="text-sm font-semibold text-gfgk-text">Ny forespørsel</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input name="startDate" type="date" required />
+                  <Input name="endDate" type="date" required />
+                </div>
+                <Select name="type" defaultValue="ferie">
+                  <option value="ferie">Ferie</option>
+                  <option value="sykemelding">Sykemelding</option>
+                  <option value="permisjon">Permisjon</option>
+                </Select>
+                <Input name="note" type="text" placeholder="Notat (valgfri)" />
+                <Button type="submit" size="sm" fullWidth>
+                  Send forespørsel
                 </Button>
               </form>
             </Card>

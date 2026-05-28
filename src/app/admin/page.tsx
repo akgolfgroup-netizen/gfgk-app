@@ -19,6 +19,7 @@ export default async function AdminPage() {
             {[
               { href: '/admin/ansatte', title: 'Ansatte', desc: 'Inviter og administrer ansatte.' },
               { href: '/admin/vaktliste', title: 'Vaktliste', desc: 'Lag og publiser vaktlister.' },
+              { href: '/admin/aktiviteter', title: 'Aktiviteter', desc: 'Turneringer, kurs og events i kalenderen.' },
               { href: '/admin/budsjett', title: 'Budsjett', desc: 'Inntekter, utgifter og rapporter.' },
               { href: '/admin/lonn', title: 'Lønn', desc: 'Timesatser og lønnskostnader.' },
               { href: '/admin/rapporter', title: 'Rapporter', desc: 'Statistikk og månedlig oversikt.' },
