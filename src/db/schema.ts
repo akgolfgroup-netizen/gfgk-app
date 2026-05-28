@@ -2,6 +2,8 @@ import { boolean, date, decimal, integer, pgEnum, pgTable, text, timestamp, uuid
 
 export const roleEnum = pgEnum('user_role', ['admin', 'ansatt'])
 
+export const preferredShiftEnum = pgEnum('preferred_shift', ['morgen', 'ettermiddag', 'kveld'])
+
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: text('email').notNull().unique(),
@@ -9,6 +11,12 @@ export const users = pgTable('users', {
   name: text('name'),
   role: roleEnum('role').notNull().default('ansatt'),
   hourlyRate: integer('hourly_rate'),
+  phone: text('phone'),
+  avatarUrl: text('avatar_url'),
+  stillingsprosent: integer('stillingsprosent'),
+  timerPerUke: decimal('timer_per_uke', { precision: 4, scale: 1 }),
+  preferredShifts: preferredShiftEnum('preferred_shifts').array(),
+  active: boolean('active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 

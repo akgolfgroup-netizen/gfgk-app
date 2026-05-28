@@ -45,14 +45,18 @@ export default async function AnsattePage() {
             </h2>
             <div className="space-y-2">
               {allUsers.map((user) => (
-                <div
+                <a
                   key={user.id}
-                  className="rounded-lg border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+                  href={`/admin/ansatte/${user.id}`}
+                  className="block rounded-lg border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <p className="font-semibold text-gfgk-text">{user.name ?? user.email}</p>
                   {user.name && <p className="text-sm text-gfgk-text-2">{user.email}</p>}
-                  <p className="mt-1 text-xs text-gfgk-text-3 uppercase tracking-wide">{user.role}</p>
-                </div>
+                  <p className="mt-1 text-xs text-gfgk-text-3 uppercase tracking-wide">
+                    {user.role}
+                    {!user.active && ' · Inaktiv'}
+                  </p>
+                </a>
               ))}
             </div>
           </section>
