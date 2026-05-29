@@ -88,6 +88,13 @@ export default async function VaktlistePage({
             </Link>
           </div>
 
+          <Link
+            href={`/admin/vaktliste/generer?uke=${weekStart}`}
+            className="mb-3 block w-full rounded-md border-2 border-gfgk-black bg-white py-3 text-center text-sm font-bold text-gfgk-text hover:bg-gfgk-black hover:text-white transition-colors"
+          >
+            Auto-generer vakter →
+          </Link>
+
           {hasUnpublished && (
             <form action={publishWeek.bind(null, weekStart)} className="mb-6">
               <button

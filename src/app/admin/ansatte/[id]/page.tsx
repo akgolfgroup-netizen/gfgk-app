@@ -18,6 +18,7 @@ import {
   toggleEmployeeActive,
   updateEmployee,
 } from '@/lib/users-admin'
+import { listAllTimeOff, setTimeOffStatus } from '@/lib/time-off'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -33,6 +34,7 @@ export default async function AnsattDetaljPage({ params }: PageProps) {
 
   const isSelf = session.user.id === user.id
   const preferred = user.preferredShifts ?? []
+  const timeOffRows = await listAllTimeOff(user.id)
 
   return (
     <>
@@ -171,6 +173,81 @@ export default async function AnsattDetaljPage({ params }: PageProps) {
               </form>
             </Card>
           </section>
+
+          {/* Ferie og fri */}
+          {timeOffRows.length > 0 && (
+            <section>
+              <SectionLabel>Ferie og fri</SectionLabel>
+              <Card padding="md" className="space-y-2">
+                {timeOffRows.map((t) => {
+                  const start = new Date(t.startDate + 'T00:00:00')
+                  const end = new Date(t.endDate + 'T00:00:00')
+                  const tone =
+                    t.status === 'approved'
+                      ? 'teal'
+                      : t.status === 'declined'
+                        ? 'red'
+                        : 'gold'
+                  return (
+                    <div
+                      key={t.id}
+                      className="flex items-center justify-between gap-2 rounded-lg border border-gfgk-border bg-white p-2"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gfgk-text">
+                          {start.toLocaleDateString('nb-NO', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                          {' – '}
+                          {end.toLocaleDateString('nb-NO', {
+                            day: 'numeric',
+                            month: 'short',
+                          })}
+                        </p>
+                        <p className="text-xs text-gfgk-text-2 capitalize">
+                          {t.type}
+                          {t.note ? ` · ${t.note}` : ''}
+                        </p>
+                      </div>
+                      <Pill tone={tone} size="sm">
+                        {t.status === 'approved'
+                          ? 'Godkjent'
+                          : t.status === 'declined'
+                            ? 'Avvist'
+                            : 'Venter'}
+                      </Pill>
+                      {t.status === 'pending' && (
+                        <div className="flex gap-1">
+                          <form
+                            action={async () => {
+                              'use server'
+                              await setTimeOffStatus(t.id, 'approved')
+                            }}
+                          >
+                            <Button type="submit" size="sm" variant="primary">
+                              OK
+                            </Button>
+                          </form>
+                          <form
+                            action={async () => {
+                              'use server'
+                              await setTimeOffStatus(t.id, 'declined')
+                            }}
+                          >
+                            <Button type="submit" size="sm" variant="destructive">
+                              Avvis
+                            </Button>
+                          </form>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </Card>
+            </section>
+          )}
 
           {/* Farlig sone */}
           {!isSelf && (
