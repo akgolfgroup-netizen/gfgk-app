@@ -15,6 +15,13 @@
       "when": 1779957781057,
       "tag": "0001_users_extended",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780061952000,
+      "tag": "0002_kunnskap_inbox",
+      "breakpoints": true
     }
   ]
 }
