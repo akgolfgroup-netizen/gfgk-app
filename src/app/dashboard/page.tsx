@@ -6,6 +6,7 @@ import { auth } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
 import { AnnouncementBanner } from '@/components/blocks/AnnouncementBanner'
 import { ClockButton } from '@/components/blocks/ClockButton'
+import { InstallPrompt } from '@/components/blocks/InstallPrompt'
 import { getDb } from '@/db'
 import { checklistRunItems, checklistRuns, checklists, shifts } from '@/db/schema'
 import { getDashboardBannerItems, markAnnouncementRead } from '@/lib/announcements'
@@ -93,6 +94,9 @@ export default async function DashboardPage() {
         </header>
 
         <div className="space-y-6 px-6 pt-6">
+          {/* Install-prompt (PWA) */}
+          <InstallPrompt />
+
           {/* Annonseringer */}
           {announcementItems.length > 0 && (
             <AnnouncementBanner

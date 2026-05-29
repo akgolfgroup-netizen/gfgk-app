@@ -301,9 +301,9 @@ export default async function ProfilPage() {
             </Card>
           </section>
 
-          {/* Mine dokumenter */}
-          <section>
-            <SectionLabel>Dokumenter</SectionLabel>
+          {/* Mine dokumenter + varsler */}
+          <section className="space-y-3">
+            <SectionLabel>Mer</SectionLabel>
             <Card padding="md" interactive>
               <a
                 href="/profil/dokumenter"
@@ -312,6 +312,15 @@ export default async function ProfilPage() {
                 <span className="text-sm font-semibold text-gfgk-text">
                   Mine dokumenter
                 </span>
+                <span className="text-sm text-gfgk-text-2">Åpne →</span>
+              </a>
+            </Card>
+            <Card padding="md" interactive>
+              <a
+                href="/profil/varsler"
+                className="flex items-center justify-between"
+              >
+                <span className="text-sm font-semibold text-gfgk-text">Varsler</span>
                 <span className="text-sm text-gfgk-text-2">Åpne →</span>
               </a>
             </Card>

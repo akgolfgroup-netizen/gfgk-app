@@ -19,7 +19,11 @@ export const MONTHS_NB = [
 ] as const
 
 export function toDateString(d: Date): string {
-  return d.toISOString().slice(0, 10)
+  // Lokal-basert (ikke UTC) — ellers forskyves kalenderdatoer i tidssoner øst for UTC.
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
 /**

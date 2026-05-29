@@ -1,15 +1,19 @@
 {
-  "name": "GFGK",
+  "name": "GFGK — Gamle Fredrikstad Golfklubb",
   "short_name": "GFGK",
-  "description": "AK Golf Group",
-  "start_url": "/",
+  "description": "Internt arbeidsverktøy for GFGK-ansatte: vakter, oppgaver, kalender og kunnskap.",
+  "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#0a0a0a",
+  "background_color": "#0A0A0A",
+  "theme_color": "#F5C518",
+  "lang": "no",
+  "categories": ["productivity", "business"],
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

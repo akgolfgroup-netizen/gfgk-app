@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { timeOff, type TimeOffStatus, type TimeOffType } from '@/db/schema'
+import { notifyTimeOffDecision } from '@/lib/notifications'
 
 const VALID_TYPES: TimeOffType[] = ['ferie', 'sykemelding', 'permisjon']
 const VALID_STATUSES: TimeOffStatus[] = ['pending', 'approved', 'declined']
@@ -61,6 +62,10 @@ export async function setTimeOffStatus(id: string, status: TimeOffStatus): Promi
     .update(timeOff)
     .set({ status, approvedBy: session.user.id })
     .where(eq(timeOff.id, id))
+
+  if (status === 'approved' || status === 'declined') {
+    await notifyTimeOffDecision(row.userId, status === 'approved')
+  }
 
   revalidatePath('/profil')
   revalidatePath(`/admin/ansatte/${row.userId}`)

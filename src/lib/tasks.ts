@@ -17,6 +17,7 @@ import {
 } from '@/db/schema'
 import { deleteBlobByUrl, uploadTaskAttachment } from '@/lib/blob'
 import { sendEmail, taskAssignedEmailHtml } from '@/lib/email'
+import { notifyTaskAssigned } from '@/lib/notifications'
 
 const VALID_STATUSES: TaskStatus[] = ['todo', 'in_progress', 'waiting', 'done']
 const VALID_PRIORITIES: TaskPriority[] = ['low', 'medium', 'high']
@@ -268,6 +269,7 @@ export async function assignTask(taskId: string, userId: string): Promise<void> 
         taskId,
       }),
     })
+    await notifyTaskAssigned(userId, task.title, taskId)
   }
 
   revalidatePath(`/oppgaver/${taskId}`)
