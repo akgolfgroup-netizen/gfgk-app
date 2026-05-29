@@ -297,6 +297,22 @@ export default async function ProfilPage() {
             </Card>
           </section>
 
+          {/* Mine dokumenter */}
+          <section>
+            <SectionLabel>Dokumenter</SectionLabel>
+            <Card padding="md" interactive>
+              <a
+                href="/profil/dokumenter"
+                className="flex items-center justify-between"
+              >
+                <span className="text-sm font-semibold text-gfgk-text">
+                  Mine dokumenter
+                </span>
+                <span className="text-sm text-gfgk-text-2">Åpne →</span>
+              </a>
+            </Card>
+          </section>
+
           {/* Logg ut */}
           <section>
             <form action={signOutAction}>

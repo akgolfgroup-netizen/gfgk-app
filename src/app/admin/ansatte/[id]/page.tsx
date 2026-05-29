@@ -67,6 +67,16 @@ export default async function AnsattDetaljPage({ params }: PageProps) {
             )}
           </section>
 
+          {/* Rask-lenker */}
+          <section className="grid grid-cols-2 gap-2">
+            <a
+              href={`/admin/ansatte/${user.id}/dokumenter`}
+              className="rounded-xl border border-gfgk-border bg-white px-4 py-3 text-center text-sm font-semibold text-gfgk-text transition-colors hover:bg-gfgk-cream-deep"
+            >
+              Dokumenter →
+            </a>
+          </section>
+
           {/* Rediger felter */}
           <section>
             <SectionLabel>Rediger ansatt</SectionLabel>

@@ -5,6 +5,8 @@ import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { shifts } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
+import { ShiftEventForm } from '@/components/blocks/ShiftEventForm'
+import { logShiftEvent } from '@/lib/shift-events'
 import { toDateString } from '@/lib/dates'
 
 const WEEKDAYS = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn']
@@ -138,6 +140,11 @@ export default async function VakterPage({
               </div>
             </section>
           )}
+
+          {/* Loggfør hendelse fra denne måneden */}
+          <section>
+            <ShiftEventForm shiftId={null} onLog={logShiftEvent} />
+          </section>
         </div>
       </main>
       <BottomNav role={session.user.role} />
