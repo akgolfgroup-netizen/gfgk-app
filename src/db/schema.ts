@@ -428,6 +428,68 @@ export const activities = pgTable('activities', {
 })
 
 // ============================================================
+// Sub-prosjekt D: Kunnskapsbank + AI Inbox
+// ============================================================
+
+export const articleCategoryEnum = pgEnum('article_category', [
+  'medlemskap',
+  'drift',
+  'faq',
+  'prosedyrer',
+  'annet',
+])
+
+export const articles = pgTable('articles', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  slug: text('slug').notNull().unique(),
+  title: text('title').notNull(),
+  category: articleCategoryEnum('category').notNull().default('annet'),
+  body: text('body').notNull(), // markdown
+  published: boolean('published').notNull().default(true),
+  createdBy: uuid('created_by')
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedBy: uuid('updated_by').references(() => users.id),
+})
+
+export const inboxStatusEnum = pgEnum('inbox_status', [
+  'new',
+  'draft_ready',
+  'sent',
+  'manual',
+  'archived',
+])
+
+export const inboxMessages = pgTable('inbox_messages', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  externalId: text('external_id').notNull().unique(),
+  fromEmail: text('from_email').notNull(),
+  fromName: text('from_name'),
+  toEmail: text('to_email').notNull(),
+  subject: text('subject').notNull(),
+  bodyText: text('body_text'),
+  bodyHtml: text('body_html'),
+  receivedAt: timestamp('received_at', { withTimezone: true }).notNull(),
+  status: inboxStatusEnum('status').notNull().default('new'),
+  aiDraft: text('ai_draft'),
+  aiSkillUsed: text('ai_skill_used'),
+  sentAt: timestamp('sent_at', { withTimezone: true }),
+  sentBy: uuid('sent_by').references(() => users.id),
+  threadId: text('thread_id'),
+})
+
+export const inboxSkills = pgTable('inbox_skills', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  prompt: text('prompt').notNull(),
+  exampleResponse: text('example_response'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+// ============================================================
 // Types
 // ============================================================
 
@@ -476,3 +538,10 @@ export type ShiftTemplate = typeof shiftTemplates.$inferSelect
 export type Activity = typeof activities.$inferSelect
 export type ActivityType = (typeof activityTypeEnum.enumValues)[number]
 export type ActivitySource = (typeof activitySourceEnum.enumValues)[number]
+
+// D-types
+export type Article = typeof articles.$inferSelect
+export type ArticleCategory = (typeof articleCategoryEnum.enumValues)[number]
+export type InboxMessage = typeof inboxMessages.$inferSelect
+export type InboxStatus = (typeof inboxStatusEnum.enumValues)[number]
+export type InboxSkill = typeof inboxSkills.$inferSelect
