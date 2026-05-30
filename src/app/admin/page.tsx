@@ -5,6 +5,7 @@ import {
   Banknote,
   CalendarDays,
   CalendarPlus,
+  Handshake,
   Inbox,
   ListChecks,
   Megaphone,
@@ -25,6 +26,7 @@ const ITEMS: Array<{
   icon: LucideIcon
 }> = [
   { href: '/admin/ansatte', title: 'Ansatte', desc: 'Inviter og administrer ansatte', icon: Users },
+  { href: '/admin/sponsorer', title: 'Sponsorer', desc: 'Avtaler, verdi og oppfølging', icon: Handshake },
   { href: '/admin/vaktliste', title: 'Vaktliste', desc: 'Lag og publiser vaktlister', icon: CalendarDays },
   { href: '/admin/sjekklister', title: 'Sjekklister', desc: 'Daglige rutiner og protokoller', icon: ListChecks },
   { href: '/admin/annonseringer', title: 'Annonseringer', desc: 'Beskjeder til alle eller utvalgte', icon: Megaphone },

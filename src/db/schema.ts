@@ -508,6 +508,77 @@ export const pushSubscriptions = pgTable('push_subscriptions', {
 })
 
 // ============================================================
+// Sponsorer
+// ============================================================
+
+export const sponsorTierEnum = pgEnum('sponsor_tier', [
+  'hovedsponsor',
+  'gull',
+  'solv',
+  'partner',
+])
+export const sponsorStatusEnum = pgEnum('sponsor_status', [
+  'prospekt',
+  'aktiv',
+  'utlopt',
+])
+
+export const sponsors = pgTable('sponsors', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  tier: sponsorTierEnum('tier').notNull().default('partner'),
+  status: sponsorStatusEnum('status').notNull().default('aktiv'),
+  orgNr: text('org_nr'),
+  website: text('website'),
+  logoUrl: text('logo_url'),
+  contactName: text('contact_name'),
+  contactEmail: text('contact_email'),
+  contactPhone: text('contact_phone'),
+  notes: text('notes'),
+  createdBy: uuid('created_by')
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const sponsorAgreements = pgTable('sponsor_agreements', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  sponsorId: uuid('sponsor_id')
+    .notNull()
+    .references(() => sponsors.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  valuePerYear: integer('value_per_year').notNull().default(0),
+  startDate: date('start_date'),
+  endDate: date('end_date'),
+  deliverables: text('deliverables'),
+  documentUrl: text('document_url'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const sponsorCommTypeEnum = pgEnum('sponsor_comm_type', [
+  'mote',
+  'epost',
+  'telefon',
+  'annet',
+])
+
+export const sponsorCommunications = pgTable('sponsor_communications', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  sponsorId: uuid('sponsor_id')
+    .notNull()
+    .references(() => sponsors.id, { onDelete: 'cascade' }),
+  type: sponsorCommTypeEnum('type').notNull().default('annet'),
+  summary: text('summary').notNull(),
+  occurredAt: date('occurred_at').notNull(),
+  followUpDate: date('follow_up_date'),
+  createdBy: uuid('created_by')
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+// ============================================================
 // Types
 // ============================================================
 
@@ -566,3 +637,11 @@ export type InboxSkill = typeof inboxSkills.$inferSelect
 
 // E-types
 export type PushSubscription = typeof pushSubscriptions.$inferSelect
+
+// Sponsor-types
+export type Sponsor = typeof sponsors.$inferSelect
+export type SponsorTier = (typeof sponsorTierEnum.enumValues)[number]
+export type SponsorStatus = (typeof sponsorStatusEnum.enumValues)[number]
+export type SponsorAgreement = typeof sponsorAgreements.$inferSelect
+export type SponsorCommunication = typeof sponsorCommunications.$inferSelect
+export type SponsorCommType = (typeof sponsorCommTypeEnum.enumValues)[number]
