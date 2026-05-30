@@ -1,5 +1,5 @@
 import { and, asc, eq, gte, inArray, isNotNull, lte, ne } from 'drizzle-orm'
-import { CheckSquare } from 'lucide-react'
+import { CheckSquare, ClipboardList } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -10,10 +10,19 @@ import { ClockButton } from '@/components/blocks/ClockButton'
 import { InstallPrompt } from '@/components/blocks/InstallPrompt'
 import { TaskBlock } from '@/components/blocks/TaskBlock'
 import { Avatar } from '@/components/ui/Avatar'
+import {
+  BottomSheet,
+  BottomSheetClose,
+  BottomSheetContent,
+  BottomSheetTitle,
+  BottomSheetTrigger,
+} from '@/components/ui/BottomSheet'
+import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 import { KPI } from '@/components/ui/KPI'
 import { SectionLabel } from '@/components/ui/SectionLabel'
+import { Textarea } from '@/components/ui/Textarea'
 import { getDb } from '@/db'
 import {
   checklistRunItems,
@@ -27,6 +36,7 @@ import {
 import { getDashboardBannerItems, markAnnouncementRead } from '@/lib/announcements'
 import { clockIn, clockOut, getActiveClock, getTodayShift } from '@/lib/clock'
 import { formatNorwegianDate, toDateString } from '@/lib/dates'
+import { createHandover, listTodaysHandovers } from '@/lib/handovers'
 import { toggleTaskDone } from '@/lib/tasks'
 
 function greetingForHour(hour: number): string {
@@ -148,6 +158,8 @@ export default async function DashboardPage() {
     if (item.done) cur.done += 1
     progressByRun.set(item.runId, cur)
   }
+
+  const todaysHandovers = await listTodaysHandovers()
 
   // Avledede verdier til hilsen + KPI-strip
   const firstName = session.user.name?.split(' ')[0] ?? ''
@@ -322,6 +334,101 @@ export default async function DashboardPage() {
                 ))}
               </div>
             )}
+          </section>
+
+          {/* Overlevering */}
+          <section>
+            <SectionLabel>Overlevering</SectionLabel>
+            {todaysHandovers.length === 0 ? (
+              <p className="text-sm text-gfgk-text-3">
+                Ingen overlevering i dag ennå.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {todaysHandovers.map((h) => (
+                  <Card key={h.id} padding="md" accent="gold" className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Avatar
+                        size="sm"
+                        src={h.fromAvatar}
+                        name={h.fromName}
+                        email={h.fromEmail}
+                      />
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gfgk-text">
+                          {h.fromName ?? h.fromEmail}
+                        </p>
+                        <p className="font-mono-nums text-xs text-gfgk-text-3">
+                          {h.createdAt.toLocaleTimeString('nb-NO', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="whitespace-pre-wrap text-sm text-gfgk-text">
+                      {h.note}
+                    </p>
+                    {h.openItems && h.openItems.length > 0 && (
+                      <ul className="space-y-1 border-t border-gfgk-border pt-2">
+                        {h.openItems.map((it, i) => (
+                          <li
+                            key={i}
+                            className="flex items-start gap-2 text-sm text-gfgk-text-2"
+                          >
+                            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gfgk-gold" />
+                            {it}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </Card>
+                ))}
+              </div>
+            )}
+            <BottomSheet>
+              <BottomSheetTrigger asChild>
+                <Button variant="secondary" size="sm" className="mt-3">
+                  <ClipboardList className="h-4 w-4" /> Skriv overlevering
+                </Button>
+              </BottomSheetTrigger>
+              <BottomSheetContent>
+                <BottomSheetTitle>Skriv overlevering</BottomSheetTitle>
+                <form action={createHandover} className="space-y-3">
+                  <div>
+                    <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                      Overlevering
+                    </label>
+                    <Textarea
+                      name="note"
+                      rows={3}
+                      required
+                      placeholder="Hva bør neste vakt vite?"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                      Åpne punkter (ett per linje)
+                    </label>
+                    <Textarea
+                      name="openItems"
+                      rows={3}
+                      placeholder={'Range-maskin 2 vakler\nMangler giveaway-baller'}
+                    />
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    <BottomSheetClose asChild>
+                      <Button type="button" variant="secondary" fullWidth>
+                        Avbryt
+                      </Button>
+                    </BottomSheetClose>
+                    <Button type="submit" variant="primary" fullWidth>
+                      Lagre
+                    </Button>
+                  </div>
+                </form>
+              </BottomSheetContent>
+            </BottomSheet>
           </section>
 
           {/* Kommende vakter */}
