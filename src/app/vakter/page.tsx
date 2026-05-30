@@ -1,5 +1,5 @@
 import { and, asc, eq, gte, lte } from 'drizzle-orm'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { CalendarClock, ChevronLeft, ChevronRight } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { getDb } from '@/db'
@@ -16,6 +16,7 @@ import {
   parseView,
   type CalendarView,
 } from '@/components/calendar/ViewToggle'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import {
@@ -207,6 +208,14 @@ export default async function VakterPage({ searchParams }: PageProps) {
               year={refDate.getFullYear()}
               events={monthEvents}
               baseHref="/vakter"
+            />
+          )}
+
+          {myShifts.length === 0 && myTimeOff.length === 0 && (
+            <EmptyState
+              icon={CalendarClock}
+              title="Ingen vakter i denne perioden"
+              description="Du har ingen planlagte vakter her. Publiserte vakter dukker opp i kalenderen så snart de er satt opp."
             />
           )}
 

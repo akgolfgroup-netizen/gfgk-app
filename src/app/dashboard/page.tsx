@@ -1,5 +1,5 @@
 import { and, asc, eq, gte, inArray, isNotNull, lte, ne } from 'drizzle-orm'
-import { CheckSquare, ClipboardList } from 'lucide-react'
+import { CalendarClock, CheckSquare, ClipboardCheck, ClipboardList } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 import { KPI } from '@/components/ui/KPI'
 import { SectionLabel } from '@/components/ui/SectionLabel'
@@ -321,9 +322,11 @@ export default async function DashboardPage() {
           <section>
             <SectionLabel>Mine oppgaver i dag</SectionLabel>
             {myTodayTasks.length === 0 ? (
-              <p className="text-sm text-gfgk-text-3">
-                Ingen oppgaver med frist i dag.
-              </p>
+              <EmptyState
+                icon={CheckSquare}
+                title="Ingen oppgaver i dag"
+                description="Du har ingen oppgaver med frist i dag. Nyt en rolig vakt."
+              />
             ) : (
               <div className="space-y-2">
                 {myTodayTasks.map((t) => (
@@ -352,9 +355,11 @@ export default async function DashboardPage() {
           <section>
             <SectionLabel>Overlevering</SectionLabel>
             {todaysHandovers.length === 0 ? (
-              <p className="text-sm text-gfgk-text-3">
-                Ingen overlevering i dag ennå.
-              </p>
+              <EmptyState
+                icon={ClipboardCheck}
+                title="Ingen overlevering i dag"
+                description="Ingen har skrevet en overlevering i dag ennå. Skriv en under for å gi neste vakt beskjed."
+              />
             ) : (
               <div className="space-y-2">
                 {todaysHandovers.map((h) => (
@@ -447,7 +452,11 @@ export default async function DashboardPage() {
           <section>
             <SectionLabel>Kommende vakter</SectionLabel>
             {rosterShifts.length === 0 ? (
-              <p className="text-sm text-gfgk-text-3">Ingen planlagte vakter.</p>
+              <EmptyState
+                icon={CalendarClock}
+                title="Ingen kommende vakter"
+                description="Det er ingen planlagte vakter fremover. De dukker opp her så snart vaktlisten er publisert."
+              />
             ) : (
               <div className="space-y-2">
                 {rosterShifts.map((shift, i) => (

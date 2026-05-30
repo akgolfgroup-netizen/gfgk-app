@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { and, asc, gte, lte } from 'drizzle-orm'
+import { Receipt } from 'lucide-react'
 import { getDb } from '@/db'
 import { transactions } from '@/db/schema'
 import { Card } from '@/components/ui/Card'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { toDateString } from '@/lib/dates'
@@ -126,6 +128,16 @@ export default async function BudsjettPage({
               <p className="kpi-label mt-0.5 !tracking-wider">kr</p>
             </Card>
           </div>
+
+          {byDate.size === 0 && (
+            <div className="mb-8">
+              <EmptyState
+                icon={Receipt}
+                title="Ingen transaksjoner"
+                description="Det er ikke ført noen inntekter eller utgifter denne måneden ennå. Legg til en transaksjon under."
+              />
+            </div>
+          )}
 
           {byDate.size > 0 && (
             <section className="mb-8">
