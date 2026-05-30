@@ -3,7 +3,8 @@ import { CheckSquare, Files, Plus, UserPlus, Users } from 'lucide-react'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { AppShell } from '@/components/AppShell'
-import { TaskBlock, type TaskBlockData } from '@/components/blocks/TaskBlock'
+import { type TaskBlockData } from '@/components/blocks/TaskBlock'
+import { TaskViews } from '@/components/blocks/TaskViews'
 import {
   BottomSheet,
   BottomSheetClose,
@@ -32,7 +33,7 @@ import {
 } from '@/db/schema'
 import { cn } from '@/lib/cn'
 import { addProjectMember, removeProjectMember } from '@/lib/projects'
-import { createTask, toggleTaskDone } from '@/lib/tasks'
+import { createTask, moveTask, toggleTaskDone } from '@/lib/tasks'
 
 type TabKey = 'oppgaver' | 'filer' | 'medlemmer'
 
@@ -262,18 +263,13 @@ async function OppgaverTab({ projectId }: { projectId: string }) {
     status: t.status,
     priority: t.priority,
     dueDate: t.dueDate,
+    zone: t.zone,
     assignees: assigneeRows
       .filter((a) => a.taskId === t.id)
       .map((a) => ({ name: a.name, email: a.email, src: a.avatarUrl })),
   }))
 
-  return (
-    <div className="space-y-2">
-      {blocks.map((b) => (
-        <TaskBlock key={b.id} task={b} onToggle={toggleTaskDone} />
-      ))}
-    </div>
-  )
+  return <TaskViews tasks={blocks} onMove={moveTask} onToggle={toggleTaskDone} />
 }
 
 // ============================================================
