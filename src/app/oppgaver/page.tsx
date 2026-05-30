@@ -209,6 +209,7 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
     <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <PageHeader title="Oppgaver" />
 
+        <div className="lg:mx-auto lg:max-w-3xl">
         {/* Filter-chips */}
         <div className="px-6 pt-4">
           <ChipBar>
@@ -281,6 +282,7 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
               )}
             </>
           )}
+        </div>
         </div>
 
       <BottomSheet>
@@ -401,7 +403,7 @@ function EmptyPage({
   return (
     <AppShell role={role} userName={userName}>
         <PageHeader title="Oppgaver" />
-        <div className="px-6 pt-12">
+        <div className="px-6 pt-12 lg:mx-auto lg:max-w-3xl">
           <EmptyState
             icon={CheckSquare}
             title="Ingen oppgaver enda"

@@ -28,7 +28,7 @@ export function PageHeader({
       className={cn('bg-gfgk-black px-6 pb-6 pt-safe', className)}
       {...props}
     >
-      <div className="pt-4">
+      <div className="pt-4 lg:mx-auto lg:max-w-6xl">
         {back && (
           <Link
             href={back.href}
