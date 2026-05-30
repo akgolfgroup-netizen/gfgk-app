@@ -1,5 +1,6 @@
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, ClipboardPlus } from 'lucide-react'
 import { auth } from '@/auth'
+import { createTask } from '@/lib/tasks'
 import { BottomNav } from '@/components/BottomNav'
 import { Avatar } from '@/components/ui/Avatar'
 import { Chip, ChipBar } from '@/components/ui/Chip'
@@ -137,6 +138,17 @@ export default async function AdminHendelserPage({ searchParams }: PageProps) {
                     </div>
                   </div>
                   <p className="whitespace-pre-wrap text-sm text-gfgk-text">{e.body}</p>
+                  <form action={createTask} className="mt-3">
+                    <input type="hidden" name="title" value={`Oppfølging: ${e.body.slice(0, 60)}`} />
+                    <input type="hidden" name="description" value={e.body} />
+                    <button
+                      type="submit"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-gfgk-border bg-white px-3 py-1.5 text-xs font-semibold text-gfgk-text transition-colors hover:bg-gfgk-cream-deep"
+                    >
+                      <ClipboardPlus className="h-3.5 w-3.5" />
+                      Lag oppgave
+                    </button>
+                  </form>
                 </article>
               ))}
             </div>
