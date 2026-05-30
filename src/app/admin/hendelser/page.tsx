@@ -139,7 +139,11 @@ export default async function AdminHendelserPage({ searchParams }: PageProps) {
                   </div>
                   <p className="whitespace-pre-wrap text-sm text-gfgk-text">{e.body}</p>
                   <form action={createTask} className="mt-3">
-                    <input type="hidden" name="title" value={`Oppfølging: ${e.body.slice(0, 60)}`} />
+                    <input
+                      type="hidden"
+                      name="title"
+                      value={`Oppfølging: ${e.body.length > 50 ? e.body.slice(0, 50) + '…' : e.body}`}
+                    />
                     <input type="hidden" name="description" value={e.body} />
                     <button
                       type="submit"
