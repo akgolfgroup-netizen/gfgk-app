@@ -4,6 +4,8 @@ import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { transactions } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
+import { Card } from '@/components/ui/Card'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 import { toDateString } from '@/lib/dates'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import { deleteTransaction } from '@/lib/transactions'
@@ -15,6 +17,11 @@ function formatKr(amount: number) {
     currency: 'NOK',
     maximumFractionDigits: 0,
   }).format(amount)
+}
+
+// Kompakt tall uten valuta — til KPI-kort (mono tabulær)
+function formatNum(amount: number) {
+  return new Intl.NumberFormat('nb-NO', { maximumFractionDigits: 0 }).format(amount)
 }
 
 function prevMonth(year: number, month: number) {
@@ -99,40 +106,35 @@ export default async function BudsjettPage({
           </div>
 
           <div className="mb-8 grid grid-cols-3 gap-3">
-            <div className="overflow-hidden rounded-lg border border-gfgk-border shadow-[0_1px_2px_rgba(0,0,0,.06)]">
-              <div className="bg-gfgk-teal-light px-3 py-2 text-center">
-                <p className="text-[10px] font-extrabold uppercase tracking-wide text-gfgk-teal-deep">Inntekter</p>
-              </div>
-              <div className="bg-white px-3 py-2 text-center">
-                <p className="text-sm font-bold text-gfgk-teal-deep">{formatKr(totalInntekt)}</p>
-              </div>
-            </div>
-            <div className="overflow-hidden rounded-lg border border-gfgk-border shadow-[0_1px_2px_rgba(0,0,0,.06)]">
-              <div className="bg-gfgk-red-light px-3 py-2 text-center">
-                <p className="text-[10px] font-extrabold uppercase tracking-wide text-gfgk-red-deep">Utgifter</p>
-              </div>
-              <div className="bg-white px-3 py-2 text-center">
-                <p className="text-sm font-bold text-gfgk-red-deep">{formatKr(totalUtgift)}</p>
-              </div>
-            </div>
-            <div className="overflow-hidden rounded-lg border border-gfgk-border shadow-[0_1px_2px_rgba(0,0,0,.06)]">
-              <div className="bg-gfgk-black px-3 py-2 text-center">
-                <p className="text-[10px] font-extrabold uppercase tracking-wide text-gfgk-gold">Resultat</p>
-              </div>
-              <div className="bg-white px-3 py-2 text-center">
-                <p className={`text-sm font-bold ${resultat >= 0 ? 'text-gfgk-teal-deep' : 'text-gfgk-red-deep'}`}>
-                  {formatKr(resultat)}
-                </p>
-              </div>
-            </div>
+            <Card padding="sm" accent="teal">
+              <p className="kpi-label">Inntekter</p>
+              <p className="kpi-value mt-1 text-lg text-gfgk-teal-deep">
+                {formatNum(totalInntekt)}
+              </p>
+              <p className="kpi-label mt-0.5 !tracking-wider">kr</p>
+            </Card>
+            <Card padding="sm" accent="red">
+              <p className="kpi-label">Utgifter</p>
+              <p className="kpi-value mt-1 text-lg text-gfgk-red-deep">
+                {formatNum(totalUtgift)}
+              </p>
+              <p className="kpi-label mt-0.5 !tracking-wider">kr</p>
+            </Card>
+            <Card padding="sm" accent="gold">
+              <p className="kpi-label">Resultat</p>
+              <p
+                className={`kpi-value mt-1 text-lg ${resultat >= 0 ? 'text-gfgk-teal-deep' : 'text-gfgk-red-deep'}`}
+              >
+                {resultat >= 0 ? '' : '−'}
+                {formatNum(Math.abs(resultat))}
+              </p>
+              <p className="kpi-label mt-0.5 !tracking-wider">kr</p>
+            </Card>
           </div>
 
           {byDate.size > 0 && (
             <section className="mb-8">
-              <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-                <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-                Transaksjoner ({rows.length})
-              </h2>
+              <SectionLabel>Transaksjoner ({rows.length})</SectionLabel>
               <div className="space-y-4">
                 {Array.from(byDate.entries()).map(([date, dateRows]) => (
                   <div key={date}>
@@ -147,7 +149,7 @@ export default async function BudsjettPage({
                       {dateRows.map((tx) => (
                         <div
                           key={tx.id}
-                          className="flex items-center justify-between rounded-lg border border-gfgk-border bg-white px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)] hover:bg-gfgk-gold-light transition-colors"
+                          className="flex items-center justify-between rounded-xl border border-gfgk-border bg-white px-4 py-3 shadow-card transition-colors hover:bg-gfgk-cream-deep"
                         >
                           <div>
                             <p className="text-sm font-semibold text-gfgk-text">
@@ -155,7 +157,7 @@ export default async function BudsjettPage({
                               {tx.description ? ` · ${tx.description}` : ''}
                             </p>
                             <p
-                              className={`text-sm font-bold ${tx.type === 'inntekt' ? 'text-gfgk-teal-deep' : 'text-gfgk-red-deep'}`}
+                              className={`font-mono-nums text-sm font-semibold ${tx.type === 'inntekt' ? 'text-gfgk-teal-deep' : 'text-gfgk-red-deep'}`}
                             >
                               {tx.type === 'inntekt' ? '+' : '−'} {formatKr(tx.amount)}
                             </p>
@@ -178,10 +180,7 @@ export default async function BudsjettPage({
           )}
 
           <section>
-            <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-              <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-              Ny transaksjon
-            </h2>
+            <SectionLabel>Ny transaksjon</SectionLabel>
             <TransactionForm defaultDate={today} />
           </section>
         </div>

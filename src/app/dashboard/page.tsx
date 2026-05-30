@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, inArray } from 'drizzle-orm'
+import { and, asc, eq, gte, inArray, ne } from 'drizzle-orm'
 import { CheckSquare } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -8,19 +8,37 @@ import { BottomNav } from '@/components/BottomNav'
 import { AnnouncementBanner } from '@/components/blocks/AnnouncementBanner'
 import { ClockButton } from '@/components/blocks/ClockButton'
 import { InstallPrompt } from '@/components/blocks/InstallPrompt'
+import { Card } from '@/components/ui/Card'
+import { Eyebrow } from '@/components/ui/Eyebrow'
+import { KPI } from '@/components/ui/KPI'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { getDb } from '@/db'
-import { checklistRunItems, checklistRuns, checklists, shifts } from '@/db/schema'
+import {
+  checklistRunItems,
+  checklistRuns,
+  checklists,
+  shifts,
+  taskAssignees,
+  tasks,
+} from '@/db/schema'
 import { getDashboardBannerItems, markAnnouncementRead } from '@/lib/announcements'
 import { clockIn, clockOut, getActiveClock, getTodayShift } from '@/lib/clock'
 import { formatNorwegianDate, toDateString } from '@/lib/dates'
+
+function greetingForHour(hour: number): string {
+  if (hour < 10) return 'morgen'
+  if (hour < 12) return 'formiddag'
+  if (hour < 18) return 'ettermiddag'
+  return 'kveld'
+}
 
 export default async function DashboardPage() {
   const session = await auth()
   if (!session?.user) redirect('/login')
 
   const db = getDb()
-  const today = toDateString(new Date())
+  const now = new Date()
+  const today = toDateString(now)
   const userId = session.user.id
 
   const [
@@ -29,6 +47,7 @@ export default async function DashboardPage() {
     todayShift,
     announcementItems,
     todayChecklistRuns,
+    openTaskRows,
   ] = await Promise.all([
     db
       .select({
@@ -59,6 +78,11 @@ export default async function DashboardPage() {
       .from(checklistRuns)
       .innerJoin(checklists, eq(checklists.id, checklistRuns.checklistId))
       .where(eq(checklistRuns.date, today)),
+    db
+      .select({ id: tasks.id })
+      .from(tasks)
+      .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
+      .where(and(eq(taskAssignees.userId, userId), ne(tasks.status, 'done'))),
   ])
 
   // Beregn progresjon per sjekkliste
@@ -83,27 +107,86 @@ export default async function DashboardPage() {
     progressByRun.set(item.runId, cur)
   }
 
+  // Avledede verdier til hilsen + KPI-strip
+  const firstName = session.user.name?.split(' ')[0] ?? ''
+  const greeting = greetingForHour(now.getHours())
+  const dateLabel = now
+    .toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long' })
+    .toUpperCase()
+  const shiftSuffix = todayShift
+    ? `du har vakt ${todayShift.startTime}–${todayShift.endTime}`
+    : 'du har fri i dag'
+
+  let checklistDone = 0
+  let checklistTotal = 0
+  for (const v of progressByRun.values()) {
+    checklistDone += v.done
+    checklistTotal += v.total
+  }
+  const openTasksCount = openTaskRows.length
+
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <header className="bg-gfgk-black px-6 pt-safe pb-6">
-          <div className="flex items-center gap-3 pt-4">
+        <header className="bg-gfgk-black px-6 pt-safe pb-7">
+          <div className="flex items-center justify-between gap-3 pt-4">
             <Image
               src="/logo.png"
               alt="GFGK"
-              width={48}
-              height={48}
+              width={44}
+              height={44}
               priority
-              className="h-11 w-11 shrink-0 drop-shadow-[0_2px_8px_rgba(255,204,0,0.25)]"
+              className="h-10 w-10 shrink-0 drop-shadow-[0_2px_8px_rgba(255,204,0,0.25)]"
             />
-            <div className="min-w-0">
-              <h1 className="truncate text-2xl font-extrabold tracking-tight text-gfgk-gold">
-                Hei{session.user.name ? `, ${session.user.name.split(' ')[0]}` : ''}
-              </h1>
-              <p className="truncate text-sm text-white/50">{session.user.email}</p>
-            </div>
+            <Eyebrow tone="light" className="text-white/70">
+              {dateLabel}
+            </Eyebrow>
           </div>
+          <h1 className="h-display mt-4 text-[28px] text-white">
+            God {greeting}
+            {firstName ? `, ${firstName}` : ''}{' '}
+            <span className="font-normal italic text-gfgk-gold">— {shiftSuffix}</span>
+          </h1>
         </header>
+
+        {/* KPI-strip */}
+        <div className="px-6 pt-5">
+          <div className="grid grid-cols-2 gap-3">
+            <Card padding="md">
+              <KPI
+                label="Vakt i dag"
+                value={todayShift ? todayShift.startTime : 'Fri'}
+                hint={todayShift ? `til ${todayShift.endTime}` : 'ingen vakt'}
+              />
+            </Card>
+            <Card padding="md">
+              <KPI
+                label="Kommende vakter"
+                value={upcomingShifts.length}
+                hint="neste 7 dager"
+              />
+            </Card>
+            <Card padding="md">
+              <KPI
+                label="Åpne oppgaver"
+                value={openTasksCount}
+                hint="tildelt deg"
+              />
+            </Card>
+            <Card padding="md">
+              <KPI
+                label="Sjekkliste"
+                value={checklistTotal > 0 ? `${checklistDone}/${checklistTotal}` : '—'}
+                hint="fullført i dag"
+                tone={
+                  checklistTotal > 0 && checklistDone === checklistTotal
+                    ? 'positive'
+                    : 'default'
+                }
+              />
+            </Card>
+          </div>
+        </div>
 
         <div className="space-y-6 px-6 pt-6">
           {/* Install-prompt (PWA) */}

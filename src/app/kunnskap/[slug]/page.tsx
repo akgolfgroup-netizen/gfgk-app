@@ -57,9 +57,7 @@ export default async function ArtikkelPage({ params }: PageProps) {
 
         <div className="space-y-4 px-6 pt-6">
           <div className="space-y-3">
-            <h1 className="text-[28px] font-extrabold leading-tight tracking-tight text-gfgk-text">
-              {article.title}
-            </h1>
+            <h1 className="h-display text-[30px]">{article.title}</h1>
             <div className="flex items-center gap-2">
               <Pill tone={CATEGORY_TONE[article.category]} size="md">
                 {CATEGORY_LABEL[article.category]}

@@ -3,9 +3,15 @@ import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { transactions } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
+import { Card } from '@/components/ui/Card'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 
 function formatKr(amount: number) {
   return new Intl.NumberFormat('nb-NO', { style: 'currency', currency: 'NOK', maximumFractionDigits: 0 }).format(amount)
+}
+
+function formatNum(amount: number) {
+  return new Intl.NumberFormat('nb-NO', { maximumFractionDigits: 0 }).format(amount)
 }
 
 function getMonths(count: number) {
@@ -79,52 +85,54 @@ export default async function RapporterPage() {
         <div className="px-6 pt-6 space-y-8">
           {/* Sammendrag */}
           <div className="grid grid-cols-3 gap-3">
-            {[
-              { label: 'Inntekter', value: totalInntekt, color: 'text-gfgk-teal-deep', bg: 'bg-gfgk-teal-light' },
-              { label: 'Utgifter', value: totalUtgift, color: 'text-gfgk-red-deep', bg: 'bg-gfgk-red-light' },
-              { label: 'Resultat', value: totalInntekt - totalUtgift, color: totalInntekt >= totalUtgift ? 'text-gfgk-teal-deep' : 'text-gfgk-red-deep', bg: 'bg-gfgk-black' },
-            ].map((item) => (
-              <div key={item.label} className="overflow-hidden rounded-lg border border-gfgk-border shadow-[0_1px_2px_rgba(0,0,0,.06)]">
-                <div className={`${item.bg} px-3 py-2 text-center`}>
-                  <p className="text-[10px] font-extrabold uppercase tracking-wide text-white/80">{item.label}</p>
-                </div>
-                <div className="bg-white px-3 py-2 text-center">
-                  <p className={`text-sm font-bold ${item.color}`}>{formatKr(item.value)}</p>
-                </div>
-              </div>
+            {([
+              { label: 'Inntekter', value: totalInntekt, color: 'text-gfgk-teal-deep', accent: 'teal' as const },
+              { label: 'Utgifter', value: totalUtgift, color: 'text-gfgk-red-deep', accent: 'red' as const },
+              {
+                label: 'Resultat',
+                value: totalInntekt - totalUtgift,
+                color: totalInntekt >= totalUtgift ? 'text-gfgk-teal-deep' : 'text-gfgk-red-deep',
+                accent: 'gold' as const,
+              },
+            ]).map((item) => (
+              <Card key={item.label} padding="sm" accent={item.accent}>
+                <p className="kpi-label">{item.label}</p>
+                <p className={`kpi-value mt-1 text-lg ${item.color}`}>
+                  {item.value < 0 ? '−' : ''}
+                  {formatNum(Math.abs(item.value))}
+                </p>
+                <p className="kpi-label mt-0.5 !tracking-wider">kr</p>
+              </Card>
             ))}
           </div>
 
           {/* Søylediagram */}
           <section>
-            <h2 className="mb-4 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-              <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-              Månedlig oversikt
-            </h2>
-            <div className="rounded-lg border border-gfgk-border bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,.06)]">
-              <div className="flex items-end gap-2 h-36">
+            <SectionLabel>Månedlig oversikt</SectionLabel>
+            <div className="rounded-2xl border border-gfgk-border bg-white p-4 shadow-card">
+              <div className="flex items-end gap-2 h-40">
                 {monthData.map((m) => (
                   <div key={m.label} className="flex-1 flex flex-col items-center gap-1">
                     <div className="w-full flex gap-0.5 items-end" style={{ height: '100px' }}>
                       <div
-                        className="flex-1 rounded-t bg-gfgk-teal-light"
+                        className="flex-1 rounded-t bg-gfgk-teal"
                         style={{ height: `${Math.round((m.inntekt / maxValue) * 100)}%`, minHeight: m.inntekt > 0 ? '4px' : '0' }}
                       />
                       <div
-                        className="flex-1 rounded-t bg-gfgk-red-light"
+                        className="flex-1 rounded-t bg-gfgk-red"
                         style={{ height: `${Math.round((m.utgift / maxValue) * 100)}%`, minHeight: m.utgift > 0 ? '4px' : '0' }}
                       />
                     </div>
-                    <p className="text-[9px] font-medium text-gfgk-text-3 capitalize">{m.label}</p>
-                    <p className={`text-[9px] font-bold ${m.resultat >= 0 ? 'text-gfgk-teal-deep' : 'text-gfgk-red-deep'}`}>
-                      {m.resultat >= 0 ? '+' : ''}{formatKr(m.resultat)}
+                    <p className="eyebrow capitalize">{m.label}</p>
+                    <p className={`font-mono-nums text-[10px] font-semibold ${m.resultat >= 0 ? 'text-gfgk-teal-deep' : 'text-gfgk-red-deep'}`}>
+                      {m.resultat >= 0 ? '+' : '−'}{formatNum(Math.abs(m.resultat))}
                     </p>
                   </div>
                 ))}
               </div>
               <div className="mt-3 flex gap-4 text-xs text-gfgk-text-2">
-                <span className="flex items-center gap-1"><span className="h-2 w-3 rounded-sm bg-gfgk-teal-light inline-block" />Inntekter</span>
-                <span className="flex items-center gap-1"><span className="h-2 w-3 rounded-sm bg-gfgk-red-light inline-block" />Utgifter</span>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-gfgk-teal inline-block" />Inntekter</span>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-gfgk-red inline-block" />Utgifter</span>
               </div>
             </div>
           </section>
@@ -132,17 +140,14 @@ export default async function RapporterPage() {
           {/* Kategorier */}
           <div className="grid grid-cols-2 gap-4">
             <section>
-              <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-                <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-                Inntektskategorier
-              </h2>
+              <SectionLabel>Inntektskategorier</SectionLabel>
               <div className="space-y-2">
                 {Object.entries(kategorierInntekt)
                   .sort((a, b) => b[1] - a[1])
                   .map(([cat, amt]) => (
-                    <div key={cat} className="flex justify-between rounded-lg border border-gfgk-border bg-white px-3 py-2 text-sm shadow-[0_1px_2px_rgba(0,0,0,.06)]">
+                    <div key={cat} className="flex justify-between rounded-xl border border-gfgk-border bg-white px-3 py-2.5 text-sm shadow-card">
                       <span className="text-gfgk-text-2 truncate">{cat}</span>
-                      <span className="font-bold text-gfgk-teal-deep ml-2 whitespace-nowrap">{formatKr(amt)}</span>
+                      <span className="font-mono-nums font-semibold text-gfgk-teal-deep ml-2 whitespace-nowrap">{formatKr(amt)}</span>
                     </div>
                   ))}
                 {Object.keys(kategorierInntekt).length === 0 && <p className="text-sm text-gfgk-text-3">Ingen data</p>}
@@ -150,17 +155,14 @@ export default async function RapporterPage() {
             </section>
 
             <section>
-              <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-                <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-                Utgiftskategorier
-              </h2>
+              <SectionLabel>Utgiftskategorier</SectionLabel>
               <div className="space-y-2">
                 {Object.entries(kategorierUtgift)
                   .sort((a, b) => b[1] - a[1])
                   .map(([cat, amt]) => (
-                    <div key={cat} className="flex justify-between rounded-lg border border-gfgk-border bg-white px-3 py-2 text-sm shadow-[0_1px_2px_rgba(0,0,0,.06)]">
+                    <div key={cat} className="flex justify-between rounded-xl border border-gfgk-border bg-white px-3 py-2.5 text-sm shadow-card">
                       <span className="text-gfgk-text-2 truncate">{cat}</span>
-                      <span className="font-bold text-gfgk-red-deep ml-2 whitespace-nowrap">{formatKr(amt)}</span>
+                      <span className="font-mono-nums font-semibold text-gfgk-red-deep ml-2 whitespace-nowrap">{formatKr(amt)}</span>
                     </div>
                   ))}
                 {Object.keys(kategorierUtgift).length === 0 && <p className="text-sm text-gfgk-text-3">Ingen data</p>}

@@ -37,13 +37,14 @@ export function CalendarDay({ date, events }: CalendarDayProps) {
     groups.set(hour, arr)
   }
 
+  const nowStr = today.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' })
+
   return (
     <div className="space-y-3">
       {isToday && (
-        <div className="rounded-lg border border-gfgk-gold bg-gfgk-gold-light px-3 py-2">
-          <p className="text-xs font-bold uppercase tracking-wide text-gfgk-gold-deep">
-            I dag · {date.toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long' })}
-          </p>
+        <div className="flex items-center gap-2">
+          <span className="pulse-dot h-2 w-2 rounded-full bg-gfgk-gold" aria-hidden="true" />
+          <span className="eyebrow text-gfgk-gold-deep">Nå · {nowStr}</span>
         </div>
       )}
 
@@ -53,7 +54,7 @@ export function CalendarDay({ date, events }: CalendarDayProps) {
         <div className="space-y-2">
           {Array.from(groups.entries()).map(([hour, items]) => (
             <div key={hour} className="grid grid-cols-[40px_1fr] gap-3">
-              <span className="text-xs font-semibold text-gfgk-text-3">
+              <span className="font-mono-nums text-xs font-semibold text-gfgk-text-3">
                 {hour}:00
               </span>
               <div className="space-y-1.5">
@@ -61,11 +62,11 @@ export function CalendarDay({ date, events }: CalendarDayProps) {
                   <div
                     key={e.id}
                     className={cn(
-                      'rounded-lg border border-gfgk-border border-l-4 bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,.06)]',
+                      'rounded-xl border border-gfgk-border border-l-4 bg-white p-3 shadow-card',
                       TONE_ACCENT[e.tone],
                     )}
                   >
-                    <p className="text-xs font-semibold text-gfgk-text-2">
+                    <p className="font-mono-nums text-xs font-semibold text-gfgk-text-2">
                       {e.startTime}–{e.endTime}
                     </p>
                     <p className="mt-0.5 text-sm font-semibold text-gfgk-text">

@@ -3,10 +3,17 @@ import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { users, timeEntries } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 import { setHourlyRate } from '@/lib/users-admin'
 
 function formatKr(amount: number) {
   return new Intl.NumberFormat('nb-NO', { style: 'currency', currency: 'NOK', maximumFractionDigits: 0 }).format(amount)
+}
+
+function formatNum(amount: number) {
+  return new Intl.NumberFormat('nb-NO', { maximumFractionDigits: 0 }).format(amount)
 }
 
 export default async function LonnPage({
@@ -65,50 +72,45 @@ export default async function LonnPage({
             <a href={`/admin/lonn?mnd=${nextMnd}`} className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-[0_1px_2px_rgba(0,0,0,.06)]">→</a>
           </div>
 
-          {/* Total lønnskostnad */}
-          <div className="overflow-hidden rounded-lg border border-gfgk-border shadow-[0_1px_2px_rgba(0,0,0,.06)]">
-            <div className="bg-gfgk-black px-4 py-3">
-              <p className="text-[10px] font-extrabold uppercase tracking-wide text-white/50">Total lønnskostnad</p>
-            </div>
-            <div className="bg-white px-4 py-3">
-              <p className="text-2xl font-extrabold text-gfgk-gold">{formatKr(totalLonnKost)}</p>
-            </div>
+          {/* Total lønnskostnad — featured KPI */}
+          <div className="rounded-2xl bg-gfgk-black px-5 py-5 shadow-hero">
+            <p className="eyebrow text-gfgk-gold">Total lønnskostnad</p>
+            <p className="kpi-value mt-2 text-4xl text-white">
+              {formatNum(totalLonnKost)}
+              <span className="ml-1.5 text-base font-normal text-white/50">kr</span>
+            </p>
+            <p className="mt-1 text-[13px] text-white/50 capitalize">{monthLabel}</p>
           </div>
 
           {/* Per ansatt */}
           <section className="space-y-3">
-            <h2 className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-              <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-              Per ansatt
-            </h2>
+            <SectionLabel>Per ansatt</SectionLabel>
             {summary.map((user) => (
-              <div key={user.id} className="overflow-hidden rounded-lg border border-gfgk-border shadow-[0_1px_2px_rgba(0,0,0,.06)]">
-                <div className="bg-gfgk-black px-4 py-2.5 flex items-center justify-between">
-                  <p className="text-sm font-bold text-white">{user.name ?? user.email}</p>
-                  <p className="text-sm font-extrabold text-gfgk-gold">
+              <Card key={user.id} padding="md" className="space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-gfgk-text">{user.name ?? user.email}</p>
+                  <p className="font-mono-nums text-sm font-semibold text-gfgk-text">
                     {user.lonnKost != null ? formatKr(user.lonnKost) : '—'}
                   </p>
                 </div>
-                <div className="bg-white px-4 py-3 space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gfgk-text-2">{user.totalHours.toFixed(1)} timer</span>
-                    <span className="text-gfgk-text-2">{user.hourlyRate ? `${user.hourlyRate} kr/t` : 'Ingen timesats'}</span>
-                  </div>
-                  <form action={setHourlyRate.bind(null, user.id)} className="flex gap-2">
-                    <input
-                      name="hourlyRate"
-                      type="number"
-                      min="0"
-                      defaultValue={user.hourlyRate ?? ''}
-                      placeholder="Timesats (kr)"
-                      className="flex-1 !py-2 !text-sm"
-                    />
-                    <button type="submit" className="rounded-md bg-gfgk-gold px-3 py-2 text-xs font-bold text-gfgk-black hover:bg-gfgk-gold-deep transition-colors whitespace-nowrap">
-                      Lagre
-                    </button>
-                  </form>
+                <div className="flex items-center justify-between text-[13px] text-gfgk-text-2">
+                  <span className="font-mono-nums">{user.totalHours.toFixed(1)} timer</span>
+                  <span>{user.hourlyRate ? `${user.hourlyRate} kr/t` : 'Ingen timesats'}</span>
                 </div>
-              </div>
+                <form action={setHourlyRate.bind(null, user.id)} className="flex gap-2">
+                  <input
+                    name="hourlyRate"
+                    type="number"
+                    min="0"
+                    defaultValue={user.hourlyRate ?? ''}
+                    placeholder="Timesats (kr)"
+                    className="flex-1 !h-10 !py-0 !text-sm"
+                  />
+                  <Button type="submit" size="sm">
+                    Lagre
+                  </Button>
+                </form>
+              </Card>
             ))}
           </section>
         </div>

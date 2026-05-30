@@ -18,13 +18,19 @@ export function MarkdownView({ content, className }: MarkdownViewProps) {
         remarkPlugins={[remarkGfm]}
         components={{
           h1: ({ children }) => (
-            <h2 className="mt-6 text-xl font-extrabold text-gfgk-text">{children}</h2>
+            <h2 className="font-display mt-7 text-xl font-bold tracking-tight text-gfgk-text">
+              {children}
+            </h2>
           ),
           h2: ({ children }) => (
-            <h2 className="mt-6 text-lg font-bold text-gfgk-text">{children}</h2>
+            <h2 className="font-display mt-7 text-lg font-bold tracking-tight text-gfgk-text">
+              {children}
+            </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="mt-4 text-base font-bold text-gfgk-text">{children}</h3>
+            <h3 className="font-display mt-5 text-base font-semibold tracking-tight text-gfgk-text">
+              {children}
+            </h3>
           ),
           p: ({ children }) => (
             <p className="mt-3 text-[15px] leading-relaxed text-gfgk-text">{children}</p>

@@ -42,7 +42,7 @@ export function CalendarMonth({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-gfgk-border bg-white shadow-[0_1px_2px_rgba(0,0,0,.06)]">
+    <div className="overflow-hidden rounded-2xl border border-gfgk-border bg-white shadow-card">
       {/* Header med ukedager */}
       <div className="grid grid-cols-7 bg-gfgk-black">
         {WEEKDAYS_NB.map((d) => (

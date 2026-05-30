@@ -35,8 +35,16 @@ export function CalendarWeek({ weekStart, events, baseHref }: CalendarWeekProps)
   const days = daysInWeek(weekStart)
   const today = new Date()
 
+  // NÅ-markør: gull-linje på dagens tidspunkt hvis uka inneholder i dag
+  const nowMin = today.getHours() * 60 + today.getMinutes()
+  const showNow =
+    days.some((d) => sameDay(d, today)) &&
+    nowMin >= START_HOUR * 60 &&
+    nowMin <= END_HOUR * 60
+  const nowTop = ((nowMin - START_HOUR * 60) / 60) * HOUR_HEIGHT
+
   return (
-    <div className="overflow-hidden rounded-xl border border-gfgk-border bg-white shadow-[0_1px_2px_rgba(0,0,0,.06)]">
+    <div className="overflow-hidden rounded-2xl border border-gfgk-border bg-white shadow-card">
       {/* Header: ukedager */}
       <div className="grid grid-cols-[40px_repeat(7,_1fr)] border-b border-gfgk-border bg-gfgk-black">
         <div />
@@ -69,6 +77,18 @@ export function CalendarWeek({ weekStart, events, baseHref }: CalendarWeekProps)
         className="relative grid grid-cols-[40px_repeat(7,_1fr)]"
         style={{ height: `${(END_HOUR - START_HOUR) * HOUR_HEIGHT}px` }}
       >
+        {/* NÅ-markør */}
+        {showNow && (
+          <div
+            className="pointer-events-none absolute inset-x-0 z-20 flex items-center"
+            style={{ top: `${nowTop}px` }}
+            aria-hidden="true"
+          >
+            <span className="pulse-dot ml-1.5 h-2 w-2 shrink-0 rounded-full bg-gfgk-gold" />
+            <div className="h-px flex-1 bg-gfgk-gold/80" />
+          </div>
+        )}
+
         {/* Time labels */}
         <div className="flex flex-col">
           {Array.from({ length: END_HOUR - START_HOUR }, (_, i) => (
