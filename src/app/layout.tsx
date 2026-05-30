@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
+import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister'
 
 // Self-hostede variable-fonter fra GFGK/AK-designsystemet
 const sans = localFont({
@@ -46,7 +47,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="no"
       className={`${sans.variable} ${display.variable} ${mono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <ServiceWorkerRegister />
+        {children}
+      </body>
     </html>
   )
 }
