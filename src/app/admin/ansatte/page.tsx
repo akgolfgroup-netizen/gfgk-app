@@ -1,9 +1,7 @@
 import { and, gt, isNull } from 'drizzle-orm'
 import { headers } from 'next/headers'
-import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { invites, users } from '@/db/schema'
-import { BottomNav } from '@/components/BottomNav'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import { CopyButton } from '@/components/CopyButton'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -11,7 +9,7 @@ import { SectionLabel } from '@/components/ui/SectionLabel'
 import { createInvite, revokeInvite } from '@/lib/invite'
 
 export default async function AnsattePage() {
-  const [session, headersList] = await Promise.all([auth(), headers()])
+  const headersList = await headers()
   const db = getDb()
 
   const [allUsers, pendingInvites] = await Promise.all([
@@ -29,7 +27,6 @@ export default async function AnsattePage() {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader title="Ansatte" back={{ href: '/admin', label: 'Admin' }} />
 
         <div className="px-6 pt-6 space-y-8">
@@ -113,8 +110,6 @@ export default async function AnsattePage() {
             </form>
           </section>
         </div>
-      </main>
-      <BottomNav role={session!.user.role} />
     </>
   )
 }

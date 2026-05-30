@@ -2,7 +2,7 @@ import { asc, eq, inArray } from 'drizzle-orm'
 import { BookOpen, CheckSquare } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
+import { AppShell } from '@/components/AppShell'
 import { ChecklistRunItem } from '@/components/blocks/ChecklistRunItem'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -69,8 +69,7 @@ export default async function SjekklisterPage() {
           .orderBy(asc(checklistItems.orderIndex))
 
   return (
-    <>
-      <main className="min-h-dvh pb-24">
+    <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <PageHeader title="Sjekklister i dag" />
 
         <div className="space-y-6 px-6 pt-6">
@@ -129,8 +128,6 @@ export default async function SjekklisterPage() {
             })
           )}
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
-    </>
+    </AppShell>
   )
 }

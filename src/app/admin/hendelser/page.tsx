@@ -1,7 +1,6 @@
 import { AlertTriangle, ClipboardPlus } from 'lucide-react'
 import { auth } from '@/auth'
 import { createTask } from '@/lib/tasks'
-import { BottomNav } from '@/components/BottomNav'
 import { Avatar } from '@/components/ui/Avatar'
 import { Chip, ChipBar } from '@/components/ui/Chip'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -59,7 +58,6 @@ export default async function AdminHendelserPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader title="Hendelseslogg" back={{ href: '/admin', label: 'Admin' }} />
 
         {/* Filter-chips: kategori + alvorlighet */}
@@ -158,8 +156,6 @@ export default async function AdminHendelserPage({ searchParams }: PageProps) {
             </div>
           )}
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
     </>
   )
 }

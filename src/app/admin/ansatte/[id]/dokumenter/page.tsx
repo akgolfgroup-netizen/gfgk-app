@@ -2,7 +2,6 @@ import { eq } from 'drizzle-orm'
 import { FileText } from 'lucide-react'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import { DocumentCard } from '@/components/blocks/DocumentCard'
 import { DocumentUploader } from '@/components/blocks/DocumentUploader'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -27,7 +26,6 @@ export default async function AdminAnsattDokumenterPage({ params }: PageProps) {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title="Dokumenter"
           subtitle={user.name ?? user.email}
@@ -56,8 +54,6 @@ export default async function AdminAnsattDokumenterPage({ params }: PageProps) {
 
           <DocumentUploader userId={id} onUpload={uploadDocument} />
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
     </>
   )
 }

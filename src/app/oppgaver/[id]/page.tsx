@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
+import { AppShell } from '@/components/AppShell'
 import { AttachmentGrid, type AttachmentData } from '@/components/blocks/AttachmentGrid'
 import { Comment, type CommentData } from '@/components/blocks/Comment'
 import { TaskDescriptionEdit } from '@/components/blocks/TaskDescriptionEdit'
@@ -184,8 +184,7 @@ export default async function OppgaveDetaljPage({ params }: PageProps) {
   }))
 
   return (
-    <>
-      <main className="min-h-dvh pb-24">
+    <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <SubHeader
           title="Oppgave"
           back={
@@ -501,8 +500,6 @@ export default async function OppgaveDetaljPage({ params }: PageProps) {
             </form>
           </section>
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
-    </>
+    </AppShell>
   )
 }

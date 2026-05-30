@@ -1,7 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import { MarkdownEditor } from '@/components/blocks/MarkdownEditor'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -26,7 +25,6 @@ export default async function RedigerArtikkelPage({ params }: PageProps) {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title="Rediger artikkel"
           subtitle={article.title}
@@ -68,8 +66,6 @@ export default async function RedigerArtikkelPage({ params }: PageProps) {
             </Button>
           </form>
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
     </>
   )
 }

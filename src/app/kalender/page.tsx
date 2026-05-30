@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
+import { AppShell } from '@/components/AppShell'
 import { CalendarDay } from '@/components/calendar/CalendarDay'
 import { CalendarMonth, type CalendarEvent } from '@/components/calendar/CalendarMonth'
 import { CalendarWeek, type CalendarTimedEvent } from '@/components/calendar/CalendarWeek'
@@ -136,8 +136,7 @@ export default async function KalenderPage({ searchParams }: PageProps) {
   }))
 
   return (
-    <>
-      <main className="min-h-dvh pb-24">
+    <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <PageHeader title="Kalender" subtitle="Turneringer og aktiviteter" />
 
         <div className="space-y-4 px-6 pt-4">
@@ -225,7 +224,6 @@ export default async function KalenderPage({ searchParams }: PageProps) {
             </section>
           )}
         </div>
-      </main>
 
       {session.user.role === 'admin' && (
         <BottomSheet>
@@ -294,8 +292,6 @@ export default async function KalenderPage({ searchParams }: PageProps) {
           </BottomSheetContent>
         </BottomSheet>
       )}
-
-      <BottomNav role={session.user.role} />
-    </>
+    </AppShell>
   )
 }

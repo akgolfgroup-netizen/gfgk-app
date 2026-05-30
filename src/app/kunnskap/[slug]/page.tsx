@@ -1,7 +1,7 @@
 import { Pencil } from 'lucide-react'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
+import { AppShell } from '@/components/AppShell'
 import { MarkdownView } from '@/components/blocks/MarkdownView'
 import { Pill } from '@/components/ui/Pill'
 import { SubHeader } from '@/components/ui/SubHeader'
@@ -39,8 +39,7 @@ export default async function ArtikkelPage({ params }: PageProps) {
   if (!article) notFound()
 
   return (
-    <>
-      <main className="min-h-dvh pb-24">
+    <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <SubHeader
           title={article.title}
           back={{ href: '/kunnskap', label: 'Kunnskap' }}
@@ -77,8 +76,6 @@ export default async function ArtikkelPage({ params }: PageProps) {
 
           <MarkdownView content={article.body} />
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
-    </>
+    </AppShell>
   )
 }

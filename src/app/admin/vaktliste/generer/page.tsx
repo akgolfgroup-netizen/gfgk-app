@@ -1,7 +1,6 @@
 import { Plus } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import {
   BottomSheet,
@@ -69,7 +68,6 @@ export default async function GenererPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title="Generer vakter"
           subtitle="Auto-fyll basert på preferanser og stillingsprosent"
@@ -240,8 +238,6 @@ export default async function GenererPage({ searchParams }: PageProps) {
             </p>
           </form>
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
     </>
   )
 }

@@ -1,7 +1,6 @@
 import { asc, eq } from 'drizzle-orm'
 import { CheckSquare, Plus } from 'lucide-react'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import {
   BottomSheet,
@@ -90,7 +89,6 @@ export default async function AdminSjekklisterPage() {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title="Sjekklister"
           back={{ href: '/admin', label: 'Admin' }}
@@ -134,7 +132,6 @@ export default async function AdminSjekklisterPage() {
             </div>
           )}
         </div>
-      </main>
 
       <BottomSheet>
         <BottomSheetTrigger asChild>
@@ -250,7 +247,6 @@ export default async function AdminSjekklisterPage() {
         </BottomSheetContent>
       </BottomSheet>
 
-      <BottomNav role={session.user.role} />
     </>
   )
 }

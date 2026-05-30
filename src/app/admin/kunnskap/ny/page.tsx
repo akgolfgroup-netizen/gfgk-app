@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import { MarkdownEditor } from '@/components/blocks/MarkdownEditor'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -15,7 +14,6 @@ export default async function NyArtikkelPage() {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title="Ny artikkel"
           back={{ href: '/admin/kunnskap', label: 'Kunnskap' }}
@@ -67,8 +65,6 @@ export default async function NyArtikkelPage() {
             </Button>
           </form>
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
     </>
   )
 }

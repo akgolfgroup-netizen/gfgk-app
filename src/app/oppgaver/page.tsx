@@ -2,7 +2,7 @@ import { and, asc, eq, inArray, isNotNull, isNull, lt, ne, or } from 'drizzle-or
 import { CheckSquare, Plus } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
+import { AppShell } from '@/components/AppShell'
 import { TaskBlock, type TaskBlockData } from '@/components/blocks/TaskBlock'
 import {
   BottomSheet,
@@ -92,6 +92,7 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
     return (
       <EmptyPage
         role={session.user.role}
+        userName={session.user.name ?? null}
         filter={filter}
         currentUserId={userId}
       />
@@ -205,8 +206,7 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
     .orderBy(users.name)
 
   return (
-    <>
-      <main className="min-h-dvh pb-24">
+    <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <PageHeader title="Oppgaver" />
 
         {/* Filter-chips */}
@@ -282,7 +282,6 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
             </>
           )}
         </div>
-      </main>
 
       <BottomSheet>
         <BottomSheetTrigger asChild>
@@ -384,24 +383,23 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
           </form>
         </BottomSheetContent>
       </BottomSheet>
-
-      <BottomNav role={session.user.role} />
-    </>
+    </AppShell>
   )
 }
 
 function EmptyPage({
   role,
+  userName,
   filter,
   currentUserId: _,
 }: {
   role: 'admin' | 'ansatt'
+  userName: string | null
   filter: FilterKey
   currentUserId: string
 }) {
   return (
-    <>
-      <main className="min-h-dvh pb-24">
+    <AppShell role={role} userName={userName}>
         <PageHeader title="Oppgaver" />
         <div className="px-6 pt-12">
           <EmptyState
@@ -414,8 +412,6 @@ function EmptyPage({
             }
           />
         </div>
-      </main>
-      <BottomNav role={role} />
-    </>
+    </AppShell>
   )
 }

@@ -1,6 +1,5 @@
 import { Lightbulb, Plus } from 'lucide-react'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import {
   BottomSheet,
@@ -25,7 +24,6 @@ export default async function AiSkillsPage() {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title="AI svar-maler"
           subtitle="Skills som agenten bruker"
@@ -83,7 +81,6 @@ export default async function AiSkillsPage() {
             </div>
           )}
         </div>
-      </main>
 
       <BottomSheet>
         <BottomSheetTrigger asChild>
@@ -142,7 +139,6 @@ export default async function AiSkillsPage() {
         </BottomSheetContent>
       </BottomSheet>
 
-      <BottomNav role={session.user.role} />
     </>
   )
 }

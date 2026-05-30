@@ -2,7 +2,7 @@ import { and, count, eq, inArray, ne, sql } from 'drizzle-orm'
 import { FolderPlus, Plus } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
+import { AppShell } from '@/components/AppShell'
 import { ProjectCard, type ProjectCardData } from '@/components/blocks/ProjectCard'
 import { Button } from '@/components/ui/Button'
 import {
@@ -153,8 +153,7 @@ export default async function ProsjekterPage({ searchParams }: PageProps) {
   const projectList = await loadProjectsForTab(session.user.id, tab)
 
   return (
-    <>
-      <main className="min-h-dvh pb-24">
+    <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <PageHeader title="Prosjekter" />
 
         {/* Tab-bar */}
@@ -205,7 +204,6 @@ export default async function ProsjekterPage({ searchParams }: PageProps) {
             </div>
           )}
         </div>
-      </main>
 
       {tab !== 'arkiv' && (
         <BottomSheet>
@@ -268,8 +266,6 @@ export default async function ProsjekterPage({ searchParams }: PageProps) {
           </BottomSheetContent>
         </BottomSheet>
       )}
-
-      <BottomNav role={session.user.role} />
-    </>
+    </AppShell>
   )
 }

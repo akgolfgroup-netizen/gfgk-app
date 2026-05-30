@@ -1,7 +1,6 @@
 import { BookOpen, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { FAB } from '@/components/ui/FAB'
@@ -36,7 +35,6 @@ export default async function AdminKunnskapPage() {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title="Kunnskap"
           subtitle="Administrer artikler"
@@ -92,7 +90,6 @@ export default async function AdminKunnskapPage() {
             </div>
           )}
         </div>
-      </main>
 
       <FAB asChild aria-label="Ny artikkel">
         <Link href="/admin/kunnskap/ny">
@@ -100,7 +97,6 @@ export default async function AdminKunnskapPage() {
         </Link>
       </FAB>
 
-      <BottomNav role={session.user.role} />
     </>
   )
 }

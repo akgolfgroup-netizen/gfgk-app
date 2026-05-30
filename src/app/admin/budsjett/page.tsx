@@ -1,9 +1,7 @@
 import Link from 'next/link'
 import { and, asc, gte, lte } from 'drizzle-orm'
-import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { transactions } from '@/db/schema'
-import { BottomNav } from '@/components/BottomNav'
 import { Card } from '@/components/ui/Card'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
@@ -40,7 +38,7 @@ export default async function BudsjettPage({
 }: {
   searchParams: Promise<{ mnd?: string }>
 }) {
-  const [{ mnd }, session] = await Promise.all([searchParams, auth()])
+  const { mnd } = await searchParams
 
   const now = new Date()
   const [year, month] = ((): [number, number] => {
@@ -79,7 +77,6 @@ export default async function BudsjettPage({
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader title="Budsjett" back={{ href: '/admin', label: 'Admin' }} />
 
         <div className="px-6 pt-6">
@@ -178,8 +175,6 @@ export default async function BudsjettPage({
             <TransactionForm defaultDate={today} />
           </section>
         </div>
-      </main>
-      <BottomNav role={session!.user.role} />
     </>
   )
 }

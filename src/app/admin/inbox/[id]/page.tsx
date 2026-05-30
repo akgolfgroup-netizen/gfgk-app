@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import { AiReplyComposer } from '@/components/blocks/AiReplyComposer'
 import { Card } from '@/components/ui/Card'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -43,7 +42,6 @@ export default async function InboxDetailPage({ params }: PageProps) {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title={msg.subject}
           subtitle={msg.fromName ? `${msg.fromName} <${msg.fromEmail}>` : msg.fromEmail}
@@ -103,8 +101,6 @@ export default async function InboxDetailPage({ params }: PageProps) {
             </section>
           )}
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
     </>
   )
 }

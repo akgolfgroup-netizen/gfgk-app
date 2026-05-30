@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
+import { AppShell } from '@/components/AppShell'
 import { AnnouncementBanner } from '@/components/blocks/AnnouncementBanner'
 import { ClockButton } from '@/components/blocks/ClockButton'
 import { InstallPrompt } from '@/components/blocks/InstallPrompt'
@@ -181,8 +181,7 @@ export default async function DashboardPage() {
   const openTasksCount = openTaskRows.length
 
   return (
-    <>
-      <main className="min-h-dvh pb-24">
+    <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <header className="bg-gfgk-black px-6 pt-safe pb-7">
           <div className="flex items-center justify-between gap-3 pt-4">
             <Image
@@ -473,8 +472,6 @@ export default async function DashboardPage() {
             )}
           </section>
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
-    </>
+    </AppShell>
   )
 }

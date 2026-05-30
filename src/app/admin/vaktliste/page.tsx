@@ -1,9 +1,7 @@
 import Link from 'next/link'
 import { and, eq, gte, lte } from 'drizzle-orm'
-import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { shifts, users } from '@/db/schema'
-import { BottomNav } from '@/components/BottomNav'
 import {
   addDays,
   formatNorwegianDate,
@@ -22,7 +20,7 @@ export default async function VaktlistePage({
 }: {
   searchParams: Promise<{ uke?: string }>
 }) {
-  const [{ uke }, session] = await Promise.all([searchParams, auth()])
+  const { uke } = await searchParams
 
   const monday = uke ? new Date(uke + 'T00:00:00') : getMonday(new Date())
   const weekStart = toDateString(monday)
@@ -59,7 +57,6 @@ export default async function VaktlistePage({
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader title="Vaktliste" back={{ href: '/admin', label: 'Admin' }} />
 
         <div className="px-6 pt-6">
@@ -195,8 +192,6 @@ export default async function VaktlistePage({
             </form>
           </section>
         </div>
-      </main>
-      <BottomNav role={session!.user.role} />
     </>
   )
 }

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
+import { AppShell } from '@/components/AppShell'
 import { PushManager } from '@/components/blocks/PushManager'
 import { Card } from '@/components/ui/Card'
 import { SectionLabel } from '@/components/ui/SectionLabel'
@@ -11,8 +11,7 @@ export default async function VarslerPage() {
   if (!session?.user) redirect('/login')
 
   return (
-    <>
-      <main className="min-h-dvh pb-24">
+    <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <SubHeader
           title="Varsler"
           subtitle="Push-varsler til denne enheten"
@@ -31,8 +30,6 @@ export default async function VarslerPage() {
             </p>
           </section>
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
-    </>
+    </AppShell>
   )
 }

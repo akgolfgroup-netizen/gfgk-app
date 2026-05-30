@@ -5,7 +5,7 @@ import { getDb } from '@/db'
 import { timeEntries, users } from '@/db/schema'
 import { AvatarUpload } from '@/components/blocks/AvatarUpload'
 import { PreferredShiftChips } from '@/components/blocks/PreferredShiftChips'
-import { BottomNav } from '@/components/BottomNav'
+import { AppShell } from '@/components/AppShell'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -65,8 +65,7 @@ export default async function ProfilPage() {
   const upcomingTimeOff = await listUpcomingTimeOff(me.id)
 
   return (
-    <>
-      <main className="min-h-dvh pb-24">
+    <AppShell role={me.role} userName={me.name ?? null}>
         <PageHeader title="Min profil" subtitle={me.email} />
 
         <div className="space-y-8 px-6 pt-6">
@@ -421,8 +420,6 @@ export default async function ProfilPage() {
             </form>
           </section>
         </div>
-      </main>
-      <BottomNav role={me.role} />
-    </>
+    </AppShell>
   )
 }

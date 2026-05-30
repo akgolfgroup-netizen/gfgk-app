@@ -8,7 +8,6 @@ import {
 } from 'lucide-react'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import {
   BottomSheet,
@@ -105,7 +104,6 @@ export default async function SponsorDetailPage({
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title={sponsor.name}
           back={{ href: '/admin/sponsorer', label: 'Sponsorer' }}
@@ -368,8 +366,6 @@ export default async function SponsorDetailPage({
             </BottomSheet>
           </section>
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
     </>
   )
 }

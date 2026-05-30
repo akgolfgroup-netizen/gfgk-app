@@ -15,8 +15,6 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import Link from 'next/link'
-import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import { PageHeader } from '@/components/ui/PageHeader'
 
 const ITEMS: Array<{
@@ -41,10 +39,8 @@ const ITEMS: Array<{
 ]
 
 export default async function AdminPage() {
-  const session = await auth()
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader title="Admin" subtitle="Internt panel for daglig leder" />
 
         <div className="px-6 pt-6">
@@ -67,8 +63,6 @@ export default async function AdminPage() {
             })}
           </div>
         </div>
-      </main>
-      <BottomNav role={session!.user.role} />
     </>
   )
 }

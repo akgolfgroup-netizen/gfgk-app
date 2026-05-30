@@ -1,7 +1,6 @@
 import { desc } from 'drizzle-orm'
 import { Megaphone, Pin, Plus } from 'lucide-react'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import {
   BottomSheet,
@@ -39,7 +38,6 @@ export default async function AdminAnnonseringerPage() {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title="Annonseringer"
           back={{ href: '/admin', label: 'Admin' }}
@@ -108,7 +106,6 @@ export default async function AdminAnnonseringerPage() {
             </div>
           )}
         </div>
-      </main>
 
       <BottomSheet>
         <BottomSheetTrigger asChild>
@@ -181,7 +178,6 @@ export default async function AdminAnnonseringerPage() {
         </BottomSheetContent>
       </BottomSheet>
 
-      <BottomNav role={session.user.role} />
     </>
   )
 }

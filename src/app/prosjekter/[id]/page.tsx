@@ -2,7 +2,7 @@ import { and, asc, desc, eq, inArray, isNull } from 'drizzle-orm'
 import { CheckSquare, Files, Plus, UserPlus, Users } from 'lucide-react'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
+import { AppShell } from '@/components/AppShell'
 import { TaskBlock, type TaskBlockData } from '@/components/blocks/TaskBlock'
 import {
   BottomSheet,
@@ -87,8 +87,7 @@ export default async function ProsjektDetaljPage({ params, searchParams }: PageP
   }
 
   return (
-    <>
-      <main className="min-h-dvh pb-24">
+    <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <PageHeader
           title={project.name}
           subtitle={
@@ -144,7 +143,6 @@ export default async function ProsjektDetaljPage({ params, searchParams }: PageP
             <MedlemmerTab projectId={id} isOwner={membership?.role === 'eier'} />
           )}
         </div>
-      </main>
 
       {tab === 'oppgaver' && (
         <BottomSheet>
@@ -217,9 +215,7 @@ export default async function ProsjektDetaljPage({ params, searchParams }: PageP
           </BottomSheetContent>
         </BottomSheet>
       )}
-
-      <BottomNav role={session.user.role} />
-    </>
+    </AppShell>
   )
 }
 

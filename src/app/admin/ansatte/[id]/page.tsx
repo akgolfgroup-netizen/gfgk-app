@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation'
 import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { users } from '@/db/schema'
-import { BottomNav } from '@/components/BottomNav'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
@@ -38,7 +37,6 @@ export default async function AnsattDetaljPage({ params }: PageProps) {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title={user.name ?? user.email}
           subtitle={user.email}
@@ -285,8 +283,6 @@ export default async function AnsattDetaljPage({ params }: PageProps) {
             </section>
           )}
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
     </>
   )
 }

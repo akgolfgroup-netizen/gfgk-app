@@ -1,8 +1,6 @@
 import { and, gte, lte } from 'drizzle-orm'
-import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { users, timeEntries } from '@/db/schema'
-import { BottomNav } from '@/components/BottomNav'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -22,7 +20,7 @@ export default async function LonnPage({
 }: {
   searchParams: Promise<{ mnd?: string }>
 }) {
-  const [{ mnd }, session] = await Promise.all([searchParams, auth()])
+  const { mnd } = await searchParams
 
   const now = new Date()
   const [year, month] = ((): [number, number] => {
@@ -57,7 +55,6 @@ export default async function LonnPage({
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader title="Lønn" back={{ href: '/admin', label: 'Admin' }} />
 
         <div className="px-6 pt-6 space-y-6">
@@ -110,8 +107,6 @@ export default async function LonnPage({
             ))}
           </section>
         </div>
-      </main>
-      <BottomNav role={session!.user.role} />
     </>
   )
 }

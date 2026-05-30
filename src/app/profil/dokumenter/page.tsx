@@ -1,7 +1,7 @@
 import { FileText } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
+import { AppShell } from '@/components/AppShell'
 import { DocumentCard } from '@/components/blocks/DocumentCard'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SubHeader } from '@/components/ui/SubHeader'
@@ -14,8 +14,7 @@ export default async function ProfilDokumenterPage() {
   const docs = await listDocumentsForUser(session.user.id)
 
   return (
-    <>
-      <main className="min-h-dvh pb-24">
+    <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <SubHeader
           title="Mine dokumenter"
           subtitle="Kontrakter, attester og felles dokumenter"
@@ -37,8 +36,6 @@ export default async function ProfilDokumenterPage() {
             </div>
           )}
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
-    </>
+    </AppShell>
   )
 }

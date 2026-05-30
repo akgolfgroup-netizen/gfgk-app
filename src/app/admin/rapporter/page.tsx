@@ -1,9 +1,7 @@
 import { and, gte, lte } from 'drizzle-orm'
 import { Download } from 'lucide-react'
-import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { transactions } from '@/db/schema'
-import { BottomNav } from '@/components/BottomNav'
 import { Card } from '@/components/ui/Card'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
@@ -31,7 +29,6 @@ function getMonths(count: number) {
 }
 
 export default async function RapporterPage() {
-  const session = await auth()
   const months = getMonths(6)
 
   const first = months[0]
@@ -65,7 +62,6 @@ export default async function RapporterPage() {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title="Rapporter"
           subtitle="Siste 6 måneder"
@@ -171,8 +167,6 @@ export default async function RapporterPage() {
             </section>
           </div>
         </div>
-      </main>
-      <BottomNav role={session!.user.role} />
     </>
   )
 }

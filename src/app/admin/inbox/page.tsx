@@ -1,6 +1,5 @@
 import { Inbox } from 'lucide-react'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import { InboxItem } from '@/components/blocks/InboxItem'
 import { Chip, ChipBar } from '@/components/ui/Chip'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -34,7 +33,6 @@ export default async function AdminInboxPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader
           title="Inbox"
           subtitle="servicepunkt@gfgk.no"
@@ -68,8 +66,6 @@ export default async function AdminInboxPage({ searchParams }: PageProps) {
             </div>
           )}
         </div>
-      </main>
-      <BottomNav role={session.user.role} />
     </>
   )
 }

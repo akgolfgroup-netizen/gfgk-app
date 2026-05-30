@@ -2,7 +2,6 @@ import { Handshake, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { BottomNav } from '@/components/BottomNav'
 import {
   BottomSheet,
   BottomSheetClose,
@@ -77,7 +76,6 @@ export default async function SponsorerPage({
 
   return (
     <>
-      <main className="min-h-dvh pb-24">
         <PageHeader title="Sponsorer" back={{ href: '/admin', label: 'Admin' }} />
 
         {/* KPI-strip */}
@@ -167,7 +165,6 @@ export default async function SponsorerPage({
             </div>
           )}
         </div>
-      </main>
 
       {/* Ny sponsor */}
       <BottomSheet>
@@ -236,7 +233,6 @@ export default async function SponsorerPage({
         </BottomSheetContent>
       </BottomSheet>
 
-      <BottomNav role={session.user.role} />
     </>
   )
 }
