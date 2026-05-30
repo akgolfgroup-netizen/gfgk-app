@@ -2,9 +2,9 @@ import { Inbox } from 'lucide-react'
 import { auth } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
 import { InboxItem } from '@/components/blocks/InboxItem'
+import { Chip, ChipBar } from '@/components/ui/Chip'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageHeader } from '@/components/ui/PageHeader'
-import { cn } from '@/lib/cn'
 import { listInbox } from '@/lib/inbox'
 import type { InboxStatus } from '@/db/schema'
 
@@ -42,29 +42,17 @@ export default async function AdminInboxPage({ searchParams }: PageProps) {
         />
 
         <div className="space-y-4 px-6 pt-4">
-          <div className="overflow-x-auto">
-            <div className="flex gap-2 pb-1">
-              {FILTERS.map((f) => {
-                const active = f.key === 'alle' ? !status : status === f.key
-                const href =
-                  f.key === 'alle' ? '/admin/inbox' : `/admin/inbox?filter=${f.key}`
-                return (
-                  <a
-                    key={f.key}
-                    href={href}
-                    className={cn(
-                      'inline-flex h-8 shrink-0 items-center rounded-full px-3 text-[13px] font-semibold transition-colors',
-                      active
-                        ? 'bg-gfgk-gold text-gfgk-black'
-                        : 'bg-gfgk-cream-deep text-gfgk-text hover:bg-gfgk-cream',
-                    )}
-                  >
-                    {f.label}
-                  </a>
-                )
-              })}
-            </div>
-          </div>
+          <ChipBar>
+            {FILTERS.map((f) => (
+              <Chip
+                key={f.key}
+                active={f.key === 'alle' ? !status : status === f.key}
+                href={f.key === 'alle' ? '/admin/inbox' : `/admin/inbox?filter=${f.key}`}
+              >
+                {f.label}
+              </Chip>
+            ))}
+          </ChipBar>
 
           {messages.length === 0 ? (
             <EmptyState

@@ -2,11 +2,11 @@ import { AlertTriangle } from 'lucide-react'
 import { auth } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
 import { Avatar } from '@/components/ui/Avatar'
+import { Chip, ChipBar } from '@/components/ui/Chip'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Pill } from '@/components/ui/Pill'
 import { listShiftEvents } from '@/lib/shift-events'
-import { cn } from '@/lib/cn'
 import type { ShiftEventCategory, ShiftEventSeverity } from '@/db/schema'
 
 interface PageProps {
@@ -61,43 +61,33 @@ export default async function AdminHendelserPage({ searchParams }: PageProps) {
       <main className="min-h-dvh pb-24">
         <PageHeader title="Hendelseslogg" back={{ href: '/admin', label: 'Admin' }} />
 
-        {/* Filter-chips */}
+        {/* Filter-chips: kategori + alvorlighet */}
         <div className="space-y-2 px-6 pt-4">
-          <div className="overflow-x-auto">
-            <div className="flex gap-2 pb-1">
-              <FilterChip
-                href="/admin/hendelser"
-                active={!category && !severity}
-                label="Alle"
-              />
-              {CATEGORIES.map((c) => {
-                const href = `/admin/hendelser?category=${c}${severity ? `&severity=${severity}` : ''}`
-                return (
-                  <FilterChip
-                    key={c}
-                    href={href}
-                    active={category === c}
-                    label={CATEGORY_LABEL[c]}
-                  />
-                )
-              })}
-            </div>
-          </div>
-          <div className="overflow-x-auto">
-            <div className="flex gap-2 pb-1">
-              {SEVERITIES.map((s) => {
-                const href = `/admin/hendelser?severity=${s}${category ? `&category=${category}` : ''}`
-                return (
-                  <FilterChip
-                    key={s}
-                    href={href}
-                    active={severity === s}
-                    label={SEVERITY_LABEL[s]}
-                  />
-                )
-              })}
-            </div>
-          </div>
+          <ChipBar>
+            <Chip href="/admin/hendelser" active={!category && !severity}>
+              Alle
+            </Chip>
+            {CATEGORIES.map((c) => (
+              <Chip
+                key={c}
+                active={category === c}
+                href={`/admin/hendelser?category=${c}${severity ? `&severity=${severity}` : ''}`}
+              >
+                {CATEGORY_LABEL[c]}
+              </Chip>
+            ))}
+          </ChipBar>
+          <ChipBar>
+            {SEVERITIES.map((s) => (
+              <Chip
+                key={s}
+                active={severity === s}
+                href={`/admin/hendelser?severity=${s}${category ? `&category=${category}` : ''}`}
+              >
+                {SEVERITY_LABEL[s]}
+              </Chip>
+            ))}
+          </ChipBar>
         </div>
 
         <div className="px-6 pt-6">
@@ -112,7 +102,7 @@ export default async function AdminHendelserPage({ searchParams }: PageProps) {
               {events.map((e) => (
                 <article
                   key={e.id}
-                  className="rounded-xl border border-gfgk-border bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+                  className="rounded-xl border border-gfgk-border bg-white p-4 shadow-card"
                 >
                   <div className="mb-2 flex items-start gap-3">
                     <Avatar
@@ -125,7 +115,7 @@ export default async function AdminHendelserPage({ searchParams }: PageProps) {
                       <p className="text-sm font-semibold text-gfgk-text">
                         {e.userName ?? e.userEmail}
                       </p>
-                      <p className="text-xs text-gfgk-text-2">
+                      <p className="font-mono-nums text-xs text-gfgk-text-2">
                         {e.createdAt.toLocaleDateString('nb-NO', {
                           day: 'numeric',
                           month: 'short',
@@ -155,29 +145,5 @@ export default async function AdminHendelserPage({ searchParams }: PageProps) {
       </main>
       <BottomNav role={session.user.role} />
     </>
-  )
-}
-
-function FilterChip({
-  href,
-  active,
-  label,
-}: {
-  href: string
-  active: boolean
-  label: string
-}) {
-  return (
-    <a
-      href={href}
-      className={cn(
-        'inline-flex h-8 shrink-0 items-center rounded-full px-3 text-[13px] font-semibold transition-colors',
-        active
-          ? 'bg-gfgk-gold text-gfgk-black'
-          : 'bg-gfgk-cream-deep text-gfgk-text hover:bg-gfgk-cream',
-      )}
-    >
-      {label}
-    </a>
   )
 }

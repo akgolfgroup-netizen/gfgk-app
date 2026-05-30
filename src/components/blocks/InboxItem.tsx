@@ -54,7 +54,7 @@ export function InboxItem({ msg }: InboxItemProps) {
     <Link
       href={`/admin/inbox/${msg.id}`}
       className={cn(
-        'block rounded-xl border border-gfgk-border border-l-4 bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,.06)] transition-colors hover:bg-gfgk-cream-deep',
+        'block rounded-xl border border-gfgk-border border-l-4 bg-white p-3 shadow-card transition-colors hover:bg-gfgk-cream-deep',
         STATUS_ACCENT[msg.status],
       )}
     >
@@ -62,9 +62,18 @@ export function InboxItem({ msg }: InboxItemProps) {
         <p className="truncate text-sm font-semibold text-gfgk-text">
           {msg.fromName ?? msg.fromEmail}
         </p>
-        <span className="shrink-0 text-xs text-gfgk-text-3">{timeAgo(msg.receivedAt)}</span>
+        <span className="font-mono-nums shrink-0 text-xs text-gfgk-text-3">
+          {timeAgo(msg.receivedAt)}
+        </span>
       </div>
-      <p className="truncate text-sm text-gfgk-text">{msg.subject}</p>
+      <p
+        className={cn(
+          'truncate text-sm text-gfgk-text',
+          msg.status === 'new' && 'font-semibold',
+        )}
+      >
+        {msg.subject}
+      </p>
       <div className="mt-1.5">
         <Pill tone={STATUS_TONE[msg.status]} size="sm">
           {STATUS_LABEL[msg.status]}
