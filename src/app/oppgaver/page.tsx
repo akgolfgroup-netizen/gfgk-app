@@ -175,6 +175,7 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
     status: t.status,
     priority: t.priority,
     dueDate: t.dueDate,
+    zone: t.zone,
     assignees: assigneeRows
       .filter((a) => a.taskId === t.id)
       .map((a) => ({ name: a.name, email: a.email, src: a.avatarUrl })),
@@ -333,6 +334,12 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
                   </option>
                 ))}
               </Select>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                Sone (valgfri)
+              </label>
+              <Input name="zone" type="text" placeholder="F.eks. Hull 3, Pro shop" />
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">

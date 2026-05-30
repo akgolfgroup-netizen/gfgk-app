@@ -123,6 +123,7 @@ export default async function DashboardPage() {
         status: tasks.status,
         priority: tasks.priority,
         dueDate: tasks.dueDate,
+        zone: tasks.zone,
       })
       .from(tasks)
       .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
@@ -327,6 +328,7 @@ export default async function DashboardPage() {
                       status: t.status,
                       priority: t.priority,
                       dueDate: t.dueDate,
+                      zone: t.zone,
                       assignees: [],
                     }}
                     onToggle={toggleTaskDone}

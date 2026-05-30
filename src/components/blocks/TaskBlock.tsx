@@ -2,7 +2,7 @@
 
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical } from 'lucide-react'
+import { GripVertical, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { useTransition } from 'react'
 import { AvatarStack, type AvatarStackUser } from '@/components/ui/AvatarStack'
@@ -17,6 +17,7 @@ export interface TaskBlockData {
   priority: 'low' | 'medium' | 'high'
   dueDate: string | null
   assignees: AvatarStackUser[]
+  zone?: string | null
 }
 
 export interface TaskBlockProps {
@@ -111,7 +112,7 @@ export function TaskBlock({ task, onToggle, sortable = false, flat = false }: Ta
         >
           {task.title}
         </span>
-        {(due || task.priority !== 'medium' || task.assignees.length > 0) && (
+        {(due || task.priority !== 'medium' || task.zone || task.assignees.length > 0) && (
           <div className="flex items-center gap-2 text-xs text-gfgk-text-2">
             {due && (
               <span
@@ -126,6 +127,12 @@ export function TaskBlock({ task, onToggle, sortable = false, flat = false }: Ta
               <Pill tone={priorityTone(task.priority)} size="sm">
                 {PRIORITY_LABEL[task.priority]}
               </Pill>
+            )}
+            {task.zone && (
+              <span className="inline-flex items-center gap-1 text-xs text-gfgk-text-3">
+                <MapPin className="h-3 w-3" />
+                {task.zone}
+              </span>
             )}
           </div>
         )}

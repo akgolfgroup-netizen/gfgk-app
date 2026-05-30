@@ -120,6 +120,7 @@ export async function createTask(formData: FormData): Promise<void> {
   const priority: TaskPriority = isPriority(priorityRaw) ? priorityRaw : 'medium'
   const assigneeId = (formData.get('assigneeId') as string) || null
   const image = formData.get('image')
+  const zone = ((formData.get('zone') as string) ?? '').trim() || null
 
   if (!title) return
 
@@ -146,6 +147,7 @@ export async function createTask(formData: FormData): Promise<void> {
       description,
       dueDate,
       priority,
+      zone,
       orderIndex,
       createdBy: session.user.id,
       updatedBy: session.user.id,
