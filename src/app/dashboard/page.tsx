@@ -203,9 +203,10 @@ export default async function DashboardPage() {
           </h1>
         </header>
 
+        <div className="lg:mx-auto lg:max-w-5xl">
         {/* KPI-strip */}
         <div className="px-6 pt-5">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <Card padding="md">
               <KPI
                 label="Vakt i dag"
@@ -242,7 +243,8 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="space-y-6 px-6 pt-6">
+        {/* Install + annonseringer spenner full bredde over kolonnene */}
+        <div className="space-y-6 px-6 pt-6 empty:hidden">
           {/* Install-prompt (PWA) */}
           <InstallPrompt />
 
@@ -258,7 +260,11 @@ export default async function DashboardPage() {
               onDismiss={markAnnouncementRead}
             />
           )}
+        </div>
 
+        <div className="px-6 pt-6 lg:grid lg:grid-cols-[2fr_1fr] lg:items-start lg:gap-6 lg:pt-6">
+        {/* Venstre hovedkolonne */}
+        <div className="space-y-6 lg:pt-0">
           {/* Innstempling */}
           <ClockButton
             isClockedIn={Boolean(activeClock)}
@@ -336,7 +342,10 @@ export default async function DashboardPage() {
               </div>
             )}
           </section>
+        </div>
 
+        {/* Høyre siderail */}
+        <div className="mt-6 space-y-6 lg:mt-0">
           {/* Overlevering */}
           <section>
             <SectionLabel>Overlevering</SectionLabel>
@@ -471,6 +480,8 @@ export default async function DashboardPage() {
               </div>
             )}
           </section>
+        </div>
+        </div>
         </div>
     </AppShell>
   )
