@@ -57,7 +57,7 @@ export default async function LoginPage({
         </div>
 
         {/* Hero-tekst */}
-        <div className="flex flex-1 flex-col justify-center gap-5">
+        <div className="flex flex-1 flex-col items-center justify-center gap-5 text-center">
           <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-2xl bg-white shadow-lg">
             <Image
               src="/logo.png"
