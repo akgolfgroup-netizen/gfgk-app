@@ -11,6 +11,7 @@ import {
   toDateString,
 } from '@/lib/dates'
 import { ConfirmButton } from '@/components/ConfirmButton'
+import { Button } from '@/components/ui/Button'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { createShift, deleteShift, publishWeek } from '@/lib/shifts'
@@ -57,9 +58,13 @@ export default async function VaktlistePage({
 
   return (
     <>
-        <PageHeader title="Vaktliste" back={{ href: '/admin', label: 'Admin' }} />
+        <PageHeader
+          title="Vaktliste"
+          back={{ href: '/admin', label: 'Admin' }}
+          maxWidth="6xl"
+        />
 
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-6xl">
           <div className="mb-6 flex items-center justify-between">
             <Link
               href={`/admin/vaktliste?uke=${prevMonday}`}
@@ -89,12 +94,9 @@ export default async function VaktlistePage({
 
           {hasUnpublished && (
             <form action={publishWeek.bind(null, weekStart)} className="mb-6">
-              <button
-                type="submit"
-                className="w-full rounded-md bg-gfgk-gold py-3 text-sm font-bold text-gfgk-black hover:bg-gfgk-gold-deep transition-colors"
-              >
+              <Button type="submit" variant="accent" fullWidth>
                 Publiser vaktliste for uke {weekNum}
-              </button>
+              </Button>
             </form>
           )}
 
@@ -112,7 +114,7 @@ export default async function VaktlistePage({
                       {dayShifts.map((shift) => (
                         <div
                           key={shift.id}
-                          className="flex items-center justify-between rounded-lg border border-gfgk-border bg-white px-4 py-3 shadow-card"
+                          className="flex items-center justify-between rounded-2xl border border-gfgk-border bg-white px-4 py-3 shadow-card"
                         >
                           <div>
                             <p className="text-sm font-bold text-gfgk-black">
@@ -145,7 +147,7 @@ export default async function VaktlistePage({
 
           <section>
             <SectionLabel>Ny vakt</SectionLabel>
-            <form action={createShift} className="space-y-4 rounded-lg border border-gfgk-border bg-white p-4 shadow-card">
+            <form action={createShift} className="space-y-4 rounded-2xl border border-gfgk-border bg-white p-4 shadow-card">
               <label className="block space-y-1.5">
                 <span className="text-sm font-semibold text-gfgk-text">Dato</span>
                 <select name="date" className="w-full">
@@ -183,12 +185,9 @@ export default async function VaktlistePage({
                 <span className="text-sm font-semibold text-gfgk-text">Notat (valgfritt)</span>
                 <input name="note" type="text" className="w-full" />
               </label>
-              <button
-                type="submit"
-                className="w-full rounded-md bg-gfgk-gold py-3 text-sm font-bold text-gfgk-black hover:bg-gfgk-gold-deep transition-colors"
-              >
+              <Button type="submit" variant="accent" fullWidth>
                 Legg til vakt
-              </button>
+              </Button>
             </form>
           </section>
         </div>

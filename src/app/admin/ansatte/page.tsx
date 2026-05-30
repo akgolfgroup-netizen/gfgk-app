@@ -4,6 +4,7 @@ import { getDb } from '@/db'
 import { invites, users } from '@/db/schema'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import { CopyButton } from '@/components/CopyButton'
+import { Button } from '@/components/ui/Button'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { createInvite, revokeInvite } from '@/lib/invite'
@@ -27,9 +28,13 @@ export default async function AnsattePage() {
 
   return (
     <>
-        <PageHeader title="Ansatte" back={{ href: '/admin', label: 'Admin' }} />
+        <PageHeader
+          title="Ansatte"
+          back={{ href: '/admin', label: 'Admin' }}
+          maxWidth="6xl"
+        />
 
-        <div className="px-6 pt-6 space-y-8">
+        <div className="px-6 pt-6 space-y-8 lg:mx-auto lg:max-w-6xl">
           <section>
             <SectionLabel>Brukere ({allUsers.length})</SectionLabel>
             <div className="space-y-2">
@@ -37,7 +42,7 @@ export default async function AnsattePage() {
                 <a
                   key={user.id}
                   href={`/admin/ansatte/${user.id}`}
-                  className="block rounded-lg border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-card transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
+                  className="block rounded-2xl border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-card transition-[border-color,box-shadow] duration-150 hover:shadow-card-hover"
                 >
                   <p className="font-semibold text-gfgk-text">{user.name ?? user.email}</p>
                   {user.name && <p className="text-sm text-gfgk-text-2">{user.email}</p>}
@@ -57,7 +62,7 @@ export default async function AnsattePage() {
                 {pendingInvites.map((invite) => (
                   <div
                     key={invite.id}
-                    className="rounded-lg border border-gfgk-border bg-gfgk-gold-light px-4 py-3 shadow-card space-y-2"
+                    className="rounded-2xl border border-gfgk-border bg-gfgk-gold-light px-4 py-3 shadow-card space-y-2"
                   >
                     <p className="font-semibold text-gfgk-text">{invite.email}</p>
                     <p className="text-xs text-gfgk-text-2 uppercase tracking-wide">
@@ -82,7 +87,7 @@ export default async function AnsattePage() {
 
           <section>
             <SectionLabel>Ny invitasjon</SectionLabel>
-            <form action={createInvite} className="space-y-4 rounded-lg border border-gfgk-border bg-white p-4 shadow-card">
+            <form action={createInvite} className="space-y-4 rounded-2xl border border-gfgk-border bg-white p-4 shadow-card">
               <label className="block space-y-1.5">
                 <span className="text-sm font-semibold text-gfgk-text">E-post</span>
                 <input
@@ -101,12 +106,9 @@ export default async function AnsattePage() {
                   <option value="admin">Admin</option>
                 </select>
               </label>
-              <button
-                type="submit"
-                className="w-full rounded-md bg-gfgk-gold py-3 text-sm font-bold text-gfgk-black hover:bg-gfgk-gold-deep transition-colors"
-              >
+              <Button type="submit" variant="accent" fullWidth>
                 Generer invitasjonslenke
-              </button>
+              </Button>
             </form>
           </section>
         </div>
