@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { SubmitButton } from '@/components/ui/SubmitButton'
 import { createTransaction } from '@/lib/transactions'
 
 const KATEGORIER = {
@@ -71,12 +72,13 @@ export function TransactionForm({ defaultDate }: { defaultDate: string }) {
         <input name="description" type="text" className="w-full" />
       </label>
 
-      <button
-        type="submit"
-        className="w-full rounded-md bg-gfgk-gold py-3 text-sm font-bold text-gfgk-black hover:bg-gfgk-gold-deep transition-colors"
+      <SubmitButton
+        fullWidth
+        pendingText="Lagrer …"
+        className="h-auto rounded-md bg-gfgk-gold py-3 text-sm font-bold text-gfgk-black hover:bg-gfgk-gold-deep"
       >
         Legg til
-      </button>
+      </SubmitButton>
     </form>
   )
 }

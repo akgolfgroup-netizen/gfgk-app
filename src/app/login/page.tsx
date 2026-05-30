@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { signIn } from '@/auth'
-import { Button } from '@/components/ui/Button'
+import { SubmitButton } from '@/components/ui/SubmitButton'
 
 async function loginAction(formData: FormData) {
   'use server'
@@ -108,9 +108,9 @@ export default async function LoginPage({
                 className="w-full"
               />
             </label>
-            <Button type="submit" size="lg" fullWidth>
+            <SubmitButton size="lg" fullWidth pendingText="Logger inn …">
               Logg inn
-            </Button>
+            </SubmitButton>
             {error && (
               <p
                 role="alert"

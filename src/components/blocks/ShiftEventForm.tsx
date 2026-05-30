@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
+import { SubmitButton } from '@/components/ui/SubmitButton'
 import { Textarea } from '@/components/ui/Textarea'
 
 interface ShiftEventFormProps {
@@ -32,10 +33,13 @@ export function ShiftEventForm({ shiftId, onLog }: ShiftEventFormProps) {
           {shiftId && <input type="hidden" name="shiftId" value={shiftId} />}
 
           <div>
-            <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+            <label
+              htmlFor="shift-event-category"
+              className="mb-1.5 block text-sm font-semibold text-gfgk-text"
+            >
               Kategori
             </label>
-            <Select name="category" defaultValue="hendelse">
+            <Select id="shift-event-category" name="category" defaultValue="hendelse">
               <option value="hendelse">Generell hendelse</option>
               <option value="klage">Klage</option>
               <option value="maskin">Maskin / utstyr</option>
@@ -45,10 +49,13 @@ export function ShiftEventForm({ shiftId, onLog }: ShiftEventFormProps) {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+            <label
+              htmlFor="shift-event-severity"
+              className="mb-1.5 block text-sm font-semibold text-gfgk-text"
+            >
               Alvorlighet
             </label>
-            <Select name="severity" defaultValue="info">
+            <Select id="shift-event-severity" name="severity" defaultValue="info">
               <option value="info">Info</option>
               <option value="medium">Medium</option>
               <option value="hoy">Høy</option>
@@ -56,10 +63,14 @@ export function ShiftEventForm({ shiftId, onLog }: ShiftEventFormProps) {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+            <label
+              htmlFor="shift-event-body"
+              className="mb-1.5 block text-sm font-semibold text-gfgk-text"
+            >
               Beskrivelse
             </label>
             <Textarea
+              id="shift-event-body"
               name="body"
               required
               rows={4}
@@ -74,9 +85,9 @@ export function ShiftEventForm({ shiftId, onLog }: ShiftEventFormProps) {
                 Avbryt
               </Button>
             </BottomSheetClose>
-            <Button type="submit" variant="primary" fullWidth>
+            <SubmitButton variant="primary" fullWidth pendingText="Lagrer …">
               Loggfør
-            </Button>
+            </SubmitButton>
           </div>
         </form>
       </BottomSheetContent>

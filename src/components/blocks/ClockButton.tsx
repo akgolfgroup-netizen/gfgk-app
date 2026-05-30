@@ -31,7 +31,7 @@ export function ClockButton({
   onClockIn,
   onClockOut,
 }: ClockButtonProps) {
-  const [, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition()
   const [tick, setTick] = useState(0)
 
   // Live timer (oppdater hvert sekund når innstemplet)
@@ -74,6 +74,7 @@ export function ClockButton({
             variant="primary"
             size="lg"
             fullWidth
+            disabled={isPending}
             className="!bg-gfgk-gold !text-gfgk-black"
           >
             <LogOut className="h-5 w-5" />
@@ -112,7 +113,7 @@ export function ClockButton({
         }}
         className="mt-4"
       >
-        <Button type="submit" variant="primary" size="lg" fullWidth>
+        <Button type="submit" variant="primary" size="lg" fullWidth disabled={isPending}>
           <LogIn className="h-5 w-5" />
           Stempel inn
         </Button>
