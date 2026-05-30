@@ -22,6 +22,12 @@ const TONE_BG = {
   red: 'bg-gfgk-red text-white',
 } as const
 
+const TONE_ACCENT = {
+  gold: 'border-l-gfgk-gold',
+  teal: 'border-l-gfgk-teal',
+  red: 'border-l-gfgk-red',
+} as const
+
 function timeToMinutes(t: string): number {
   const [h, m] = t.split(':').map(Number)
   return (h ?? 0) * 60 + (m ?? 0)
@@ -29,7 +35,7 @@ function timeToMinutes(t: string): number {
 
 const START_HOUR = 7
 const END_HOUR = 22
-const HOUR_HEIGHT = 48 // px
+const HOUR_HEIGHT = 56 // px — litt romsligere kolonner på desktop
 
 export function CalendarWeek({ weekStart, events, baseHref }: CalendarWeekProps) {
   const days = daysInWeek(weekStart)
@@ -44,109 +50,178 @@ export function CalendarWeek({ weekStart, events, baseHref }: CalendarWeekProps)
   const nowTop = ((nowMin - START_HOUR * 60) / 60) * HOUR_HEIGHT
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gfgk-border bg-white shadow-card">
-      {/* Header: ukedager */}
-      <div className="grid grid-cols-[40px_repeat(7,_1fr)] border-b border-gfgk-border bg-gfgk-black">
-        <div />
+    <>
+      {/* ---------- MOBIL: dag-for-dag agenda ---------- */}
+      <div className="space-y-4 lg:hidden">
         {days.map((d, i) => {
+          const dateStr = toDateString(d)
           const isToday = sameDay(d, today)
+          const dayEvents = events
+            .filter((e) => e.date === dateStr)
+            .sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime))
+
+          // Skjul tomme dager (men alltid vis i dag)
+          if (dayEvents.length === 0 && !isToday) return null
+
           return (
-            <a
-              key={i}
-              href={`${baseHref}?view=dag&date=${toDateString(d)}`}
-              className="flex flex-col items-center py-2 text-center transition-colors hover:bg-white/5"
-            >
-              <span className="text-[10px] font-extrabold uppercase tracking-wide text-gfgk-gold">
-                {WEEKDAYS_NB[i]}
-              </span>
-              <span
-                className={cn(
-                  'mt-0.5 text-sm font-bold',
-                  isToday ? 'text-gfgk-gold' : 'text-white/80',
-                )}
+            <section key={i}>
+              <a
+                href={`${baseHref}?view=dag&date=${dateStr}`}
+                className="mb-2 flex items-baseline gap-2"
               >
-                {d.getDate()}
-              </span>
-            </a>
+                <span
+                  className={cn(
+                    'text-[11px] font-extrabold uppercase tracking-wide',
+                    isToday ? 'text-gfgk-gold-deep' : 'text-gfgk-text-3',
+                  )}
+                >
+                  {WEEKDAYS_NB[i]}
+                </span>
+                <span
+                  className={cn(
+                    'text-sm font-bold capitalize',
+                    isToday ? 'text-gfgk-gold-deep' : 'text-gfgk-text',
+                  )}
+                >
+                  {d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long' })}
+                </span>
+                {isToday && (
+                  <span className="rounded-full bg-gfgk-gold px-2 py-0.5 text-[10px] font-bold text-gfgk-black">
+                    I dag
+                  </span>
+                )}
+              </a>
+
+              {dayEvents.length === 0 ? (
+                <p className="pl-0.5 text-xs text-gfgk-text-3">Ingen aktiviteter</p>
+              ) : (
+                <div className="space-y-2">
+                  {dayEvents.map((e) => (
+                    <div
+                      key={e.id}
+                      className={cn(
+                        'flex min-h-[44px] items-center gap-3 rounded-xl border border-gfgk-border border-l-4 bg-white px-3 py-2.5 shadow-card',
+                        TONE_ACCENT[e.tone],
+                      )}
+                    >
+                      <span className="font-mono-nums shrink-0 text-xs font-semibold text-gfgk-text-2">
+                        {e.startTime}
+                        <span className="text-gfgk-text-3">–{e.endTime}</span>
+                      </span>
+                      <span className="truncate text-sm font-semibold text-gfgk-text">
+                        {e.title}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
           )
         })}
       </div>
 
-      {/* Timeline */}
-      <div
-        className="relative grid grid-cols-[40px_repeat(7,_1fr)]"
-        style={{ height: `${(END_HOUR - START_HOUR) * HOUR_HEIGHT}px` }}
-      >
-        {/* NÅ-markør */}
-        {showNow && (
-          <div
-            className="pointer-events-none absolute inset-x-0 z-20 flex items-center"
-            style={{ top: `${nowTop}px` }}
-            aria-hidden="true"
-          >
-            <span className="pulse-dot ml-1.5 h-2 w-2 shrink-0 rounded-full bg-gfgk-gold" />
-            <div className="h-px flex-1 bg-gfgk-gold/80" />
-          </div>
-        )}
-
-        {/* Time labels */}
-        <div className="flex flex-col">
-          {Array.from({ length: END_HOUR - START_HOUR }, (_, i) => (
-            <div
-              key={i}
-              className="border-b border-gfgk-border text-right pr-1 text-[10px] text-gfgk-text-3"
-              style={{ height: `${HOUR_HEIGHT}px` }}
-            >
-              {String(START_HOUR + i).padStart(2, '0')}:00
-            </div>
-          ))}
+      {/* ---------- DESKTOP: tidslinje-rutenett ---------- */}
+      <div className="hidden overflow-hidden rounded-2xl border border-gfgk-border bg-white shadow-card lg:block">
+        {/* Header: ukedager */}
+        <div className="grid grid-cols-[52px_repeat(7,_1fr)] border-b border-gfgk-border bg-gfgk-black">
+          <div />
+          {days.map((d, i) => {
+            const isToday = sameDay(d, today)
+            return (
+              <a
+                key={i}
+                href={`${baseHref}?view=dag&date=${toDateString(d)}`}
+                className="flex flex-col items-center py-2.5 text-center transition-colors hover:bg-white/5"
+              >
+                <span className="text-[10px] font-extrabold uppercase tracking-wide text-gfgk-gold">
+                  {WEEKDAYS_NB[i]}
+                </span>
+                <span
+                  className={cn(
+                    'mt-0.5 text-sm font-bold',
+                    isToday ? 'text-gfgk-gold' : 'text-white/80',
+                  )}
+                >
+                  {d.getDate()}
+                </span>
+              </a>
+            )
+          })}
         </div>
 
-        {/* 7 day columns */}
-        {days.map((d, dayIdx) => {
-          const dateStr = toDateString(d)
-          const dayEvents = events.filter((e) => e.date === dateStr)
-          return (
+        {/* Timeline */}
+        <div
+          className="relative grid grid-cols-[52px_repeat(7,_1fr)]"
+          style={{ height: `${(END_HOUR - START_HOUR) * HOUR_HEIGHT}px` }}
+        >
+          {/* NÅ-markør */}
+          {showNow && (
             <div
-              key={dayIdx}
-              className="relative border-l border-gfgk-border"
+              className="pointer-events-none absolute inset-x-0 z-20 flex items-center"
+              style={{ top: `${nowTop}px` }}
+              aria-hidden="true"
             >
-              {/* Hourly grid */}
-              {Array.from({ length: END_HOUR - START_HOUR }, (_, i) => (
-                <div
-                  key={i}
-                  className="border-b border-gfgk-border"
-                  style={{ height: `${HOUR_HEIGHT}px` }}
-                />
-              ))}
-              {/* Events */}
-              {dayEvents.map((e) => {
-                const startMin = timeToMinutes(e.startTime)
-                const endMin = timeToMinutes(e.endTime)
-                const offsetMin = startMin - START_HOUR * 60
-                const heightMin = endMin - startMin
-                if (offsetMin < 0 || heightMin <= 0) return null
-                return (
-                  <div
-                    key={e.id}
-                    className={cn(
-                      'absolute left-0.5 right-0.5 rounded-md px-1 py-0.5 text-[10px] font-semibold overflow-hidden',
-                      TONE_BG[e.tone],
-                    )}
-                    style={{
-                      top: `${(offsetMin / 60) * HOUR_HEIGHT}px`,
-                      height: `${(heightMin / 60) * HOUR_HEIGHT}px`,
-                    }}
-                  >
-                    <div className="truncate">{e.startTime}</div>
-                    <div className="truncate">{e.title}</div>
-                  </div>
-                )
-              })}
+              <span className="pulse-dot ml-2 h-2 w-2 shrink-0 rounded-full bg-gfgk-gold" />
+              <div className="h-px flex-1 bg-gfgk-gold/80" />
             </div>
-          )
-        })}
+          )}
+
+          {/* Time labels */}
+          <div className="flex flex-col">
+            {Array.from({ length: END_HOUR - START_HOUR }, (_, i) => (
+              <div
+                key={i}
+                className="border-b border-gfgk-border pr-1.5 text-right text-[10px] text-gfgk-text-3"
+                style={{ height: `${HOUR_HEIGHT}px` }}
+              >
+                {String(START_HOUR + i).padStart(2, '0')}:00
+              </div>
+            ))}
+          </div>
+
+          {/* 7 day columns */}
+          {days.map((d, dayIdx) => {
+            const dateStr = toDateString(d)
+            const dayEvents = events.filter((e) => e.date === dateStr)
+            return (
+              <div key={dayIdx} className="relative border-l border-gfgk-border">
+                {/* Hourly grid */}
+                {Array.from({ length: END_HOUR - START_HOUR }, (_, i) => (
+                  <div
+                    key={i}
+                    className="border-b border-gfgk-border"
+                    style={{ height: `${HOUR_HEIGHT}px` }}
+                  />
+                ))}
+                {/* Events */}
+                {dayEvents.map((e) => {
+                  const startMin = timeToMinutes(e.startTime)
+                  const endMin = timeToMinutes(e.endTime)
+                  const offsetMin = startMin - START_HOUR * 60
+                  const heightMin = endMin - startMin
+                  if (offsetMin < 0 || heightMin <= 0) return null
+                  return (
+                    <div
+                      key={e.id}
+                      className={cn(
+                        'absolute left-0.5 right-0.5 overflow-hidden rounded-md px-1.5 py-1 text-[10px] font-semibold',
+                        TONE_BG[e.tone],
+                      )}
+                      style={{
+                        top: `${(offsetMin / 60) * HOUR_HEIGHT}px`,
+                        height: `${(heightMin / 60) * HOUR_HEIGHT}px`,
+                      }}
+                    >
+                      <div className="font-mono-nums truncate">{e.startTime}</div>
+                      <div className="truncate">{e.title}</div>
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </div>
       </div>
-    </div>
+    </>
   )
 }

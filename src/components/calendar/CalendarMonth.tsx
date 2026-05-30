@@ -64,9 +64,9 @@ export function CalendarMonth({
           return (
             <a
               key={i}
-              href={`${baseHref}?view=dag&date=${cell.isoString}`}
+              href={`${baseHref}?view=maned&date=${cell.isoString}`}
               className={cn(
-                'flex min-h-[48px] flex-col items-center justify-start gap-1 border-b border-r border-gfgk-border p-1 text-xs transition-colors hover:bg-gfgk-cream-deep',
+                'flex min-h-[56px] flex-col items-center justify-start gap-1 border-b border-r border-gfgk-border p-1.5 text-xs transition-colors hover:bg-gfgk-cream-deep',
                 !cell.inMonth && 'bg-gfgk-cream/50 text-gfgk-text-3',
                 cell.inMonth && 'text-gfgk-text-2',
                 isToday && 'bg-gfgk-gold-light',

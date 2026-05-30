@@ -1,3 +1,4 @@
+import { CalendarOff } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import type { CalendarTimedEvent } from './CalendarWeek'
 
@@ -37,6 +38,7 @@ export function CalendarDay({ date, events }: CalendarDayProps) {
     groups.set(hour, arr)
   }
 
+  const nowMin = today.getHours() * 60 + today.getMinutes()
   const nowStr = today.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' })
 
   return (
@@ -49,34 +51,48 @@ export function CalendarDay({ date, events }: CalendarDayProps) {
       )}
 
       {sorted.length === 0 ? (
-        <p className="text-sm text-gfgk-text-3">Ingen events denne dagen.</p>
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-gfgk-border bg-white/50 px-6 py-10 text-center">
+          <CalendarOff className="h-6 w-6 text-gfgk-text-3" aria-hidden="true" />
+          <p className="text-sm font-medium text-gfgk-text-2">
+            Ingen aktiviteter denne dagen
+          </p>
+        </div>
       ) : (
-        <div className="space-y-2">
-          {Array.from(groups.entries()).map(([hour, items]) => (
-            <div key={hour} className="grid grid-cols-[40px_1fr] gap-3">
-              <span className="font-mono-nums text-xs font-semibold text-gfgk-text-3">
-                {hour}:00
-              </span>
-              <div className="space-y-1.5">
-                {items.map((e) => (
-                  <div
-                    key={e.id}
-                    className={cn(
-                      'rounded-xl border border-gfgk-border border-l-4 bg-white p-3 shadow-card',
-                      TONE_ACCENT[e.tone],
-                    )}
-                  >
-                    <p className="font-mono-nums text-xs font-semibold text-gfgk-text-2">
-                      {e.startTime}–{e.endTime}
-                    </p>
-                    <p className="mt-0.5 text-sm font-semibold text-gfgk-text">
-                      {e.title}
-                    </p>
-                  </div>
-                ))}
+        <div className="space-y-3">
+          {Array.from(groups.entries()).map(([hour, items]) => {
+            const hourMin = Number(hour) * 60
+            const isCurrentHour = isToday && nowMin >= hourMin && nowMin < hourMin + 60
+            return (
+              <div key={hour} className="grid grid-cols-[44px_1fr] gap-3">
+                <span
+                  className={cn(
+                    'font-mono-nums pt-0.5 text-xs font-semibold',
+                    isCurrentHour ? 'text-gfgk-gold-deep' : 'text-gfgk-text-3',
+                  )}
+                >
+                  {hour}:00
+                </span>
+                <div className="space-y-2">
+                  {items.map((e) => (
+                    <div
+                      key={e.id}
+                      className={cn(
+                        'min-h-[44px] rounded-xl border border-gfgk-border border-l-4 bg-white p-3 shadow-card',
+                        TONE_ACCENT[e.tone],
+                      )}
+                    >
+                      <p className="font-mono-nums text-xs font-semibold text-gfgk-text-2">
+                        {e.startTime}–{e.endTime}
+                      </p>
+                      <p className="mt-0.5 text-sm font-semibold text-gfgk-text">
+                        {e.title}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

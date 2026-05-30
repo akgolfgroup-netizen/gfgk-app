@@ -17,10 +17,10 @@ import {
 import { Button } from '@/components/ui/Button'
 import { FAB } from '@/components/ui/FAB'
 import { Input } from '@/components/ui/Input'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
+import { cn } from '@/lib/cn'
 import type { Activity } from '@/db/schema'
 import {
   endOfMonth,
@@ -28,6 +28,7 @@ import {
   endOfYear,
   formatNorwegianMonthYear,
   isoWeek,
+  shiftPeriod,
   startOfMonth,
   startOfWeek,
   startOfYear,
@@ -38,6 +39,13 @@ import { createActivity, listActivities } from '@/lib/activities'
 interface PageProps {
   searchParams: Promise<{ view?: string; date?: string }>
 }
+
+const ACTIVITY_ACCENT = {
+  gold: 'border-l-gfgk-gold',
+  teal: 'border-l-gfgk-teal',
+  red: 'border-l-gfgk-red',
+  neutral: 'border-l-gfgk-text-3',
+} as const
 
 function activityTone(type: Activity['type']): 'gold' | 'teal' | 'red' | 'neutral' {
   switch (type) {
@@ -101,22 +109,11 @@ export default async function KalenderPage({ searchParams }: PageProps) {
 
   const activities = await listActivities({ from, to })
 
-  // Beregn forrige/neste
-  const prev = new Date(refDate)
-  const next = new Date(refDate)
-  if (view === 'dag') {
-    prev.setDate(prev.getDate() - 1)
-    next.setDate(next.getDate() + 1)
-  } else if (view === 'uke') {
-    prev.setDate(prev.getDate() - 7)
-    next.setDate(next.getDate() + 7)
-  } else if (view === 'ar') {
-    prev.setFullYear(prev.getFullYear() - 1)
-    next.setFullYear(next.getFullYear() + 1)
-  } else {
-    prev.setMonth(prev.getMonth() - 1)
-    next.setMonth(next.getMonth() + 1)
-  }
+  // Beregn forrige/neste. I måneds-visning er refDate BÅDE valgt dag og
+  // referansemåned — hopp hele måneder og klamp dagnummeret så vi ikke
+  // ruller over til en annen måned (f.eks. 31. mai → «31. april» = 1. mai).
+  const prev = shiftPeriod(refDate, view, -1)
+  const next = shiftPeriod(refDate, view, 1)
 
   const title =
     view === 'dag'
@@ -137,43 +134,46 @@ export default async function KalenderPage({ searchParams }: PageProps) {
     tone: activityTone(a.type),
   }))
 
+  const selectedDateStr = toDateString(refDate)
+  const selectedDayActivities = activities
+    .filter((a) => toDateString(a.startAt) === selectedDateStr)
+    .sort((a, b) => a.startAt.getTime() - b.startAt.getTime())
+
   return (
     <AppShell role={session.user.role} userName={session.user.name ?? null}>
-        <PageHeader
-          title="Kalender"
-          subtitle="Turneringer og aktiviteter"
-          maxWidth="6xl"
-        />
-
-        <div className="space-y-4 px-6 pt-4 lg:mx-auto lg:max-w-6xl">
-          <div className="flex items-center justify-between gap-3">
-            <ViewToggle current={view} baseHref="/kalender" />
-            <div className="flex items-center gap-1">
-              <a
-                href={`/kalender?view=${view}&date=${toDateString(prev)}`}
-                className="rounded-md border border-gfgk-border bg-white p-2 text-gfgk-text-2 hover:bg-gfgk-cream-deep"
-                aria-label="Forrige"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </a>
-              <a
-                href={`/kalender?view=${view}&date=${toDateString(new Date())}`}
-                className="rounded-md border border-gfgk-border bg-white px-3 py-1.5 text-xs font-semibold text-gfgk-text hover:bg-gfgk-cream-deep"
-              >
-                I dag
-              </a>
-              <a
-                href={`/kalender?view=${view}&date=${toDateString(next)}`}
-                className="rounded-md border border-gfgk-border bg-white p-2 text-gfgk-text-2 hover:bg-gfgk-cream-deep"
-                aria-label="Neste"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </a>
+        <div className="sticky top-0 z-30 border-b border-gfgk-border bg-gfgk-cream/95 backdrop-blur supports-[backdrop-filter]:bg-gfgk-cream/80">
+          <div className="space-y-3 px-6 pt-safe pb-3 lg:mx-auto lg:max-w-6xl">
+            <p className="eyebrow pt-3">Kalender · Turneringer og aktiviteter</p>
+            <h1 className="h-display text-2xl capitalize lg:text-3xl">{title}</h1>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <ViewToggle current={view} baseHref="/kalender" />
+              <div className="flex items-center justify-end gap-1">
+                <a
+                  href={`/kalender?view=${view}&date=${toDateString(prev)}`}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-gfgk-border bg-white text-gfgk-text-2 hover:bg-gfgk-cream-deep"
+                  aria-label="Forrige"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </a>
+                <a
+                  href={`/kalender?view=${view}&date=${toDateString(new Date())}`}
+                  className="flex h-10 items-center rounded-lg border border-gfgk-border bg-white px-4 text-sm font-semibold text-gfgk-text hover:bg-gfgk-cream-deep"
+                >
+                  I dag
+                </a>
+                <a
+                  href={`/kalender?view=${view}&date=${toDateString(next)}`}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-gfgk-border bg-white text-gfgk-text-2 hover:bg-gfgk-cream-deep"
+                  aria-label="Neste"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </a>
+              </div>
             </div>
           </div>
+        </div>
 
-          <h2 className="text-sm font-bold capitalize text-gfgk-text">{title}</h2>
-
+        <div className="space-y-4 px-6 pt-4 lg:mx-auto lg:max-w-6xl">
           {view === 'dag' && (
             <CalendarDay date={refDate} events={activities.map(toTimedEvent)} />
           )}
@@ -185,12 +185,61 @@ export default async function KalenderPage({ searchParams }: PageProps) {
             />
           )}
           {view === 'maned' && (
-            <CalendarMonth
-              year={refDate.getFullYear()}
-              month={refDate.getMonth() + 1}
-              events={monthEvents}
-              baseHref="/kalender"
-            />
+            <>
+              <CalendarMonth
+                year={refDate.getFullYear()}
+                month={refDate.getMonth() + 1}
+                events={monthEvents}
+                selectedDate={selectedDateStr}
+                baseHref="/kalender"
+              />
+              <section className="space-y-2">
+                <SectionLabel as="h3">
+                  <span className="capitalize">
+                    {refDate.toLocaleDateString('nb-NO', {
+                      weekday: 'long',
+                      day: 'numeric',
+                      month: 'long',
+                    })}
+                  </span>
+                </SectionLabel>
+                {selectedDayActivities.length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-gfgk-border bg-white/50 px-4 py-6 text-center text-sm text-gfgk-text-3">
+                    Ingen aktiviteter denne dagen
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {selectedDayActivities.map((a) => (
+                      <div
+                        key={a.id}
+                        className={cn(
+                          'min-h-[44px] rounded-xl border border-gfgk-border border-l-4 bg-white p-3 shadow-card',
+                          ACTIVITY_ACCENT[activityTone(a.type)],
+                        )}
+                      >
+                        <p className="font-mono-nums text-xs font-semibold text-gfgk-text-2">
+                          {a.startAt.toLocaleTimeString('nb-NO', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                          –
+                          {a.endAt.toLocaleTimeString('nb-NO', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                        <p className="mt-0.5 text-sm font-semibold text-gfgk-text">
+                          {a.title}
+                        </p>
+                        {a.location && (
+                          <p className="mt-0.5 text-xs text-gfgk-text-3">{a.location}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </>
           )}
           {view === 'ar' && (
             <CalendarYear
@@ -200,8 +249,8 @@ export default async function KalenderPage({ searchParams }: PageProps) {
             />
           )}
 
-          {/* Liste over events for valgt periode (måned/år) */}
-          {(view === 'maned' || view === 'ar') && activities.length > 0 && (
+          {/* Liste over events for året */}
+          {view === 'ar' && activities.length > 0 && (
             <section>
               <SectionLabel as="h3">Kommende</SectionLabel>
               <div className="space-y-2">

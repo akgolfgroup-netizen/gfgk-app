@@ -17,7 +17,6 @@ import {
   type CalendarView,
 } from '@/components/calendar/ViewToggle'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import {
   endOfMonth,
@@ -25,6 +24,7 @@ import {
   endOfYear,
   formatNorwegianMonthYear,
   isoWeek,
+  shiftPeriod,
   startOfMonth,
   startOfWeek,
   startOfYear,
@@ -93,22 +93,10 @@ export default async function VakterPage({ searchParams }: PageProps) {
       ),
   ])
 
-  // Beregn forrige/neste
-  const prev = new Date(refDate)
-  const next = new Date(refDate)
-  if (view === 'dag') {
-    prev.setDate(prev.getDate() - 1)
-    next.setDate(next.getDate() + 1)
-  } else if (view === 'uke') {
-    prev.setDate(prev.getDate() - 7)
-    next.setDate(next.getDate() + 7)
-  } else if (view === 'ar') {
-    prev.setFullYear(prev.getFullYear() - 1)
-    next.setFullYear(next.getFullYear() + 1)
-  } else {
-    prev.setMonth(prev.getMonth() - 1)
-    next.setMonth(next.getMonth() + 1)
-  }
+  // Beregn forrige/neste. Måneds-visning hopper hele måneder og klamper
+  // dagnummeret (refDate er både valgt dag og referansemåned).
+  const prev = shiftPeriod(refDate, view, -1)
+  const next = shiftPeriod(refDate, view, 1)
 
   const title =
     view === 'dag'
@@ -150,43 +138,44 @@ export default async function VakterPage({ searchParams }: PageProps) {
     tone: 'gold' as const,
   }))
 
+  const selectedDateStr = toDateString(refDate)
+  const selectedDayShifts = myShifts.filter((s) => s.date === selectedDateStr)
+
   return (
     <AppShell role={session.user.role} userName={session.user.name ?? null}>
-        <PageHeader
-          title="Mine vakter"
-          subtitle={`${myShifts.length} vakter`}
-          maxWidth="6xl"
-        />
-
-        <div className="space-y-4 px-6 pt-4 lg:mx-auto lg:max-w-6xl">
-          <div className="flex items-center justify-between gap-3">
-            <ViewToggle current={view} baseHref="/vakter" />
-            <div className="flex items-center gap-1">
-              <a
-                href={`/vakter?view=${view}&date=${toDateString(prev)}`}
-                className="rounded-md border border-gfgk-border bg-white p-2 text-gfgk-text-2 hover:bg-gfgk-cream-deep"
-                aria-label="Forrige"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </a>
-              <a
-                href={`/vakter?view=${view}&date=${toDateString(new Date())}`}
-                className="rounded-md border border-gfgk-border bg-white px-3 py-1.5 text-xs font-semibold text-gfgk-text hover:bg-gfgk-cream-deep"
-              >
-                I dag
-              </a>
-              <a
-                href={`/vakter?view=${view}&date=${toDateString(next)}`}
-                className="rounded-md border border-gfgk-border bg-white p-2 text-gfgk-text-2 hover:bg-gfgk-cream-deep"
-                aria-label="Neste"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </a>
+        <div className="sticky top-0 z-30 border-b border-gfgk-border bg-gfgk-cream/95 backdrop-blur supports-[backdrop-filter]:bg-gfgk-cream/80">
+          <div className="space-y-3 px-6 pt-safe pb-3 lg:mx-auto lg:max-w-6xl">
+            <p className="eyebrow pt-3">Mine vakter · {myShifts.length} vakter</p>
+            <h1 className="h-display text-2xl capitalize lg:text-3xl">{title}</h1>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <ViewToggle current={view} baseHref="/vakter" />
+              <div className="flex items-center justify-end gap-1">
+                <a
+                  href={`/vakter?view=${view}&date=${toDateString(prev)}`}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-gfgk-border bg-white text-gfgk-text-2 hover:bg-gfgk-cream-deep"
+                  aria-label="Forrige"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </a>
+                <a
+                  href={`/vakter?view=${view}&date=${toDateString(new Date())}`}
+                  className="flex h-10 items-center rounded-lg border border-gfgk-border bg-white px-4 text-sm font-semibold text-gfgk-text hover:bg-gfgk-cream-deep"
+                >
+                  I dag
+                </a>
+                <a
+                  href={`/vakter?view=${view}&date=${toDateString(next)}`}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-gfgk-border bg-white text-gfgk-text-2 hover:bg-gfgk-cream-deep"
+                  aria-label="Neste"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </a>
+              </div>
             </div>
           </div>
+        </div>
 
-          <h2 className="text-sm font-bold capitalize text-gfgk-text">{title}</h2>
-
+        <div className="space-y-4 px-6 pt-4 lg:mx-auto lg:max-w-6xl">
           {view === 'dag' && <CalendarDay date={refDate} events={timedEvents} />}
           {view === 'uke' && (
             <CalendarWeek
@@ -196,12 +185,49 @@ export default async function VakterPage({ searchParams }: PageProps) {
             />
           )}
           {view === 'maned' && (
-            <CalendarMonth
-              year={refDate.getFullYear()}
-              month={refDate.getMonth() + 1}
-              events={monthEvents}
-              baseHref="/vakter"
-            />
+            <>
+              <CalendarMonth
+                year={refDate.getFullYear()}
+                month={refDate.getMonth() + 1}
+                events={monthEvents}
+                selectedDate={selectedDateStr}
+                baseHref="/vakter"
+              />
+              <section className="space-y-2">
+                <SectionLabel as="h3">
+                  <span className="capitalize">
+                    {refDate.toLocaleDateString('nb-NO', {
+                      weekday: 'long',
+                      day: 'numeric',
+                      month: 'long',
+                    })}
+                  </span>
+                </SectionLabel>
+                {selectedDayShifts.length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-gfgk-border bg-white/50 px-4 py-6 text-center text-sm text-gfgk-text-3">
+                    Ingen vakter denne dagen
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {selectedDayShifts.map((s) => (
+                      <div
+                        key={s.id}
+                        className="min-h-[44px] rounded-xl border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white p-3 shadow-card"
+                      >
+                        <p className="font-mono-nums text-xs font-semibold text-gfgk-text-2">
+                          {s.startTime}–{s.endTime}
+                        </p>
+                        {s.note && (
+                          <p className="mt-0.5 text-sm font-semibold text-gfgk-text">
+                            {s.note}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </>
           )}
           {view === 'ar' && (
             <CalendarYear
@@ -219,7 +245,7 @@ export default async function VakterPage({ searchParams }: PageProps) {
             />
           )}
 
-          {(view === 'maned' || view === 'ar') && myShifts.length > 0 && (
+          {view === 'ar' && myShifts.length > 0 && (
             <section>
               <SectionLabel as="h3">Detaljer</SectionLabel>
               <div className="space-y-2">

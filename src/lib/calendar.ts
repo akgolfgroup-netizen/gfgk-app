@@ -110,6 +110,33 @@ export function monthGrid(year: number, month: number): MonthCell[] {
   })
 }
 
+/**
+ * Flytt en referansedato med ±1 periode for kalender-navigasjon.
+ * For måneds-visning hopper vi hele måneder og klamper dagnummeret til
+ * måltidens lengde (31. mai − 1 mnd → 30. april, ikke 1. mai).
+ */
+export function shiftPeriod(
+  ref: Date,
+  view: 'dag' | 'uke' | 'maned' | 'ar',
+  dir: -1 | 1,
+): Date {
+  const out = new Date(ref)
+  if (view === 'dag') {
+    out.setDate(out.getDate() + dir)
+  } else if (view === 'uke') {
+    out.setDate(out.getDate() + dir * 7)
+  } else if (view === 'ar') {
+    out.setFullYear(out.getFullYear() + dir)
+  } else {
+    const day = out.getDate()
+    out.setDate(1) // unngå roll-over før vi bytter måned
+    out.setMonth(out.getMonth() + dir)
+    const lastDay = new Date(out.getFullYear(), out.getMonth() + 1, 0).getDate()
+    out.setDate(Math.min(day, lastDay))
+  }
+  return out
+}
+
 export function formatNorwegianMonthYear(d: Date): string {
   return `${MONTHS_NB[d.getMonth()]} ${d.getFullYear()}`
 }
