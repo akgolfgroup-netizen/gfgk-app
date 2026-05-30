@@ -51,6 +51,9 @@ const BottomSheetContent = React.forwardRef<
         'motion-reduce:animate-none',
         className,
       )}
+      // Opt-out av Radix sin describedby-advarsel når arket ikke har en
+      // BottomSheetDescription. Overstyrbar via props ved behov.
+      aria-describedby={undefined}
       {...props}
     >
       <div className="flex justify-center pt-3">

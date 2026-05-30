@@ -4,7 +4,7 @@ import { auth } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
 import { MarkdownView } from '@/components/blocks/MarkdownView'
 import { Pill } from '@/components/ui/Pill'
-import { PageHeader } from '@/components/ui/PageHeader'
+import { SubHeader } from '@/components/ui/SubHeader'
 import type { ArticleCategory } from '@/db/schema'
 import { getArticleBySlug } from '@/lib/articles'
 
@@ -39,14 +39,14 @@ export default async function ArtikkelPage({ params }: PageProps) {
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <PageHeader
+        <SubHeader
           title={article.title}
           back={{ href: '/kunnskap', label: 'Kunnskap' }}
           action={
             session.user.role === 'admin' ? (
               <a
                 href={`/admin/kunnskap/${article.id}/rediger`}
-                className="rounded-md p-1.5 text-white/50 hover:bg-white/10 hover:text-white"
+                className="rounded-lg p-1.5 text-gfgk-text-2 transition-colors hover:bg-gfgk-cream-deep hover:text-gfgk-text"
                 aria-label="Rediger"
               >
                 <Pencil className="h-5 w-5" />
@@ -56,18 +56,23 @@ export default async function ArtikkelPage({ params }: PageProps) {
         />
 
         <div className="space-y-4 px-6 pt-6">
-          <div className="flex items-center gap-2">
-            <Pill tone={CATEGORY_TONE[article.category]} size="md">
-              {CATEGORY_LABEL[article.category]}
-            </Pill>
-            <span className="text-xs text-gfgk-text-3">
-              Oppdatert{' '}
-              {article.updatedAt.toLocaleDateString('nb-NO', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
-            </span>
+          <div className="space-y-3">
+            <h1 className="text-[28px] font-extrabold leading-tight tracking-tight text-gfgk-text">
+              {article.title}
+            </h1>
+            <div className="flex items-center gap-2">
+              <Pill tone={CATEGORY_TONE[article.category]} size="md">
+                {CATEGORY_LABEL[article.category]}
+              </Pill>
+              <span className="text-xs text-gfgk-text-3">
+                Oppdatert{' '}
+                {article.updatedAt.toLocaleDateString('nb-NO', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </span>
+            </div>
           </div>
 
           <MarkdownView content={article.body} />

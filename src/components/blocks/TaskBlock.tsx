@@ -72,7 +72,7 @@ export function TaskBlock({ task, onToggle, sortable = false, flat = false }: Ta
       ref={sortable ? setNodeRef : undefined}
       style={style}
       className={cn(
-        'group flex items-center gap-2 rounded-xl border border-gfgk-border bg-white px-3 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)] transition-colors',
+        'group flex items-center gap-2 rounded-xl border border-gfgk-border bg-white px-3 py-3 shadow-card transition-colors',
         !flat && 'hover:bg-gfgk-cream-deep',
         done && 'opacity-60',
       )}

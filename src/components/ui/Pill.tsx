@@ -3,7 +3,7 @@ import * as React from 'react'
 import { cn } from '@/lib/cn'
 
 const pillVariants = cva(
-  'inline-flex items-center gap-1.5 rounded-full font-semibold uppercase tracking-wider whitespace-nowrap',
+  'inline-flex items-center gap-1.5 rounded-full font-medium whitespace-nowrap',
   {
     variants: {
       tone: {
@@ -14,9 +14,9 @@ const pillVariants = cva(
         black: 'bg-gfgk-black text-gfgk-gold',
       },
       size: {
-        sm: 'h-[18px] px-2 text-[10px]',
-        md: 'h-6 px-2.5 text-[11px]',
-        lg: 'h-7 px-3 text-xs',
+        sm: 'h-[18px] px-2 text-[11px]',
+        md: 'h-6 px-2.5 text-xs',
+        lg: 'h-7 px-3 text-[13px]',
       },
     },
     defaultVariants: {

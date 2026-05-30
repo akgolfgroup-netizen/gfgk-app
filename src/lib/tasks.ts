@@ -55,6 +55,51 @@ async function userCanAccessTask(taskId: string, userId: string): Promise<boolea
   return Boolean(member)
 }
 
+/**
+ * Intern: tildel en bruker til en oppgave + send e-post/push.
+ * Antar at kalleren allerede har sjekket tilgang. Idempotent (hopper over
+ * hvis allerede tildelt). Brukes av createTask, assignTask og reassignTask.
+ */
+async function assignAndNotify(taskId: string, userId: string): Promise<void> {
+  const db = getDb()
+
+  const [existing] = await db
+    .select({ userId: taskAssignees.userId })
+    .from(taskAssignees)
+    .where(and(eq(taskAssignees.taskId, taskId), eq(taskAssignees.userId, userId)))
+    .limit(1)
+  if (existing) return
+
+  await db.insert(taskAssignees).values({ taskId, userId })
+
+  const [task] = await db.select().from(tasks).where(eq(tasks.id, taskId)).limit(1)
+  const [user] = await db
+    .select({ email: users.email, name: users.name })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1)
+
+  if (task && user) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: `Ny oppgave: ${task.title}`,
+        html: taskAssignedEmailHtml({
+          name: user.name ?? '',
+          title: task.title,
+          dueDate: task.dueDate,
+          appUrl,
+          taskId,
+        }),
+      })
+      await notifyTaskAssigned(userId, task.title, taskId)
+    } catch (err) {
+      console.warn('[tasks] varsling feilet ved tildeling:', err)
+    }
+  }
+}
+
 // ============================================================
 // CRUD
 // ============================================================
@@ -73,6 +118,8 @@ export async function createTask(formData: FormData): Promise<void> {
   const dueDate = (formData.get('dueDate') as string) || null
   const priorityRaw = (formData.get('priority') as string) ?? 'medium'
   const priority: TaskPriority = isPriority(priorityRaw) ? priorityRaw : 'medium'
+  const assigneeId = (formData.get('assigneeId') as string) || null
+  const image = formData.get('image')
 
   if (!title) return
 
@@ -90,17 +137,45 @@ export async function createTask(formData: FormData): Promise<void> {
     )
   const orderIndex = (maxRow?.maxOrder ?? -1) + 1
 
-  await db.insert(tasks).values({
-    title,
-    projectId,
-    parentId,
-    description,
-    dueDate,
-    priority,
-    orderIndex,
-    createdBy: session.user.id,
-    updatedBy: session.user.id,
-  })
+  const [created] = await db
+    .insert(tasks)
+    .values({
+      title,
+      projectId,
+      parentId,
+      description,
+      dueDate,
+      priority,
+      orderIndex,
+      createdBy: session.user.id,
+      updatedBy: session.user.id,
+    })
+    .returning({ id: tasks.id })
+
+  if (created) {
+    // Ansvarlig ved opprettelse (valgfri) — tildel + varsle
+    if (assigneeId) {
+      await assignAndNotify(created.id, assigneeId)
+    }
+
+    // Bilde ved opprettelse (valgfri). Feil/manglende blob-token skal IKKE
+    // stoppe oppgave-opprettelsen.
+    if (image instanceof File && image.size > 0) {
+      try {
+        const result = await uploadTaskAttachment(image, created.id)
+        await db.insert(attachments).values({
+          taskId: created.id,
+          blobUrl: result.url,
+          filename: image.name,
+          mimeType: image.type,
+          sizeBytes: image.size,
+          uploadedBy: session.user.id,
+        })
+      } catch (err) {
+        console.warn('[tasks] bilde-opplasting ved opprettelse feilet:', err)
+      }
+    }
+  }
 
   revalidatePath('/oppgaver')
   if (projectId) revalidatePath(`/prosjekter/${projectId}`)
@@ -236,42 +311,7 @@ export async function assignTask(taskId: string, userId: string): Promise<void> 
   if (!session?.user) return
   if (!(await userCanAccessTask(taskId, session.user.id))) return
 
-  const db = getDb()
-
-  // Sjekk om allerede tildelt
-  const [existing] = await db
-    .select({ userId: taskAssignees.userId })
-    .from(taskAssignees)
-    .where(and(eq(taskAssignees.taskId, taskId), eq(taskAssignees.userId, userId)))
-    .limit(1)
-  if (existing) return
-
-  await db.insert(taskAssignees).values({ taskId, userId })
-
-  // Hent oppgave og bruker for e-post
-  const [task] = await db.select().from(tasks).where(eq(tasks.id, taskId)).limit(1)
-  const [user] = await db
-    .select({ email: users.email, name: users.name })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1)
-
-  if (task && user) {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-    await sendEmail({
-      to: user.email,
-      subject: `Ny oppgave: ${task.title}`,
-      html: taskAssignedEmailHtml({
-        name: user.name ?? '',
-        title: task.title,
-        dueDate: task.dueDate,
-        appUrl,
-        taskId,
-      }),
-    })
-    await notifyTaskAssigned(userId, task.title, taskId)
-  }
-
+  await assignAndNotify(taskId, userId)
   revalidatePath(`/oppgaver/${taskId}`)
 }
 
@@ -286,6 +326,22 @@ export async function unassignTask(taskId: string, userId: string): Promise<void
   await getDb()
     .delete(taskAssignees)
     .where(and(eq(taskAssignees.taskId, taskId), eq(taskAssignees.userId, userId)))
+
+  revalidatePath(`/oppgaver/${taskId}`)
+}
+
+/**
+ * Gi bort / bytt ansvarlig: fjern alle nåværende tildelte og sett én ny.
+ * Varsler den nye ansvarlige.
+ */
+export async function reassignTask(taskId: string, newUserId: string): Promise<void> {
+  const session = await auth()
+  if (!session?.user) return
+  if (!(await userCanAccessTask(taskId, session.user.id))) return
+  if (!newUserId) return
+
+  await getDb().delete(taskAssignees).where(eq(taskAssignees.taskId, taskId))
+  await assignAndNotify(taskId, newUserId)
 
   revalidatePath(`/oppgaver/${taskId}`)
 }

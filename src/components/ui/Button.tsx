@@ -4,24 +4,30 @@ import * as React from 'react'
 import { cn } from '@/lib/cn'
 
 const buttonVariants = cva(
-  // Base
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold transition-colors disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] motion-reduce:active:scale-100',
+  // Base — AK-editorial: fargeskift som trykk-tilbakemelding, ingen scale/lift, tydelig fokusring
+  'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-semibold transition-[background-color,box-shadow,border-color] duration-150 outline-none focus-visible:ring-2 focus-visible:ring-gfgk-gold/45 focus-visible:ring-offset-2 focus-visible:ring-offset-gfgk-cream disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        primary: 'bg-gfgk-gold text-gfgk-black hover:bg-gfgk-gold-deep',
+        // Standard CTA: sort fyll + gull tekst (forest+lime → charcoal+gull)
+        primary: 'rounded-xl bg-gfgk-black text-gfgk-gold hover:bg-gfgk-charcoal',
+        // Signatur-CTA: gull pill med glød. Brukes sparsomt.
+        accent:
+          'rounded-full bg-gfgk-gold text-gfgk-black shadow-gold-glow hover:brightness-105',
+        // Alternativ handling: 1px kant
         secondary:
-          'border-2 border-gfgk-black bg-white text-gfgk-text hover:bg-gfgk-black hover:text-white',
-        destructive:
-          'bg-gfgk-red-light text-gfgk-red-deep hover:bg-gfgk-red/20',
+          'rounded-xl border border-gfgk-border-strong bg-white text-gfgk-text hover:bg-gfgk-cream-deep',
+        // De-emfasert
         ghost:
-          'bg-transparent text-gfgk-text-2 hover:bg-gfgk-cream-deep hover:text-gfgk-text',
+          'rounded-xl bg-transparent text-gfgk-text-2 hover:bg-gfgk-cream-deep hover:text-gfgk-text',
+        // Destruktiv: rød fyll + hvit tekst
+        destructive: 'rounded-xl bg-gfgk-red text-white hover:bg-gfgk-red-deep',
       },
       size: {
-        sm: 'h-8 rounded-md px-3 text-xs',
-        md: 'h-10 rounded-lg px-4 text-sm',
-        lg: 'h-12 rounded-lg px-6 text-sm',
-        xl: 'h-14 rounded-xl px-8 text-base',
+        sm: 'h-9 px-4 text-[13px]',
+        md: 'h-11 px-5 text-sm',
+        lg: 'h-[52px] px-6 text-[15px]',
+        xl: 'h-14 px-8 text-base',
       },
       fullWidth: {
         true: 'w-full',

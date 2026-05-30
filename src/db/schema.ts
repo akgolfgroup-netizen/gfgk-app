@@ -8,6 +8,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  unique,
   uuid,
 } from 'drizzle-orm/pg-core'
 
@@ -270,7 +271,7 @@ export const checklistRuns = pgTable(
     completedBy: uuid('completed_by').references(() => users.id),
     completedAt: timestamp('completed_at', { withTimezone: true }),
   },
-  (t) => [primaryKey({ columns: [t.checklistId, t.date] })],
+  (t) => [unique('checklist_runs_checklist_id_date_uniq').on(t.checklistId, t.date)],
 )
 
 export const checklistRunItems = pgTable('checklist_run_items', {

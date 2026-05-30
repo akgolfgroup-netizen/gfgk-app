@@ -17,6 +17,7 @@ import {
   type CalendarView,
 } from '@/components/calendar/ViewToggle'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 import {
   endOfMonth,
   endOfWeek,
@@ -206,15 +207,12 @@ export default async function VakterPage({ searchParams }: PageProps) {
 
           {(view === 'maned' || view === 'ar') && myShifts.length > 0 && (
             <section>
-              <h3 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-                <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-                Detaljer
-              </h3>
+              <SectionLabel as="h3">Detaljer</SectionLabel>
               <div className="space-y-2">
                 {myShifts.map((s) => (
                   <div
                     key={s.id}
-                    className="rounded-lg border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+                    className="rounded-xl border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-card"
                   >
                     <p className="text-sm font-semibold capitalize text-gfgk-text">
                       {new Date(s.date + 'T00:00:00').toLocaleDateString('nb-NO', {

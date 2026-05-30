@@ -50,6 +50,9 @@ const DialogContent = React.forwardRef<
         'motion-reduce:animate-none',
         className,
       )}
+      // Opt-out av Radix sin describedby-advarsel når modalen ikke har en
+      // DialogDescription. Overstyrbar via props ved behov.
+      aria-describedby={undefined}
       {...props}
     >
       {children}

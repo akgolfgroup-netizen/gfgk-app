@@ -3,7 +3,7 @@ import * as React from 'react'
 import { cn } from '@/lib/cn'
 
 const cardVariants = cva(
-  'rounded-xl border border-gfgk-border bg-white shadow-[0_1px_2px_rgba(0,0,0,.06)]',
+  'rounded-2xl border border-gfgk-border bg-white shadow-card',
   {
     variants: {
       accent: {
@@ -19,7 +19,7 @@ const cardVariants = cva(
         lg: 'p-6',
       },
       interactive: {
-        true: 'transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0',
+        true: 'cursor-pointer transition-[border-color,box-shadow] duration-150 hover:border-gfgk-border-strong hover:shadow-card-hover',
       },
     },
     defaultVariants: {

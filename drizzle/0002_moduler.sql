@@ -97,7 +97,7 @@ CREATE TABLE "checklist_runs" (
 	"date" date NOT NULL,
 	"completed_by" uuid,
 	"completed_at" timestamp with time zone,
-	CONSTRAINT "checklist_runs_checklist_id_date_pk" PRIMARY KEY("checklist_id","date")
+	CONSTRAINT "checklist_runs_checklist_id_date_uniq" UNIQUE("checklist_id","date")
 );
 --> statement-breakpoint
 CREATE TABLE "checklists" (

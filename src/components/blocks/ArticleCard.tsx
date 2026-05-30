@@ -41,7 +41,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
   return (
     <Link
       href={`/kunnskap/${article.slug}`}
-      className="block rounded-xl border border-gfgk-border bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,.06)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
+      className="block rounded-2xl border border-gfgk-border bg-white p-4 shadow-card transition-[border-color,box-shadow] duration-150 hover:border-gfgk-border-strong hover:shadow-card-hover"
     >
       <h3 className="text-base font-bold text-gfgk-text line-clamp-2">{article.title}</h3>
       <p className="mt-1 text-sm text-gfgk-text-2 line-clamp-2">

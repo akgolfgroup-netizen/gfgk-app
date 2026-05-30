@@ -12,12 +12,14 @@ import {
   BottomSheetTrigger,
 } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/Button'
+import { Chip, ChipBar } from '@/components/ui/Chip'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { FAB } from '@/components/ui/FAB'
 import { Input } from '@/components/ui/Input'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { Select } from '@/components/ui/Select'
+import { Textarea } from '@/components/ui/Textarea'
 import { getDb } from '@/db'
 import {
   projectMembers,
@@ -27,7 +29,6 @@ import {
   users,
   type Task,
 } from '@/db/schema'
-import { cn } from '@/lib/cn'
 import { createTask, toggleTaskDone } from '@/lib/tasks'
 
 type FilterKey = 'mine' | 'alle' | 'i-dag' | 'forfalt' | 'fullfort'
@@ -195,32 +196,27 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
     .where(and(eq(projectMembers.userId, userId), ne(projects.status, 'arkivert')))
     .orderBy(projects.name)
 
+  // Aktive ansatte for «Ansvarlig»-velgeren
+  const employees = await db
+    .select({ id: users.id, name: users.name, email: users.email })
+    .from(users)
+    .where(eq(users.active, true))
+    .orderBy(users.name)
+
   return (
     <>
       <main className="min-h-dvh pb-24">
         <PageHeader title="Oppgaver" />
 
         {/* Filter-chips */}
-        <div className="overflow-x-auto px-6 pt-4">
-          <div className="flex gap-2 pb-1">
-            {FILTERS.map((f) => {
-              const active = filter === f.key
-              return (
-                <a
-                  key={f.key}
-                  href={`/oppgaver?filter=${f.key}`}
-                  className={cn(
-                    'inline-flex h-8 shrink-0 items-center rounded-full px-3 text-[13px] font-semibold transition-colors',
-                    active
-                      ? 'bg-gfgk-gold text-gfgk-black'
-                      : 'bg-gfgk-cream-deep text-gfgk-text hover:bg-gfgk-cream',
-                  )}
-                >
-                  {f.label}
-                </a>
-              )
-            })}
-          </div>
+        <div className="px-6 pt-4">
+          <ChipBar>
+            {FILTERS.map((f) => (
+              <Chip key={f.key} active={filter === f.key} href={`/oppgaver?filter=${f.key}`}>
+                {f.label}
+              </Chip>
+            ))}
+          </ChipBar>
         </div>
 
         <div className="space-y-6 px-6 pt-6">
@@ -304,6 +300,16 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                Beskrivelse
+              </label>
+              <Textarea
+                name="description"
+                rows={3}
+                placeholder="Hva skal gjøres? (valgfritt)"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
                 Prosjekt
               </label>
               <Select name="projectId" defaultValue="">
@@ -314,6 +320,31 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
                   </option>
                 ))}
               </Select>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                Ansvarlig
+              </label>
+              <Select name="assigneeId" defaultValue="">
+                <option value="">Ingen ansvarlig</option>
+                {employees.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.name ?? e.email}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                Bilde
+              </label>
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                capture="environment"
+                className="!h-auto !rounded-xl !px-3 !py-2.5 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-gfgk-black file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-gfgk-gold"
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>

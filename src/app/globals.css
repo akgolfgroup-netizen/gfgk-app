@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,13 +9,24 @@
   }
 
   body {
-    background: #FAF7EE;
-    color: #1B1B1B;
+    background: #FAFAF8;
+    color: #0A0A0A;
+    font-family: var(--font-sans), Inter, system-ui, sans-serif;
+    font-feature-settings: 'ss01', 'cv11';
     @apply antialiased;
     overscroll-behavior-y: none;
   }
 
-  input, select, textarea {
+  /* Input — AK-radius 12px (ikke pill). Pill forbeholdes accent-CTA/badges. */
+  input, select {
+    @apply h-11 border border-gfgk-border-strong rounded-xl px-4 text-base outline-none bg-white text-gfgk-text;
+    @apply focus:border-gfgk-gold focus:ring-2 focus:ring-gfgk-gold/30;
+    @apply placeholder:text-gfgk-text-3;
+    @apply disabled:bg-gfgk-cream disabled:text-gfgk-text-3 disabled:cursor-not-allowed;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  textarea {
     @apply border border-gfgk-border-strong rounded-xl px-4 py-3 text-base outline-none bg-white text-gfgk-text;
     @apply focus:border-gfgk-gold focus:ring-2 focus:ring-gfgk-gold/30;
     @apply placeholder:text-gfgk-text-3;
@@ -27,10 +36,78 @@
 
   select {
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235A5A5A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233D3D3D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 12px center;
+    background-position: right 14px center;
     padding-right: 2.5rem;
+  }
+}
+
+/* =============================================================
+   AK-typografi i GFGK-drakt — eyebrow, display-italic, KPI
+   ============================================================= */
+@layer components {
+  /* Display — Inter Tight, hero-overskrifter */
+  .h-display {
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.04;
+    text-wrap: balance;
+    @apply text-gfgk-text;
+  }
+  /* Editorial italic — signaturen. Inter Tight italic, aldri serif. */
+  .h-display em,
+  em.editorial {
+    font-style: italic;
+    font-weight: 400;
+    @apply text-gfgk-gold-deep;
+  }
+
+  .h-1 {
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+  }
+  .h-2 {
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+  }
+
+  /* Eyebrow — mono CAPS, instrumentpanel-signaturen */
+  .eyebrow {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    @apply text-gfgk-text-3;
+  }
+
+  /* KPI — JetBrains Mono tabulær */
+  .kpi-value {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    @apply text-gfgk-text;
+  }
+  .kpi-label {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    @apply text-gfgk-text-3;
+  }
+
+  .font-mono-nums {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
   }
 }
 
@@ -39,4 +116,42 @@
   .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
   .pl-safe { padding-left: env(safe-area-inset-left); }
   .pr-safe { padding-right: env(safe-area-inset-right); }
+
+  /* Horisontale chip-/filterrader: skjul scrollbar, behold scroll */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Myk gull-flate til logo-fliser og aksenter */
+  .surface-gold-soft {
+    background: rgba(255, 204, 0, 0.14);
+  }
+
+  /* Tabulære tall — hindrer layout-shift */
+  .nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Puls-prikk «live»-markør (AK PulseDot) */
+  .pulse-dot {
+    position: relative;
+  }
+  .pulse-dot::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 9999px;
+    background: rgba(255, 204, 0, 0.45);
+    animation: gfgk-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  @keyframes gfgk-ping {
+    75%, 100% { transform: scale(2); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-dot::before { animation: none; }
+  }
 }

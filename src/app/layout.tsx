@@ -1,5 +1,28 @@
 import type { Metadata, Viewport } from 'next'
+import localFont from 'next/font/local'
 import './globals.css'
+
+// Self-hostede variable-fonter fra GFGK/AK-designsystemet
+const sans = localFont({
+  src: './fonts/Inter.woff2',
+  variable: '--font-sans',
+  weight: '100 900',
+  display: 'swap',
+})
+const display = localFont({
+  src: [
+    { path: './fonts/InterTight.woff2', style: 'normal', weight: '100 900' },
+    { path: './fonts/InterTight-Italic.woff2', style: 'italic', weight: '100 900' },
+  ],
+  variable: '--font-display',
+  display: 'swap',
+})
+const mono = localFont({
+  src: './fonts/JetBrainsMono.woff2',
+  variable: '--font-mono',
+  weight: '100 900',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'GFGK',
@@ -10,7 +33,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#F5C518',
+  themeColor: '#FFCC00',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
@@ -19,7 +42,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="no">
+    <html
+      lang="no"
+      className={`${sans.variable} ${display.variable} ${mono.variable}`}
+    >
       <body>{children}</body>
     </html>
   )

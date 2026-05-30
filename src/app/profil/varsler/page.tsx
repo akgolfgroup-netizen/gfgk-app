@@ -3,8 +3,8 @@ import { auth } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
 import { PushManager } from '@/components/blocks/PushManager'
 import { Card } from '@/components/ui/Card'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
+import { SubHeader } from '@/components/ui/SubHeader'
 
 export default async function VarslerPage() {
   const session = await auth()
@@ -13,7 +13,7 @@ export default async function VarslerPage() {
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <PageHeader
+        <SubHeader
           title="Varsler"
           subtitle="Push-varsler til denne enheten"
           back={{ href: '/profil', label: 'Profil' }}

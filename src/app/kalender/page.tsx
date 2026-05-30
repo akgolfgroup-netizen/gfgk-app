@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/Button'
 import { FAB } from '@/components/ui/FAB'
 import { Input } from '@/components/ui/Input'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import type { Activity } from '@/db/schema'
@@ -197,15 +198,12 @@ export default async function KalenderPage({ searchParams }: PageProps) {
           {/* Liste over events for valgt periode (måned/år) */}
           {(view === 'maned' || view === 'ar') && activities.length > 0 && (
             <section>
-              <h3 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-                <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-                Kommende
-              </h3>
+              <SectionLabel as="h3">Kommende</SectionLabel>
               <div className="space-y-2">
                 {activities.slice(0, 10).map((a) => (
                   <div
                     key={a.id}
-                    className="rounded-lg border border-gfgk-border border-l-4 border-l-gfgk-teal bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+                    className="rounded-xl border border-gfgk-border border-l-4 border-l-gfgk-teal bg-white p-3 shadow-card"
                   >
                     <p className="text-sm font-semibold text-gfgk-text">{a.title}</p>
                     <p className="mt-0.5 text-xs text-gfgk-text-2">

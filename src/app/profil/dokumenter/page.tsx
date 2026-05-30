@@ -4,7 +4,7 @@ import { auth } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
 import { DocumentCard } from '@/components/blocks/DocumentCard'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { PageHeader } from '@/components/ui/PageHeader'
+import { SubHeader } from '@/components/ui/SubHeader'
 import { listDocumentsForUser } from '@/lib/documents'
 
 export default async function ProfilDokumenterPage() {
@@ -16,7 +16,7 @@ export default async function ProfilDokumenterPage() {
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <PageHeader
+        <SubHeader
           title="Mine dokumenter"
           subtitle="Kontrakter, attester og felles dokumenter"
           back={{ href: '/profil', label: 'Profil' }}

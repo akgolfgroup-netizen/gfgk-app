@@ -1,5 +1,6 @@
 import { and, asc, eq, gte, inArray } from 'drizzle-orm'
 import { CheckSquare } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
@@ -7,6 +8,7 @@ import { BottomNav } from '@/components/BottomNav'
 import { AnnouncementBanner } from '@/components/blocks/AnnouncementBanner'
 import { ClockButton } from '@/components/blocks/ClockButton'
 import { InstallPrompt } from '@/components/blocks/InstallPrompt'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 import { getDb } from '@/db'
 import { checklistRunItems, checklistRuns, checklists, shifts } from '@/db/schema'
 import { getDashboardBannerItems, markAnnouncementRead } from '@/lib/announcements'
@@ -85,11 +87,21 @@ export default async function DashboardPage() {
     <>
       <main className="min-h-dvh pb-24">
         <header className="bg-gfgk-black px-6 pt-safe pb-6">
-          <div className="pt-4">
-            <h1 className="text-2xl font-extrabold tracking-tight text-gfgk-gold">
-              Hei{session.user.name ? `, ${session.user.name.split(' ')[0]}` : ''}
-            </h1>
-            <p className="mt-0.5 text-sm text-white/50">{session.user.email}</p>
+          <div className="flex items-center gap-3 pt-4">
+            <Image
+              src="/logo.png"
+              alt="GFGK"
+              width={48}
+              height={48}
+              priority
+              className="h-11 w-11 shrink-0 drop-shadow-[0_2px_8px_rgba(255,204,0,0.25)]"
+            />
+            <div className="min-w-0">
+              <h1 className="truncate text-2xl font-extrabold tracking-tight text-gfgk-gold">
+                Hei{session.user.name ? `, ${session.user.name.split(' ')[0]}` : ''}
+              </h1>
+              <p className="truncate text-sm text-white/50">{session.user.email}</p>
+            </div>
           </div>
         </header>
 
@@ -126,10 +138,7 @@ export default async function DashboardPage() {
           {/* Dagens sjekklister */}
           {todayChecklistRuns.length > 0 && (
             <section>
-              <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-                <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-                Sjekklister i dag
-              </h2>
+              <SectionLabel>Sjekklister i dag</SectionLabel>
               <div className="space-y-2">
                 {todayChecklistRuns.map((r) => {
                   const prog = progressByRun.get(r.runId) ?? { total: 0, done: 0 }
@@ -139,7 +148,7 @@ export default async function DashboardPage() {
                     <Link
                       key={r.runId}
                       href={`/sjekklister`}
-                      className="block rounded-xl border border-gfgk-border bg-white p-3 transition-colors hover:bg-gfgk-cream-deep"
+                      className="block rounded-2xl border border-gfgk-border bg-white p-3 shadow-card transition-colors hover:bg-gfgk-cream-deep"
                     >
                       <div className="mb-2 flex items-center justify-between gap-3">
                         <span className="flex min-w-0 items-center gap-2 text-sm font-semibold text-gfgk-text">
@@ -165,10 +174,7 @@ export default async function DashboardPage() {
 
           {/* Kommende vakter */}
           <section>
-            <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-              <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-              Kommende vakter
-            </h2>
+            <SectionLabel>Kommende vakter</SectionLabel>
             {upcomingShifts.length === 0 ? (
               <p className="text-sm text-gfgk-text-3">Ingen planlagte vakter.</p>
             ) : (
@@ -176,7 +182,7 @@ export default async function DashboardPage() {
                 {upcomingShifts.map((shift, i) => (
                   <div
                     key={i}
-                    className="rounded-lg border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+                    className="rounded-xl border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-card"
                   >
                     <p className="text-sm font-semibold capitalize text-gfgk-text">
                       {formatNorwegianDate(shift.date)}

@@ -1,5 +1,12 @@
 import { and, asc, desc, eq, inArray } from 'drizzle-orm'
-import { CornerDownRight, MessageSquare, Trash2, UserMinus, UserPlus } from 'lucide-react'
+import {
+  ArrowLeftRight,
+  CornerDownRight,
+  MessageSquare,
+  Trash2,
+  UserMinus,
+  UserPlus,
+} from 'lucide-react'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
@@ -19,8 +26,8 @@ import {
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
+import { SubHeader } from '@/components/ui/SubHeader'
 import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { getDb } from '@/db'
@@ -41,6 +48,7 @@ import {
   deleteComment,
   deleteTask,
   deleteTaskAttachment,
+  reassignTask,
   toggleTaskDone,
   unassignTask,
   updateTask,
@@ -100,16 +108,14 @@ export default async function OppgaveDetaljPage({ params }: PageProps) {
     .innerJoin(users, eq(taskAssignees.userId, users.id))
     .where(eq(taskAssignees.taskId, id))
 
-  // Eligible: prosjekt-medlemmer som IKKE er tildelt
+  // Eligible: alle aktive ansatte som IKKE allerede er tildelt
   const assignedIds = assigneeRows.map((a) => a.userId)
-  const eligibleAssignees = task.projectId
-    ? await db
-        .select({ id: users.id, name: users.name, email: users.email, avatarUrl: users.avatarUrl })
-        .from(projectMembers)
-        .innerJoin(users, eq(projectMembers.userId, users.id))
-        .where(eq(projectMembers.projectId, task.projectId))
-        .then((rows) => rows.filter((r) => !assignedIds.includes(r.id)))
-    : []
+  const activeUsers = await db
+    .select({ id: users.id, name: users.name, email: users.email, avatarUrl: users.avatarUrl })
+    .from(users)
+    .where(eq(users.active, true))
+    .orderBy(asc(users.name))
+  const eligibleAssignees = activeUsers.filter((u) => !assignedIds.includes(u.id))
 
   // Underoppgaver
   const subtasks = await db
@@ -180,7 +186,7 @@ export default async function OppgaveDetaljPage({ params }: PageProps) {
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <PageHeader
+        <SubHeader
           title="Oppgave"
           back={
             project
@@ -191,8 +197,8 @@ export default async function OppgaveDetaljPage({ params }: PageProps) {
             <BottomSheet>
               <BottomSheetTrigger asChild>
                 <button
-                  className="rounded-md p-1.5 text-white/50 hover:bg-white/10 hover:text-white"
-                  aria-label="Mer"
+                  className="rounded-lg p-1.5 text-gfgk-text-2 transition-colors hover:bg-gfgk-red-light hover:text-gfgk-red-deep"
+                  aria-label="Slett oppgave"
                 >
                   <Trash2 className="h-5 w-5" />
                 </button>
@@ -301,39 +307,72 @@ export default async function OppgaveDetaljPage({ params }: PageProps) {
                 <p className="text-sm text-gfgk-text-3">Ingen tildelt</p>
               )}
 
-              {eligibleAssignees.length > 0 && (
-                <BottomSheet>
-                  <BottomSheetTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <UserPlus className="h-4 w-4" />
-                      Tildel
-                    </Button>
-                  </BottomSheetTrigger>
-                  <BottomSheetContent>
-                    <BottomSheetTitle>Tildel oppgave</BottomSheetTitle>
-                    <div className="space-y-2">
-                      {eligibleAssignees.map((u) => (
-                        <form
-                          key={u.id}
-                          action={assignTask.bind(null, id, u.id)}
-                        >
-                          <BottomSheetClose asChild>
-                            <button
-                              type="submit"
-                              className="flex w-full items-center gap-3 rounded-xl border border-gfgk-border bg-white px-4 py-3 text-left transition-colors hover:bg-gfgk-cream-deep"
-                            >
-                              <Avatar size="md" src={u.avatarUrl} name={u.name} email={u.email} />
-                              <span className="text-sm font-semibold text-gfgk-text">
-                                {u.name ?? u.email}
-                              </span>
-                            </button>
-                          </BottomSheetClose>
-                        </form>
-                      ))}
-                    </div>
-                  </BottomSheetContent>
-                </BottomSheet>
-              )}
+              <div className="flex shrink-0 items-center gap-1">
+                {eligibleAssignees.length > 0 && (
+                  <BottomSheet>
+                    <BottomSheetTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <UserPlus className="h-4 w-4" />
+                        Tildel
+                      </Button>
+                    </BottomSheetTrigger>
+                    <BottomSheetContent>
+                      <BottomSheetTitle>Tildel oppgave</BottomSheetTitle>
+                      <div className="space-y-2">
+                        {eligibleAssignees.map((u) => (
+                          <form key={u.id} action={assignTask.bind(null, id, u.id)}>
+                            <BottomSheetClose asChild>
+                              <button
+                                type="submit"
+                                className="flex w-full items-center gap-3 rounded-xl border border-gfgk-border bg-white px-4 py-3 text-left transition-colors hover:bg-gfgk-cream-deep"
+                              >
+                                <Avatar size="md" src={u.avatarUrl} name={u.name} email={u.email} />
+                                <span className="text-sm font-semibold text-gfgk-text">
+                                  {u.name ?? u.email}
+                                </span>
+                              </button>
+                            </BottomSheetClose>
+                          </form>
+                        ))}
+                      </div>
+                    </BottomSheetContent>
+                  </BottomSheet>
+                )}
+
+                {assigneeRows.length > 0 && eligibleAssignees.length > 0 && (
+                  <BottomSheet>
+                    <BottomSheetTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <ArrowLeftRight className="h-4 w-4" />
+                        Bytt
+                      </Button>
+                    </BottomSheetTrigger>
+                    <BottomSheetContent>
+                      <BottomSheetTitle>Bytt ansvarlig</BottomSheetTitle>
+                      <p className="mb-3 text-sm text-gfgk-text-2">
+                        Velg ny ansvarlig. Nåværende tildelte fjernes.
+                      </p>
+                      <div className="space-y-2">
+                        {eligibleAssignees.map((u) => (
+                          <form key={u.id} action={reassignTask.bind(null, id, u.id)}>
+                            <BottomSheetClose asChild>
+                              <button
+                                type="submit"
+                                className="flex w-full items-center gap-3 rounded-xl border border-gfgk-border bg-white px-4 py-3 text-left transition-colors hover:bg-gfgk-cream-deep"
+                              >
+                                <Avatar size="md" src={u.avatarUrl} name={u.name} email={u.email} />
+                                <span className="text-sm font-semibold text-gfgk-text">
+                                  {u.name ?? u.email}
+                                </span>
+                              </button>
+                            </BottomSheetClose>
+                          </form>
+                        ))}
+                      </div>
+                    </BottomSheetContent>
+                  </BottomSheet>
+                )}
+              </div>
             </div>
           </section>
 

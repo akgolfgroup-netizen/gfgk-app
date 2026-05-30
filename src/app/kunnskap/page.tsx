@@ -3,10 +3,10 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
 import { ArticleCard } from '@/components/blocks/ArticleCard'
+import { Chip, ChipBar } from '@/components/ui/Chip'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Input } from '@/components/ui/Input'
 import { PageHeader } from '@/components/ui/PageHeader'
-import { cn } from '@/lib/cn'
 import { listArticles } from '@/lib/articles'
 import type { ArticleCategory } from '@/db/schema'
 
@@ -54,32 +54,20 @@ export default async function KunnskapPage({ searchParams }: PageProps) {
           </form>
 
           {/* Kategori-chips */}
-          <div className="overflow-x-auto">
-            <div className="flex gap-2 pb-1">
-              {CATEGORIES.map((c) => {
-                const active =
-                  c.key === 'alle' ? !category : category === c.key
-                const href =
-                  c.key === 'alle'
-                    ? `/kunnskap${query ? `?q=${encodeURIComponent(query)}` : ''}`
-                    : `/kunnskap?kat=${c.key}${query ? `&q=${encodeURIComponent(query)}` : ''}`
-                return (
-                  <a
-                    key={c.key}
-                    href={href}
-                    className={cn(
-                      'inline-flex h-8 shrink-0 items-center rounded-full px-3 text-[13px] font-semibold transition-colors',
-                      active
-                        ? 'bg-gfgk-gold text-gfgk-black'
-                        : 'bg-gfgk-cream-deep text-gfgk-text hover:bg-gfgk-cream',
-                    )}
-                  >
-                    {c.label}
-                  </a>
-                )
-              })}
-            </div>
-          </div>
+          <ChipBar>
+            {CATEGORIES.map((c) => {
+              const active = c.key === 'alle' ? !category : category === c.key
+              const href =
+                c.key === 'alle'
+                  ? `/kunnskap${query ? `?q=${encodeURIComponent(query)}` : ''}`
+                  : `/kunnskap?kat=${c.key}${query ? `&q=${encodeURIComponent(query)}` : ''}`
+              return (
+                <Chip key={c.key} active={active} href={href}>
+                  {c.label}
+                </Chip>
+              )
+            })}
+          </ChipBar>
 
           {/* Resultater */}
           {articles.length === 0 ? (

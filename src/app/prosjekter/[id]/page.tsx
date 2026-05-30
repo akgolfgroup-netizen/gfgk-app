@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/Input'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Pill, statusTone } from '@/components/ui/Pill'
 import { Select } from '@/components/ui/Select'
+import { Textarea } from '@/components/ui/Textarea'
 import { Avatar } from '@/components/ui/Avatar'
 import { getDb } from '@/db'
 import {
@@ -161,6 +162,28 @@ export default async function ProsjektDetaljPage({ params, searchParams }: PageP
                   Tittel
                 </label>
                 <Input name="title" type="text" required autoFocus />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                  Beskrivelse
+                </label>
+                <Textarea
+                  name="description"
+                  rows={3}
+                  placeholder="Hva skal gjøres? (valgfritt)"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                  Bilde
+                </label>
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  capture="environment"
+                  className="!h-auto !rounded-xl !px-3 !py-2.5 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-gfgk-black file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-gfgk-gold"
+                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
