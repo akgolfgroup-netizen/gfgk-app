@@ -6,6 +6,8 @@ import { invites, users } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import { CopyButton } from '@/components/CopyButton'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 import { createInvite, revokeInvite } from '@/lib/invite'
 
 export default async function AnsattePage() {
@@ -28,27 +30,17 @@ export default async function AnsattePage() {
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <header className="bg-gfgk-black px-6 pt-safe pb-6">
-          <div className="pt-4">
-            <a href="/admin" className="text-sm text-white/50 hover:text-white/80 transition-colors">
-              ← Admin
-            </a>
-            <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-gfgk-gold">Ansatte</h1>
-          </div>
-        </header>
+        <PageHeader title="Ansatte" back={{ href: '/admin', label: 'Admin' }} />
 
         <div className="px-6 pt-6 space-y-8">
           <section>
-            <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-              <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-              Brukere ({allUsers.length})
-            </h2>
+            <SectionLabel>Brukere ({allUsers.length})</SectionLabel>
             <div className="space-y-2">
               {allUsers.map((user) => (
                 <a
                   key={user.id}
                   href={`/admin/ansatte/${user.id}`}
-                  className="block rounded-lg border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
+                  className="block rounded-lg border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-card transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <p className="font-semibold text-gfgk-text">{user.name ?? user.email}</p>
                   {user.name && <p className="text-sm text-gfgk-text-2">{user.email}</p>}
@@ -63,15 +55,12 @@ export default async function AnsattePage() {
 
           {pendingInvites.length > 0 && (
             <section>
-              <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-                <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-                Ventende invitasjoner ({pendingInvites.length})
-              </h2>
+              <SectionLabel>Ventende invitasjoner ({pendingInvites.length})</SectionLabel>
               <div className="space-y-2">
                 {pendingInvites.map((invite) => (
                   <div
                     key={invite.id}
-                    className="rounded-lg border border-gfgk-border bg-gfgk-gold-light px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)] space-y-2"
+                    className="rounded-lg border border-gfgk-border bg-gfgk-gold-light px-4 py-3 shadow-card space-y-2"
                   >
                     <p className="font-semibold text-gfgk-text">{invite.email}</p>
                     <p className="text-xs text-gfgk-text-2 uppercase tracking-wide">
@@ -95,11 +84,8 @@ export default async function AnsattePage() {
           )}
 
           <section>
-            <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-              <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-              Ny invitasjon
-            </h2>
-            <form action={createInvite} className="space-y-4 rounded-lg border border-gfgk-border bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,.06)]">
+            <SectionLabel>Ny invitasjon</SectionLabel>
+            <form action={createInvite} className="space-y-4 rounded-lg border border-gfgk-border bg-white p-4 shadow-card">
               <label className="block space-y-1.5">
                 <span className="text-sm font-semibold text-gfgk-text">E-post</span>
                 <input

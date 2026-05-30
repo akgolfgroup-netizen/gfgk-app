@@ -11,7 +11,7 @@ export function TransactionForm({ defaultDate }: { defaultDate: string }) {
   const [type, setType] = useState<'inntekt' | 'utgift'>('inntekt')
 
   return (
-    <form action={createTransaction} className="space-y-4 rounded-lg border border-gfgk-border bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,.06)]">
+    <form action={createTransaction} className="space-y-4 rounded-lg border border-gfgk-border bg-white p-4 shadow-card">
       <div className="grid grid-cols-2 gap-2">
         {(['inntekt', 'utgift'] as const).map((t) => (
           <button

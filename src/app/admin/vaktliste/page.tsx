@@ -13,6 +13,8 @@ import {
   toDateString,
 } from '@/lib/dates'
 import { ConfirmButton } from '@/components/ConfirmButton'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 import { createShift, deleteShift, publishWeek } from '@/lib/shifts'
 
 export default async function VaktlistePage({
@@ -58,20 +60,13 @@ export default async function VaktlistePage({
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <header className="bg-gfgk-black px-6 pt-safe pb-6">
-          <div className="pt-4">
-            <a href="/admin" className="text-sm text-white/50 hover:text-white/80 transition-colors">
-              ← Admin
-            </a>
-            <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-gfgk-gold">Vaktliste</h1>
-          </div>
-        </header>
+        <PageHeader title="Vaktliste" back={{ href: '/admin', label: 'Admin' }} />
 
         <div className="px-6 pt-6">
           <div className="mb-6 flex items-center justify-between">
             <Link
               href={`/admin/vaktliste?uke=${prevMonday}`}
-              className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+              className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-card"
             >
               ←
             </Link>
@@ -82,7 +77,7 @@ export default async function VaktlistePage({
             </span>
             <Link
               href={`/admin/vaktliste?uke=${nextMonday}`}
-              className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+              className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-card"
             >
               →
             </Link>
@@ -112,10 +107,7 @@ export default async function VaktlistePage({
               const dayShifts = weekShifts.filter((s) => s.date === key)
               return (
                 <div key={key}>
-                  <h2 className="mb-2 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-                    <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-                    {formatNorwegianDate(key)}
-                  </h2>
+                  <SectionLabel className="mb-2">{formatNorwegianDate(key)}</SectionLabel>
                   {dayShifts.length === 0 ? (
                     <p className="text-sm text-gfgk-text-3">Ingen vakter</p>
                   ) : (
@@ -123,7 +115,7 @@ export default async function VaktlistePage({
                       {dayShifts.map((shift) => (
                         <div
                           key={shift.id}
-                          className="flex items-center justify-between rounded-lg border border-gfgk-border bg-white px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+                          className="flex items-center justify-between rounded-lg border border-gfgk-border bg-white px-4 py-3 shadow-card"
                         >
                           <div>
                             <p className="text-sm font-bold text-gfgk-black">
@@ -155,11 +147,8 @@ export default async function VaktlistePage({
           </div>
 
           <section>
-            <h2 className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-gfgk-gold-deep">
-              <span className="inline-block h-3.5 w-0.5 rounded-full bg-gfgk-gold" />
-              Ny vakt
-            </h2>
-            <form action={createShift} className="space-y-4 rounded-lg border border-gfgk-border bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,.06)]">
+            <SectionLabel>Ny vakt</SectionLabel>
+            <form action={createShift} className="space-y-4 rounded-lg border border-gfgk-border bg-white p-4 shadow-card">
               <label className="block space-y-1.5">
                 <span className="text-sm font-semibold text-gfgk-text">Dato</span>
                 <select name="date" className="w-full">

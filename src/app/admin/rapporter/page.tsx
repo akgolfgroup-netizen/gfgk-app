@@ -1,9 +1,11 @@
 import { and, gte, lte } from 'drizzle-orm'
+import { Download } from 'lucide-react'
 import { auth } from '@/auth'
 import { getDb } from '@/db'
 import { transactions } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
 import { Card } from '@/components/ui/Card'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 
 function formatKr(amount: number) {
@@ -64,23 +66,22 @@ export default async function RapporterPage() {
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <header className="bg-gfgk-black px-6 pt-safe pb-6">
-          <div className="pt-4 flex items-start justify-between gap-3">
-            <div>
-              <a href="/admin" className="text-sm text-white/50 hover:text-white/80 transition-colors">← Admin</a>
-              <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-gfgk-gold">Rapporter</h1>
-              <p className="text-sm text-white/50 mt-0.5">Siste 6 måneder</p>
-            </div>
-            {first && last && (
+        <PageHeader
+          title="Rapporter"
+          subtitle="Siste 6 måneder"
+          back={{ href: '/admin', label: 'Admin' }}
+          action={
+            first && last ? (
               <a
                 href={`/api/rapporter/export?from=${first.start}&to=${last.end}`}
-                className="rounded-md bg-gfgk-gold px-3 py-1.5 text-xs font-bold text-gfgk-black hover:bg-gfgk-gold-deep transition-colors whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 rounded-full bg-gfgk-gold px-3.5 py-2 text-xs font-bold text-gfgk-black transition-colors hover:bg-gfgk-gold-deep"
               >
-                ↓ CSV
+                <Download className="h-3.5 w-3.5" strokeWidth={2.5} />
+                CSV
               </a>
-            )}
-          </div>
-        </header>
+            ) : undefined
+          }
+        />
 
         <div className="px-6 pt-6 space-y-8">
           {/* Sammendrag */}

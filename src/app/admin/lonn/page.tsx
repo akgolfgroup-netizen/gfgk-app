@@ -5,6 +5,7 @@ import { users, timeEntries } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { setHourlyRate } from '@/lib/users-admin'
 
@@ -57,19 +58,14 @@ export default async function LonnPage({
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <header className="bg-gfgk-black px-6 pt-safe pb-6">
-          <div className="pt-4">
-            <a href="/admin" className="text-sm text-white/50 hover:text-white/80 transition-colors">← Admin</a>
-            <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-gfgk-gold">Lønn</h1>
-          </div>
-        </header>
+        <PageHeader title="Lønn" back={{ href: '/admin', label: 'Admin' }} />
 
         <div className="px-6 pt-6 space-y-6">
           {/* Månednavigasjon */}
           <div className="flex items-center justify-between">
-            <a href={`/admin/lonn?mnd=${prevMnd}`} className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-[0_1px_2px_rgba(0,0,0,.06)]">←</a>
+            <a href={`/admin/lonn?mnd=${prevMnd}`} className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-card">←</a>
             <span className="text-sm font-bold capitalize text-gfgk-text">{monthLabel}</span>
-            <a href={`/admin/lonn?mnd=${nextMnd}`} className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-[0_1px_2px_rgba(0,0,0,.06)]">→</a>
+            <a href={`/admin/lonn?mnd=${nextMnd}`} className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-card">→</a>
           </div>
 
           {/* Total lønnskostnad — featured KPI */}

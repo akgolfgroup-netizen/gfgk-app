@@ -1,18 +1,14 @@
 import Link from 'next/link'
 import { auth } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 export default async function AdminPage() {
   const session = await auth()
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <header className="bg-gfgk-black px-6 pt-safe pb-6">
-          <div className="pt-4">
-            <h1 className="text-2xl font-extrabold tracking-tight text-gfgk-gold">Admin</h1>
-            <p className="text-sm text-white/50 mt-0.5">Internt panel for daglig leder</p>
-          </div>
-        </header>
+        <PageHeader title="Admin" subtitle="Internt panel for daglig leder" />
 
         <div className="px-6 pt-6">
           <section className="space-y-3">
@@ -33,7 +29,7 @@ export default async function AdminPage() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="block overflow-hidden rounded-lg border border-gfgk-border shadow-[0_1px_2px_rgba(0,0,0,.06)] hover:-translate-y-0.5 hover:shadow-md transition-all duration-150"
+                className="block overflow-hidden rounded-lg border border-gfgk-border shadow-card hover:-translate-y-0.5 hover:shadow-md transition-all duration-150"
               >
                 <div className="bg-gfgk-black px-4 py-3">
                   <h2 className="text-[11px] font-extrabold uppercase tracking-wide text-gfgk-gold">{item.title}</h2>

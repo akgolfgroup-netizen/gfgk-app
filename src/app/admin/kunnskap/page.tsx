@@ -53,7 +53,7 @@ export default async function AdminKunnskapPage() {
               {articles.map((a) => (
                 <div
                   key={a.id}
-                  className="rounded-xl border border-gfgk-border bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+                  className="rounded-xl border border-gfgk-border bg-white p-3 shadow-card"
                 >
                   <div className="mb-2 flex items-start justify-between gap-2">
                     <Link

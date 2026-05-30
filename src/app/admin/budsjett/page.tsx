@@ -5,6 +5,7 @@ import { getDb } from '@/db'
 import { transactions } from '@/db/schema'
 import { BottomNav } from '@/components/BottomNav'
 import { Card } from '@/components/ui/Card'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { toDateString } from '@/lib/dates'
 import { ConfirmButton } from '@/components/ConfirmButton'
@@ -79,27 +80,20 @@ export default async function BudsjettPage({
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <header className="bg-gfgk-black px-6 pt-safe pb-6">
-          <div className="pt-4">
-            <a href="/admin" className="text-sm text-white/50 hover:text-white/80 transition-colors">
-              ← Admin
-            </a>
-            <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-gfgk-gold">Budsjett</h1>
-          </div>
-        </header>
+        <PageHeader title="Budsjett" back={{ href: '/admin', label: 'Admin' }} />
 
         <div className="px-6 pt-6">
           <div className="mb-6 flex items-center justify-between">
             <Link
               href={`/admin/budsjett?mnd=${prevMonth(year, month)}`}
-              className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+              className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-card"
             >
               ←
             </Link>
             <span className="text-sm font-bold capitalize text-gfgk-text">{monthLabel}</span>
             <Link
               href={`/admin/budsjett?mnd=${nextMonth(year, month)}`}
-              className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+              className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-card"
             >
               →
             </Link>

@@ -104,7 +104,7 @@ export default async function AdminSjekklisterPage() {
               {list.map((c) => (
                 <div
                   key={c.id}
-                  className="flex items-start gap-3 rounded-xl border border-gfgk-border bg-white px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,.06)]"
+                  className="flex items-start gap-3 rounded-xl border border-gfgk-border bg-white px-4 py-3 shadow-card"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-gfgk-text">{c.name}</p>
