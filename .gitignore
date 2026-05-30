@@ -35,10 +35,6 @@ yarn-error.log*
 .env
 .env*.save
 
-# serwist (service worker build-artefakter)
-public/sw.js.map
-public/swe-worker-*.js
-
 # playwright
 /test-results/
 /playwright-report/

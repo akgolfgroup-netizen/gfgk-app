@@ -30,7 +30,6 @@
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-switch": "^1.2.6",
-    "@serwist/next": "^9.5.11",
     "@vercel/blob": "^2.4.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
@@ -45,7 +44,6 @@
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "resend": "^6.12.3",
-    "serwist": "^9.5.11",
     "tailwind-merge": "^3.6.0",
     "web-push": "^3.6.7"
   },
