@@ -42,9 +42,10 @@ export default async function KunnskapPage({ searchParams }: PageProps) {
         <PageHeader
           title="Kunnskap"
           subtitle="Medlemskap, priser, rutiner og svar"
+          maxWidth="6xl"
         />
 
-        <div className="space-y-4 px-6 pt-4 lg:mx-auto lg:max-w-5xl">
+        <div className="space-y-4 px-6 pt-4 lg:mx-auto lg:max-w-6xl">
           {/* Søk */}
           <form action="/kunnskap" method="GET">
             {category && <input type="hidden" name="kat" value={category} />}

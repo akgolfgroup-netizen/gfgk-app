@@ -16,9 +16,10 @@ export default async function VarslerPage() {
           title="Varsler"
           subtitle="Push-varsler til denne enheten"
           back={{ href: '/profil', label: 'Profil' }}
+          maxWidth="3xl"
         />
 
-        <div className="space-y-6 px-6 pt-6">
+        <div className="space-y-6 px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           <section>
             <SectionLabel>Push-varsler</SectionLabel>
             <Card padding="md">

@@ -46,6 +46,7 @@ export default async function InboxDetailPage({ params }: PageProps) {
           title={msg.subject}
           subtitle={msg.fromName ? `${msg.fromName} <${msg.fromEmail}>` : msg.fromEmail}
           back={{ href: '/admin/inbox', label: 'Inbox' }}
+          maxWidth="3xl"
           action={
             <Pill tone={STATUS_TONE[msg.status]} size="md">
               {STATUS_LABEL[msg.status]}
@@ -53,7 +54,7 @@ export default async function InboxDetailPage({ params }: PageProps) {
           }
         />
 
-        <div className="space-y-6 px-6 pt-6">
+        <div className="space-y-6 px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           {/* Original melding */}
           <section>
             <SectionLabel>Melding</SectionLabel>

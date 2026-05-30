@@ -97,6 +97,7 @@ export default async function ProsjektDetaljPage({ params, searchParams }: PageP
               : undefined
           }
           back={{ href: '/prosjekter', label: 'Prosjekter' }}
+          maxWidth="3xl"
           action={
             <Pill tone={statusTone(project.status)} size="md">
               {STATUS_LABEL[project.status]}
@@ -106,14 +107,14 @@ export default async function ProsjektDetaljPage({ params, searchParams }: PageP
 
         {project.description && (
           <div className="border-b border-gfgk-border bg-white px-6 py-4">
-            <p className="whitespace-pre-wrap text-sm text-gfgk-text-2">
+            <p className="whitespace-pre-wrap text-sm text-gfgk-text-2 lg:mx-auto lg:max-w-3xl">
               {project.description}
             </p>
           </div>
         )}
 
         {/* Tab-bar */}
-        <div className="px-6 pt-4">
+        <div className="px-6 pt-4 lg:mx-auto lg:max-w-3xl">
           <div className="flex gap-6 border-b border-gfgk-border">
             {TABS.map((t) => {
               const Icon = t.icon
@@ -137,7 +138,7 @@ export default async function ProsjektDetaljPage({ params, searchParams }: PageP
           </div>
         </div>
 
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           {tab === 'oppgaver' && <OppgaverTab projectId={id} />}
           {tab === 'filer' && <FilerTab projectId={id} />}
           {tab === 'medlemmer' && (

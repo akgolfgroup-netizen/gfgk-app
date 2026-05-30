@@ -70,7 +70,7 @@ export default async function SjekklisterPage() {
 
   return (
     <AppShell role={session.user.role} userName={session.user.name ?? null}>
-        <PageHeader title="Sjekklister i dag" />
+        <PageHeader title="Sjekklister i dag" maxWidth="3xl" />
 
         <div className="space-y-6 px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           {myRuns.length === 0 ? (

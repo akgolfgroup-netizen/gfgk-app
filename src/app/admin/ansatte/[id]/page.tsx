@@ -41,9 +41,10 @@ export default async function AnsattDetaljPage({ params }: PageProps) {
           title={user.name ?? user.email}
           subtitle={user.email}
           back={{ href: '/admin/ansatte', label: 'Ansatte' }}
+          maxWidth="3xl"
         />
 
-        <div className="space-y-8 px-6 pt-6">
+        <div className="space-y-8 px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           {/* Avatar + status */}
           <section className="flex flex-col items-center gap-3">
             <Avatar

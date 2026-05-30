@@ -76,10 +76,14 @@ export default async function SponsorerPage({
 
   return (
     <>
-        <PageHeader title="Sponsorer" back={{ href: '/admin', label: 'Admin' }} />
+        <PageHeader
+          title="Sponsorer"
+          back={{ href: '/admin', label: 'Admin' }}
+          maxWidth="6xl"
+        />
 
         {/* KPI-strip */}
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-6xl">
           <div className="grid grid-cols-2 gap-3">
             <Card padding="md">
               <p className="kpi-label">Sponsorer</p>
@@ -113,7 +117,7 @@ export default async function SponsorerPage({
         </div>
 
         {/* Filter */}
-        <div className="px-6 pt-4">
+        <div className="px-6 pt-4 lg:mx-auto lg:max-w-6xl">
           <ChipBar>
             {FILTERS.map((f) => (
               <Chip
@@ -128,7 +132,7 @@ export default async function SponsorerPage({
         </div>
 
         {/* Liste */}
-        <div className="px-6 pt-5">
+        <div className="px-6 pt-5 lg:mx-auto lg:max-w-6xl">
           {sponsors.length === 0 ? (
             <EmptyState
               icon={Handshake}

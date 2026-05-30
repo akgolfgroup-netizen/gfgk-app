@@ -30,9 +30,10 @@ export default async function AdminAnsattDokumenterPage({ params }: PageProps) {
           title="Dokumenter"
           subtitle={user.name ?? user.email}
           back={{ href: `/admin/ansatte/${id}`, label: user.name ?? user.email }}
+          maxWidth="3xl"
         />
 
-        <div className="space-y-6 px-6 pt-6">
+        <div className="space-y-6 px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           {docs.length === 0 ? (
             <EmptyState
               icon={FileText}

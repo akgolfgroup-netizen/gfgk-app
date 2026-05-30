@@ -37,9 +37,10 @@ export default async function AdminInboxPage({ searchParams }: PageProps) {
           title="Inbox"
           subtitle="servicepunkt@gfgk.no"
           back={{ href: '/admin', label: 'Admin' }}
+          maxWidth="6xl"
         />
 
-        <div className="space-y-4 px-6 pt-4">
+        <div className="space-y-4 px-6 pt-6 lg:mx-auto lg:max-w-6xl">
           <ChipBar>
             {FILTERS.map((f) => (
               <Chip

@@ -183,6 +183,7 @@ export default async function DashboardPage() {
   return (
     <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <header className="bg-gfgk-black px-6 pt-safe pb-7">
+          <div className="lg:mx-auto lg:max-w-6xl">
           <div className="flex items-center justify-between gap-3 pt-4">
             <Image
               src="/logo.png"
@@ -201,9 +202,10 @@ export default async function DashboardPage() {
             {firstName ? `, ${firstName}` : ''}{' '}
             <span className="font-normal italic text-gfgk-gold">— {shiftSuffix}</span>
           </h1>
+          </div>
         </header>
 
-        <div className="lg:mx-auto lg:max-w-5xl">
+        <div className="lg:mx-auto lg:max-w-6xl">
         {/* KPI-strip */}
         <div className="px-6 pt-5">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

@@ -107,6 +107,7 @@ export default async function SponsorDetailPage({
         <PageHeader
           title={sponsor.name}
           back={{ href: '/admin/sponsorer', label: 'Sponsorer' }}
+          maxWidth="3xl"
           action={
             <BottomSheet>
               <BottomSheetTrigger asChild>
@@ -162,7 +163,7 @@ export default async function SponsorDetailPage({
           }
         />
 
-        <div className="space-y-6 px-6 pt-6">
+        <div className="space-y-6 px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           {/* Info */}
           <Card padding="md" className="space-y-3">
             <div className="flex items-center gap-1.5">

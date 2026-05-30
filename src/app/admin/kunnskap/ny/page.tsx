@@ -17,9 +17,10 @@ export default async function NyArtikkelPage() {
         <PageHeader
           title="Ny artikkel"
           back={{ href: '/admin/kunnskap', label: 'Kunnskap' }}
+          maxWidth="3xl"
         />
 
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           <form action={createArticle} className="space-y-4">
             <div>
               <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">

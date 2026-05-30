@@ -22,9 +22,10 @@ export default async function ImporterAktiviteterPage() {
           title="Importer CSV"
           subtitle="Aktiviteter fra fil"
           back={{ href: '/admin/aktiviteter', label: 'Aktiviteter' }}
+          maxWidth="3xl"
         />
 
-        <div className="space-y-6 px-6 pt-6">
+        <div className="space-y-6 px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           <section>
             <SectionLabel>Format</SectionLabel>
             <Card padding="md">

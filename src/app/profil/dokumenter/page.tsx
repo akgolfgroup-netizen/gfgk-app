@@ -19,9 +19,10 @@ export default async function ProfilDokumenterPage() {
           title="Mine dokumenter"
           subtitle="Kontrakter, attester og felles dokumenter"
           back={{ href: '/profil', label: 'Profil' }}
+          maxWidth="3xl"
         />
 
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           {docs.length === 0 ? (
             <EmptyState
               icon={FileText}

@@ -9,6 +9,17 @@ export interface SubHeaderProps
   subtitle?: React.ReactNode
   back?: { href: string; label?: string }
   action?: React.ReactNode
+  /**
+   * Maks-bredde på det sentrerte innholdet på desktop. SKAL matche body-bredden
+   * på samme side så headeren ikke blir bredere enn kroppen.
+   */
+  maxWidth?: '3xl' | '6xl'
+}
+
+// Hele klassenavn (ikke interpolering) så Tailwind ikke purger dem.
+const maxWidthClass: Record<'3xl' | '6xl', string> = {
+  '3xl': 'lg:max-w-3xl',
+  '6xl': 'lg:max-w-6xl',
 }
 
 /**
@@ -22,6 +33,7 @@ export function SubHeader({
   subtitle,
   back,
   action,
+  maxWidth = '6xl',
   ...props
 }: SubHeaderProps) {
   return (
@@ -32,7 +44,7 @@ export function SubHeader({
       )}
       {...props}
     >
-      <div className="pt-3">
+      <div className={cn('pt-3 lg:mx-auto', maxWidthClass[maxWidth])}>
         {back && (
           <Link
             href={back.href}

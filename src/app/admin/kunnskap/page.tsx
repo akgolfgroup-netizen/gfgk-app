@@ -39,9 +39,10 @@ export default async function AdminKunnskapPage() {
           title="Kunnskap"
           subtitle="Administrer artikler"
           back={{ href: '/admin', label: 'Admin' }}
+          maxWidth="6xl"
         />
 
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-6xl">
           {articles.length === 0 ? (
             <EmptyState
               icon={BookOpen}

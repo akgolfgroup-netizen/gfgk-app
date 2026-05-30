@@ -151,9 +151,13 @@ export default async function VakterPage({ searchParams }: PageProps) {
 
   return (
     <AppShell role={session.user.role} userName={session.user.name ?? null}>
-        <PageHeader title="Mine vakter" subtitle={`${myShifts.length} vakter`} />
+        <PageHeader
+          title="Mine vakter"
+          subtitle={`${myShifts.length} vakter`}
+          maxWidth="6xl"
+        />
 
-        <div className="space-y-4 px-6 pt-4 lg:mx-auto lg:max-w-5xl">
+        <div className="space-y-4 px-6 pt-4 lg:mx-auto lg:max-w-6xl">
           <div className="flex items-center justify-between gap-3">
             <ViewToggle current={view} baseHref="/vakter" />
             <div className="flex items-center gap-1">

@@ -187,6 +187,7 @@ export default async function OppgaveDetaljPage({ params }: PageProps) {
     <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <SubHeader
           title="Oppgave"
+          maxWidth="3xl"
           back={
             project
               ? { href: `/prosjekter/${project.id}`, label: project.name }
@@ -224,7 +225,7 @@ export default async function OppgaveDetaljPage({ params }: PageProps) {
           }
         />
 
-        <div className="space-y-6 px-6 pt-6">
+        <div className="space-y-6 px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           {/* Tittel */}
           <TaskTitleEdit
             taskId={id}
@@ -407,7 +408,7 @@ export default async function OppgaveDetaljPage({ params }: PageProps) {
                 return (
                   <div
                     key={s.id}
-                    className="flex items-center gap-2 rounded-lg border border-gfgk-border bg-white px-3 py-2"
+                    className="flex items-center gap-2 rounded-2xl border border-gfgk-border bg-white px-3 py-2"
                   >
                     <CornerDownRight className="h-3.5 w-3.5 shrink-0 text-gfgk-text-3" />
                     <form action={toggleTaskDone.bind(null, s.id)} className="inline-flex">

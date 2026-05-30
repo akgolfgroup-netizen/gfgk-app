@@ -41,9 +41,10 @@ export default async function AdminAnnonseringerPage() {
         <PageHeader
           title="Annonseringer"
           back={{ href: '/admin', label: 'Admin' }}
+          maxWidth="6xl"
         />
 
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-6xl">
           {all.length === 0 ? (
             <EmptyState
               icon={Megaphone}

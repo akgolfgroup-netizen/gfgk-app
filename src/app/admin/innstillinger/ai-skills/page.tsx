@@ -28,9 +28,10 @@ export default async function AiSkillsPage() {
           title="AI svar-maler"
           subtitle="Skills som agenten bruker"
           back={{ href: '/admin', label: 'Admin' }}
+          maxWidth="6xl"
         />
 
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-6xl">
           {skills.length === 0 ? (
             <EmptyState
               icon={Lightbulb}

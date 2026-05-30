@@ -154,10 +154,10 @@ export default async function ProsjekterPage({ searchParams }: PageProps) {
 
   return (
     <AppShell role={session.user.role} userName={session.user.name ?? null}>
-        <PageHeader title="Prosjekter" />
+        <PageHeader title="Prosjekter" maxWidth="6xl" />
 
         {/* Tab-bar */}
-        <div className="px-6 pt-4 lg:mx-auto lg:max-w-5xl">
+        <div className="px-6 pt-4 lg:mx-auto lg:max-w-6xl">
           <div className="flex gap-6 border-b border-gfgk-border">
             {TABS.map((t) => {
               const active = tab === t.key
@@ -179,7 +179,7 @@ export default async function ProsjekterPage({ searchParams }: PageProps) {
           </div>
         </div>
 
-        <div className="px-6 pt-6 lg:mx-auto lg:max-w-5xl">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-6xl">
           {projectList.length === 0 ? (
             <EmptyState
               icon={FolderPlus}

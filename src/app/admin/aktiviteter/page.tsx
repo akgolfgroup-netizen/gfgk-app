@@ -51,6 +51,7 @@ export default async function AdminAktiviteterPage() {
           title="Aktiviteter"
           subtitle="Turneringer, kurs og events"
           back={{ href: '/admin', label: 'Admin' }}
+          maxWidth="6xl"
           action={
             <a
               href="/admin/aktiviteter/import"
@@ -62,7 +63,7 @@ export default async function AdminAktiviteterPage() {
           }
         />
 
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-6xl">
           {all.length === 0 ? (
             <EmptyState
               icon={CalendarPlus}

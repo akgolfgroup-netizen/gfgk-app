@@ -10,6 +10,17 @@ export interface PageHeaderProps
   subtitle?: React.ReactNode
   back?: { href: string; label?: string }
   action?: React.ReactNode
+  /**
+   * Maks-bredde på det sentrerte innholdet på desktop. SKAL matche body-bredden
+   * på samme side så headeren ikke blir bredere enn kroppen.
+   */
+  maxWidth?: '3xl' | '6xl'
+}
+
+// Hele klassenavn (ikke interpolering) så Tailwind ikke purger dem.
+const maxWidthClass: Record<'3xl' | '6xl', string> = {
+  '3xl': 'lg:max-w-3xl',
+  '6xl': 'lg:max-w-6xl',
 }
 
 /**
@@ -21,6 +32,7 @@ export function PageHeader({
   subtitle,
   back,
   action,
+  maxWidth = '6xl',
   ...props
 }: PageHeaderProps) {
   return (
@@ -28,7 +40,7 @@ export function PageHeader({
       className={cn('bg-gfgk-black px-6 pb-6 pt-safe', className)}
       {...props}
     >
-      <div className="pt-4 lg:mx-auto lg:max-w-6xl">
+      <div className={cn('pt-4 lg:mx-auto', maxWidthClass[maxWidth])}>
         {back && (
           <Link
             href={back.href}

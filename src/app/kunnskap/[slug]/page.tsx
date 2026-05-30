@@ -43,6 +43,7 @@ export default async function ArtikkelPage({ params }: PageProps) {
         <SubHeader
           title={article.title}
           back={{ href: '/kunnskap', label: 'Kunnskap' }}
+          maxWidth="3xl"
           action={
             session.user.role === 'admin' ? (
               <a
@@ -56,7 +57,7 @@ export default async function ArtikkelPage({ params }: PageProps) {
           }
         />
 
-        <div className="space-y-4 px-6 pt-6">
+        <div className="space-y-4 px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           <div className="space-y-3">
             <h1 className="h-display text-[30px]">{article.title}</h1>
             <div className="flex items-center gap-2">

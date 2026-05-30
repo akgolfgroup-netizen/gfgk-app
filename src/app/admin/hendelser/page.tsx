@@ -58,10 +58,14 @@ export default async function AdminHendelserPage({ searchParams }: PageProps) {
 
   return (
     <>
-        <PageHeader title="Hendelseslogg" back={{ href: '/admin', label: 'Admin' }} />
+        <PageHeader
+          title="Hendelseslogg"
+          back={{ href: '/admin', label: 'Admin' }}
+          maxWidth="6xl"
+        />
 
         {/* Filter-chips: kategori + alvorlighet */}
-        <div className="space-y-2 px-6 pt-4">
+        <div className="space-y-2 px-6 pt-6 lg:mx-auto lg:max-w-6xl">
           <ChipBar>
             <Chip href="/admin/hendelser" active={!category && !severity}>
               Alle
@@ -89,7 +93,7 @@ export default async function AdminHendelserPage({ searchParams }: PageProps) {
           </ChipBar>
         </div>
 
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-6xl">
           {events.length === 0 ? (
             <EmptyState
               icon={AlertTriangle}

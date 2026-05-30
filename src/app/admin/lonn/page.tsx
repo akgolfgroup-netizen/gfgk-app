@@ -55,9 +55,13 @@ export default async function LonnPage({
 
   return (
     <>
-        <PageHeader title="Lønn" back={{ href: '/admin', label: 'Admin' }} />
+        <PageHeader
+          title="Lønn"
+          back={{ href: '/admin', label: 'Admin' }}
+          maxWidth="6xl"
+        />
 
-        <div className="px-6 pt-6 space-y-6">
+        <div className="px-6 pt-6 space-y-6 lg:mx-auto lg:max-w-6xl">
           {/* Månednavigasjon */}
           <div className="flex items-center justify-between">
             <a href={`/admin/lonn?mnd=${prevMnd}`} className="rounded-md border border-gfgk-border bg-white px-4 py-2 text-sm font-medium text-gfgk-text hover:bg-gfgk-cream-deep transition-colors shadow-card">←</a>

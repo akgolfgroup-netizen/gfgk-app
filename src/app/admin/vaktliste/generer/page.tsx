@@ -72,9 +72,10 @@ export default async function GenererPage({ searchParams }: PageProps) {
           title="Generer vakter"
           subtitle="Auto-fyll basert på preferanser og stillingsprosent"
           back={{ href: '/admin/vaktliste', label: 'Vaktliste' }}
+          maxWidth="3xl"
         />
 
-        <div className="space-y-6 px-6 pt-6">
+        <div className="space-y-6 px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           <form action={runGenerator} className="space-y-6">
             {/* Periode */}
             <section>

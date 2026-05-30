@@ -77,9 +77,13 @@ export default async function BudsjettPage({
 
   return (
     <>
-        <PageHeader title="Budsjett" back={{ href: '/admin', label: 'Admin' }} />
+        <PageHeader
+          title="Budsjett"
+          back={{ href: '/admin', label: 'Admin' }}
+          maxWidth="6xl"
+        />
 
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-6xl">
           <div className="mb-6 flex items-center justify-between">
             <Link
               href={`/admin/budsjett?mnd=${prevMonth(year, month)}`}

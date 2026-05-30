@@ -202,7 +202,7 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
 
   return (
     <AppShell role={session.user.role} userName={session.user.name ?? null}>
-        <PageHeader title="Oppgaver" />
+        <PageHeader title="Oppgaver" maxWidth={view === 'liste' ? '3xl' : '6xl'} />
 
         <div
           className={cn(
@@ -348,7 +348,7 @@ function EmptyPage({
 }) {
   return (
     <AppShell role={role} userName={userName}>
-        <PageHeader title="Oppgaver" />
+        <PageHeader title="Oppgaver" maxWidth="3xl" />
         <div className="px-6 pt-12 lg:mx-auto lg:max-w-3xl">
           <EmptyState
             icon={CheckSquare}

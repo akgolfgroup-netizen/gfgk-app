@@ -66,6 +66,7 @@ export default async function RapporterPage() {
           title="Rapporter"
           subtitle="Siste 6 måneder"
           back={{ href: '/admin', label: 'Admin' }}
+          maxWidth="6xl"
           action={
             first && last ? (
               <a
@@ -79,7 +80,7 @@ export default async function RapporterPage() {
           }
         />
 
-        <div className="px-6 pt-6 space-y-8">
+        <div className="px-6 pt-6 space-y-8 lg:mx-auto lg:max-w-6xl">
           {/* Sammendrag */}
           <div className="grid grid-cols-3 gap-3">
             {([
