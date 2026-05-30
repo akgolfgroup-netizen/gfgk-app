@@ -1,6 +1,7 @@
 'use server'
 
 import { eq } from 'drizzle-orm'
+import { revalidatePath } from 'next/cache'
 import { getDb } from '@/db'
 import { inboxMessages, inboxSkills } from '@/db/schema'
 import { findRelevantArticles } from '@/lib/articles'
@@ -204,5 +205,6 @@ export async function regenerateDraft(messageId: string): Promise<void> {
     .set({ aiDraft: null, status: 'new' })
     .where(eq(inboxMessages.id, messageId))
   await ensureDraftFor(messageId)
+  revalidatePath(`/admin/inbox/${messageId}`)
 }
 

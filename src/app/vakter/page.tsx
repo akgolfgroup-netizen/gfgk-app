@@ -40,7 +40,9 @@ export default async function VakterPage({ searchParams }: PageProps) {
 
   const { view: viewParam, date: dateParam } = await searchParams
   const view: CalendarView = parseView(viewParam)
-  const refDate = dateParam ? new Date(dateParam + 'T00:00:00') : new Date()
+  const parsedDate = dateParam ? new Date(dateParam + 'T00:00:00') : new Date()
+  // Ugyldig ?date= gir Invalid Date som kan 500-e nedstrøms — fall tilbake til i dag.
+  const refDate = isNaN(parsedDate.getTime()) ? new Date() : parsedDate
 
   let from: Date
   let to: Date

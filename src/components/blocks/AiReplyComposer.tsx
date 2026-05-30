@@ -1,6 +1,7 @@
 'use client'
 
 import { RotateCcw, Send, UserCheck } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
@@ -25,7 +26,15 @@ export function AiReplyComposer({
   onMarkManual,
 }: AiReplyComposerProps) {
   const [body, setBody] = useState(initialDraft)
+  // Når serveren sender et regenerert utkast (ny initialDraft), oppdater textarea.
+  // React-mønster: juster state under render i stedet for i en effect.
+  const [seenDraft, setSeenDraft] = useState(initialDraft)
+  if (initialDraft !== seenDraft) {
+    setSeenDraft(initialDraft)
+    setBody(initialDraft)
+  }
   const [isPending, startTransition] = useTransition()
+  const router = useRouter()
 
   if (alreadySent) {
     return (
@@ -79,7 +88,12 @@ export function AiReplyComposer({
           variant="secondary"
           size="md"
           disabled={isPending}
-          onClick={() => startTransition(() => onRegenerate(messageId))}
+          onClick={() =>
+            startTransition(async () => {
+              await onRegenerate(messageId)
+              router.refresh()
+            })
+          }
         >
           <RotateCcw className="h-4 w-4" />
           Skriv om

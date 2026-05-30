@@ -4,6 +4,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, MapPin } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { AvatarStack, type AvatarStackUser } from '@/components/ui/AvatarStack'
 import { Checkbox } from '@/components/ui/Checkbox'
@@ -53,6 +54,7 @@ function formatDue(date: string): { label: string; overdue: boolean } {
 
 export function TaskBlock({ task, onToggle, sortable = false, flat = false }: TaskBlockProps) {
   const [isPending, startTransition] = useTransition()
+  const router = useRouter()
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: task.id, disabled: !sortable })
@@ -95,7 +97,12 @@ export function TaskBlock({ task, onToggle, sortable = false, flat = false }: Ta
           variant="circle"
           checked={done}
           disabled={isPending}
-          onCheckedChange={() => startTransition(() => onToggle(task.id))}
+          onCheckedChange={() =>
+            startTransition(async () => {
+              await onToggle(task.id)
+              router.refresh()
+            })
+          }
           aria-label={done ? 'Marker som ikke fullført' : 'Marker som fullført'}
         />
       </div>

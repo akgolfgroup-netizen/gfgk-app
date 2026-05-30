@@ -27,7 +27,7 @@ interface ResendInboundPayload {
 export async function POST(request: Request) {
   const authHeader = request.headers.get('authorization')
   const expected = process.env.INBOX_WEBHOOK_SECRET
-  if (expected && authHeader !== `Bearer ${expected}`) {
+  if (!expected || authHeader !== `Bearer ${expected}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
