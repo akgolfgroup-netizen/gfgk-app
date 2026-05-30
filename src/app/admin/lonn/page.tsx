@@ -99,6 +99,8 @@ export default async function LonnPage({
                     name="hourlyRate"
                     type="number"
                     min="0"
+                    max="100000"
+                    step="1"
                     defaultValue={user.hourlyRate ?? ''}
                     placeholder="Timesats (kr)"
                     className="flex-1 !h-10 !py-0 !text-sm"

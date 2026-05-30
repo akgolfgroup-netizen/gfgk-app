@@ -40,6 +40,8 @@ export function TransactionForm({ defaultDate }: { defaultDate: string }) {
           type="number"
           required
           min="1"
+          max="100000000"
+          step="1"
           inputMode="numeric"
           className="w-full"
         />
