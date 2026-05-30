@@ -31,6 +31,7 @@ export function BottomNav({ role }: { role: Role }) {
             <li key={item.href} className="flex-1">
               <Link
                 href={item.href}
+                aria-current={active ? 'page' : undefined}
                 className={cn(
                   'flex h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors',
                   active ? 'text-gfgk-gold' : 'text-white/60 hover:text-white',

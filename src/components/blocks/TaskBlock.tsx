@@ -92,7 +92,7 @@ export function TaskBlock({ task, onToggle, sortable = false, flat = false }: Ta
         </button>
       )}
 
-      <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+      <span onClick={(e) => e.stopPropagation()} className="block shrink-0">
         <Checkbox
           variant="circle"
           checked={done}
@@ -105,7 +105,7 @@ export function TaskBlock({ task, onToggle, sortable = false, flat = false }: Ta
           }
           aria-label={done ? 'Marker som ikke fullført' : 'Marker som fullført'}
         />
-      </div>
+      </span>
 
       <Link
         href={`/oppgaver/${task.id}`}

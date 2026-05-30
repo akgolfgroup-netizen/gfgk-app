@@ -5,12 +5,14 @@ import {
   type DragEndEvent,
   DragOverlay,
   type DragStartEvent,
+  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
 import {
   SortableContext,
+  sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
@@ -80,6 +82,9 @@ export function TaskBoardView({ tasks, onMove }: TaskBoardViewProps) {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   )
 
   const byStatus = (status: TaskStatus) => items.filter((t) => t.status === status)
@@ -213,7 +218,14 @@ function SortableBoardCard({ task }: { task: TaskBlockData }) {
   }
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      aria-roledescription="Flyttbart kort"
+      aria-label={task.title}
+    >
       <BoardCard task={task} />
     </div>
   )

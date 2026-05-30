@@ -112,6 +112,7 @@ function TaskRow({
         <select
           value={task.status}
           disabled={isPending}
+          aria-label="Endre status"
           onChange={(e) => changeStatus(e.target.value)}
           className="rounded-lg border border-gfgk-border bg-white px-2 py-1 text-xs font-medium text-gfgk-text disabled:opacity-50"
         >
