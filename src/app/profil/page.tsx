@@ -5,6 +5,7 @@ import { getDb } from '@/db'
 import { timeEntries, users } from '@/db/schema'
 import { AvatarUpload } from '@/components/blocks/AvatarUpload'
 import { PreferredShiftChips } from '@/components/blocks/PreferredShiftChips'
+import { ProfilInstall } from '@/components/blocks/ProfilInstall'
 import { AppShell } from '@/components/AppShell'
 import { ConfirmButton } from '@/components/ConfirmButton'
 import { Button } from '@/components/ui/Button'
@@ -322,6 +323,14 @@ export default async function ProfilPage() {
                 <span className="text-sm font-semibold text-gfgk-text">Varsler</span>
                 <span className="text-sm text-gfgk-text-2">Åpne →</span>
               </a>
+            </Card>
+          </section>
+
+          {/* Installer app */}
+          <section>
+            <SectionLabel>Installer app</SectionLabel>
+            <Card padding="md">
+              <ProfilInstall />
             </Card>
           </section>
 
