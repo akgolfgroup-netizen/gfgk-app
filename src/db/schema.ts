@@ -579,6 +579,21 @@ export const sponsorCommunications = pgTable('sponsor_communications', {
 })
 
 // ============================================================
+// Vakt-overlevering
+// ============================================================
+
+export const handovers = pgTable('handovers', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  date: date('date').notNull(),
+  fromUserId: uuid('from_user_id')
+    .notNull()
+    .references(() => users.id),
+  note: text('note').notNull(),
+  openItems: text('open_items').array(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+// ============================================================
 // Types
 // ============================================================
 
@@ -645,3 +660,6 @@ export type SponsorStatus = (typeof sponsorStatusEnum.enumValues)[number]
 export type SponsorAgreement = typeof sponsorAgreements.$inferSelect
 export type SponsorCommunication = typeof sponsorCommunications.$inferSelect
 export type SponsorCommType = (typeof sponsorCommTypeEnum.enumValues)[number]
+
+// Overlevering
+export type Handover = typeof handovers.$inferSelect
