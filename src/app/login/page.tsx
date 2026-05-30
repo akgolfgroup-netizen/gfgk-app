@@ -35,7 +35,7 @@ export default async function LoginPage({
     <main className="relative flex min-h-dvh flex-col overflow-hidden">
       {/* Foto-hero */}
       <Image
-        src="/login-bg.webp"
+        src="/login-bg.jpg"
         alt=""
         fill
         priority

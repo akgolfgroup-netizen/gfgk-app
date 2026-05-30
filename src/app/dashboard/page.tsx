@@ -284,28 +284,29 @@ export default async function DashboardPage() {
                 {rosterShifts.map((shift, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 rounded-xl border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-3 py-2.5 shadow-card"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-card"
                   >
-                    <Avatar
-                      size="sm"
-                      src={shift.avatarUrl}
-                      name={shift.name}
-                      email={shift.email}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-gfgk-text">
-                        {shift.name ?? shift.email}
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold capitalize text-gfgk-text">
+                        {formatNorwegianDate(shift.date)}
                       </p>
                       <p className="truncate text-[13px] text-gfgk-text-2">
-                        <span className="capitalize">
-                          {formatNorwegianDate(shift.date)}
-                        </span>
-                        {' · '}
                         <span className="font-mono-nums">
                           {shift.startTime}–{shift.endTime}
                         </span>
                         {shift.note ? ` · ${shift.note}` : ''}
                       </p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="max-w-[120px] truncate text-right text-xs text-gfgk-text-3">
+                        {shift.name ?? shift.email}
+                      </span>
+                      <Avatar
+                        size="sm"
+                        src={shift.avatarUrl}
+                        name={shift.name}
+                        email={shift.email}
+                      />
                     </div>
                   </div>
                 ))}
