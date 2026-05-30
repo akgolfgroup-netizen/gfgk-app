@@ -1,7 +1,42 @@
+import {
+  AlertTriangle,
+  BarChart3,
+  BookOpen,
+  Banknote,
+  CalendarDays,
+  CalendarPlus,
+  Inbox,
+  ListChecks,
+  Megaphone,
+  Sparkles,
+  Users,
+  Wallet,
+  type LucideIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { auth } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
 import { PageHeader } from '@/components/ui/PageHeader'
+
+const ITEMS: Array<{
+  href: string
+  title: string
+  desc: string
+  icon: LucideIcon
+}> = [
+  { href: '/admin/ansatte', title: 'Ansatte', desc: 'Inviter og administrer ansatte', icon: Users },
+  { href: '/admin/vaktliste', title: 'Vaktliste', desc: 'Lag og publiser vaktlister', icon: CalendarDays },
+  { href: '/admin/sjekklister', title: 'Sjekklister', desc: 'Daglige rutiner og protokoller', icon: ListChecks },
+  { href: '/admin/annonseringer', title: 'Annonseringer', desc: 'Beskjeder til alle eller utvalgte', icon: Megaphone },
+  { href: '/admin/hendelser', title: 'Hendelser', desc: 'Klager, maskinfeil, observasjoner', icon: AlertTriangle },
+  { href: '/admin/aktiviteter', title: 'Aktiviteter', desc: 'Turneringer, kurs og events', icon: CalendarPlus },
+  { href: '/admin/kunnskap', title: 'Kunnskap', desc: 'Artikler og kundeservice', icon: BookOpen },
+  { href: '/admin/inbox', title: 'Inbox', desc: 'AI-assistert servicepunkt-e-post', icon: Inbox },
+  { href: '/admin/innstillinger/ai-skills', title: 'AI svar-maler', desc: 'Maler agenten bruker', icon: Sparkles },
+  { href: '/admin/budsjett', title: 'Budsjett', desc: 'Inntekter og utgifter', icon: Wallet },
+  { href: '/admin/lonn', title: 'Lønn', desc: 'Timesatser og lønnskostnad', icon: Banknote },
+  { href: '/admin/rapporter', title: 'Rapporter', desc: 'Statistikk og oversikt', icon: BarChart3 },
+]
 
 export default async function AdminPage() {
   const session = await auth()
@@ -11,35 +46,24 @@ export default async function AdminPage() {
         <PageHeader title="Admin" subtitle="Internt panel for daglig leder" />
 
         <div className="px-6 pt-6">
-          <section className="space-y-3">
-            {[
-              { href: '/admin/ansatte', title: 'Ansatte', desc: 'Inviter og administrer ansatte.' },
-              { href: '/admin/vaktliste', title: 'Vaktliste', desc: 'Lag og publiser vaktlister.' },
-              { href: '/admin/sjekklister', title: 'Sjekklister', desc: 'Daglige rutiner og protokoller.' },
-              { href: '/admin/annonseringer', title: 'Annonseringer', desc: 'Beskjeder til alle eller utvalgte.' },
-              { href: '/admin/hendelser', title: 'Hendelser', desc: 'Klager, maskinfeil og observasjoner fra vakter.' },
-              { href: '/admin/aktiviteter', title: 'Aktiviteter', desc: 'Turneringer, kurs og events i kalenderen.' },
-              { href: '/admin/kunnskap', title: 'Kunnskap', desc: 'Artikler for ansatte og kundeservice.' },
-              { href: '/admin/inbox', title: 'Inbox', desc: 'AI-assistert servicepunkt-e-post.' },
-              { href: '/admin/innstillinger/ai-skills', title: 'AI svar-maler', desc: 'Maler som agenten bruker.' },
-              { href: '/admin/budsjett', title: 'Budsjett', desc: 'Inntekter, utgifter og rapporter.' },
-              { href: '/admin/lonn', title: 'Lønn', desc: 'Timesatser og lønnskostnader.' },
-              { href: '/admin/rapporter', title: 'Rapporter', desc: 'Statistikk og månedlig oversikt.' },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="block overflow-hidden rounded-lg border border-gfgk-border shadow-card hover:-translate-y-0.5 hover:shadow-md transition-all duration-150"
-              >
-                <div className="bg-gfgk-black px-4 py-3">
-                  <h2 className="text-[11px] font-extrabold uppercase tracking-wide text-gfgk-gold">{item.title}</h2>
-                </div>
-                <div className="bg-white px-4 py-3">
-                  <p className="text-sm text-gfgk-text-2">{item.desc}</p>
-                </div>
-              </Link>
-            ))}
-          </section>
+          <div className="grid grid-cols-2 gap-3">
+            {ITEMS.map((item) => {
+              const Icon = item.icon
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex flex-col rounded-2xl border border-gfgk-border bg-white p-4 shadow-card transition-[border-color,box-shadow] duration-150 hover:border-gfgk-border-strong hover:shadow-card-hover"
+                >
+                  <div className="surface-gold-soft mb-3 grid h-9 w-9 place-items-center rounded-xl">
+                    <Icon className="h-5 w-5 text-gfgk-gold-deep" strokeWidth={1.8} />
+                  </div>
+                  <h2 className="text-sm font-semibold text-gfgk-text">{item.title}</h2>
+                  <p className="mt-0.5 text-xs leading-snug text-gfgk-text-2">{item.desc}</p>
+                </Link>
+              )
+            })}
+          </div>
         </div>
       </main>
       <BottomNav role={session!.user.role} />

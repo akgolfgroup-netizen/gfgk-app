@@ -36,9 +36,9 @@ export function SubHeader({
         {back && (
           <Link
             href={back.href}
-            className="-ml-1 mb-1 inline-flex items-center gap-1 text-sm font-medium text-gfgk-text-2 transition-colors hover:text-gfgk-text"
+            className="-ml-0.5 mb-2 inline-flex h-9 items-center gap-1 rounded-full border border-gfgk-border bg-white pl-2 pr-3.5 text-sm font-semibold text-gfgk-text shadow-card transition-colors hover:bg-gfgk-cream-deep"
           >
-            <ChevronLeft className="h-4 w-4" strokeWidth={2} />
+            <ChevronLeft className="h-[18px] w-[18px]" strokeWidth={2.5} />
             {back.label ?? 'Tilbake'}
           </Link>
         )}

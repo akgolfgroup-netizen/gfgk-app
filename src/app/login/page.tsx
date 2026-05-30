@@ -34,9 +34,9 @@ export default async function LoginPage({
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center px-6 pt-safe pb-safe">
       <Link
         href="/"
-        className="-ml-1 mb-8 inline-flex items-center gap-1 text-sm font-medium text-gfgk-text-2 transition-colors hover:text-gfgk-text"
+        className="-ml-0.5 mb-8 inline-flex h-9 w-fit items-center gap-1 rounded-full border border-gfgk-border bg-white pl-2 pr-3.5 text-sm font-semibold text-gfgk-text shadow-card transition-colors hover:bg-gfgk-cream-deep"
       >
-        <ChevronLeft className="h-4 w-4" strokeWidth={2} />
+        <ChevronLeft className="h-[18px] w-[18px]" strokeWidth={2.5} />
         Tilbake
       </Link>
 
