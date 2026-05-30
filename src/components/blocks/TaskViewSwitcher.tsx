@@ -4,17 +4,7 @@ import { Calendar, Columns3, List, Table } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/cn'
-
-export type TaskView = 'liste' | 'tavle' | 'tabell' | 'kalender'
-
-const VIEWS: TaskView[] = ['liste', 'tavle', 'tabell', 'kalender']
-
-/**
- * Parser en ukjent param-verdi trygt til en gyldig TaskView. Default 'liste'.
- */
-export function parseTaskView(value: string | null | undefined): TaskView {
-  return VIEWS.includes(value as TaskView) ? (value as TaskView) : 'liste'
-}
+import { parseTaskView, type TaskView } from '@/lib/task-views'
 
 const OPTIONS: Array<{ view: TaskView; label: string; icon: LucideIcon }> = [
   { view: 'liste', label: 'Liste', icon: List },

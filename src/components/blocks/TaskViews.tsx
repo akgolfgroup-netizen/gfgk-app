@@ -8,8 +8,9 @@ import { TaskBoardView } from '@/components/blocks/TaskBoardView'
 import { TaskCalendarView } from '@/components/blocks/TaskCalendarView'
 import { TaskListView } from '@/components/blocks/TaskListView'
 import { TaskTableView } from '@/components/blocks/TaskTableView'
-import { parseTaskView, TaskViewSwitcher } from '@/components/blocks/TaskViewSwitcher'
+import { TaskViewSwitcher } from '@/components/blocks/TaskViewSwitcher'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { parseTaskView } from '@/lib/task-views'
 
 type TaskStatus = TaskBlockData['status']
 

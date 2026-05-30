@@ -5,7 +5,7 @@ import { auth } from '@/auth'
 import { AppShell } from '@/components/AppShell'
 import { type TaskBlockData } from '@/components/blocks/TaskBlock'
 import { TaskViews } from '@/components/blocks/TaskViews'
-import { parseTaskView } from '@/components/blocks/TaskViewSwitcher'
+import { parseTaskView } from '@/lib/task-views'
 import {
   BottomSheet,
   BottomSheetClose,
