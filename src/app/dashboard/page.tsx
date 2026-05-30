@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, inArray, ne } from 'drizzle-orm'
+import { and, asc, eq, gte, inArray, isNotNull, lte, ne } from 'drizzle-orm'
 import { CheckSquare } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -8,6 +8,7 @@ import { BottomNav } from '@/components/BottomNav'
 import { AnnouncementBanner } from '@/components/blocks/AnnouncementBanner'
 import { ClockButton } from '@/components/blocks/ClockButton'
 import { InstallPrompt } from '@/components/blocks/InstallPrompt'
+import { TaskBlock } from '@/components/blocks/TaskBlock'
 import { Avatar } from '@/components/ui/Avatar'
 import { Card } from '@/components/ui/Card'
 import { Eyebrow } from '@/components/ui/Eyebrow'
@@ -26,6 +27,7 @@ import {
 import { getDashboardBannerItems, markAnnouncementRead } from '@/lib/announcements'
 import { clockIn, clockOut, getActiveClock, getTodayShift } from '@/lib/clock'
 import { formatNorwegianDate, toDateString } from '@/lib/dates'
+import { toggleTaskDone } from '@/lib/tasks'
 
 function greetingForHour(hour: number): string {
   if (hour < 10) return 'morgen'
@@ -51,6 +53,7 @@ export default async function DashboardPage() {
     todayChecklistRuns,
     openTaskRows,
     rosterShifts,
+    myTodayTasks,
   ] = await Promise.all([
     db
       .select({
@@ -102,6 +105,26 @@ export default async function DashboardPage() {
       .where(and(eq(shifts.published, true), gte(shifts.date, today)))
       .orderBy(asc(shifts.date), asc(shifts.startTime))
       .limit(14),
+    // Mine oppgaver i dag — tildelt meg, frist i dag eller forfalt, ikke fullført
+    db
+      .select({
+        id: tasks.id,
+        title: tasks.title,
+        status: tasks.status,
+        priority: tasks.priority,
+        dueDate: tasks.dueDate,
+      })
+      .from(tasks)
+      .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
+      .where(
+        and(
+          eq(taskAssignees.userId, userId),
+          ne(tasks.status, 'done'),
+          isNotNull(tasks.dueDate),
+          lte(tasks.dueDate, today),
+        ),
+      )
+      .orderBy(asc(tasks.dueDate)),
   ])
 
   // Beregn progresjon per sjekkliste
@@ -273,6 +296,33 @@ export default async function DashboardPage() {
               </div>
             </section>
           )}
+
+          {/* Mine oppgaver i dag */}
+          <section>
+            <SectionLabel>Mine oppgaver i dag</SectionLabel>
+            {myTodayTasks.length === 0 ? (
+              <p className="text-sm text-gfgk-text-3">
+                Ingen oppgaver med frist i dag.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {myTodayTasks.map((t) => (
+                  <TaskBlock
+                    key={t.id}
+                    task={{
+                      id: t.id,
+                      title: t.title,
+                      status: t.status,
+                      priority: t.priority,
+                      dueDate: t.dueDate,
+                      assignees: [],
+                    }}
+                    onToggle={toggleTaskDone}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
 
           {/* Kommende vakter */}
           <section>
