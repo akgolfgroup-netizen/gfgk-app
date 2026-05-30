@@ -7,7 +7,7 @@ import type { Role } from '@/db/schema'
 import { cn } from '@/lib/cn'
 
 const baseItems = [
-  { href: '/dashboard', label: 'Hjem', icon: Home },
+  { href: '/dashboard', label: 'Min dag', icon: Home },
   { href: '/oppgaver', label: 'Oppgaver', icon: CheckSquare },
   { href: '/kalender', label: 'Kalender', icon: Calendar },
   { href: '/profil', label: 'Profil', icon: User },
