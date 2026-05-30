@@ -44,7 +44,7 @@ export default async function KunnskapPage({ searchParams }: PageProps) {
           subtitle="Medlemskap, priser, rutiner og svar"
         />
 
-        <div className="space-y-4 px-6 pt-4">
+        <div className="space-y-4 px-6 pt-4 lg:mx-auto lg:max-w-5xl">
           {/* Søk */}
           <form action="/kunnskap" method="GET">
             {category && <input type="hidden" name="kat" value={category} />}
@@ -88,7 +88,7 @@ export default async function KunnskapPage({ searchParams }: PageProps) {
               }
             />
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
               {articles.map((a) => (
                 <ArticleCard key={a.id} article={a} />
               ))}

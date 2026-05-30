@@ -157,7 +157,7 @@ export default async function ProsjekterPage({ searchParams }: PageProps) {
         <PageHeader title="Prosjekter" />
 
         {/* Tab-bar */}
-        <div className="px-6 pt-4">
+        <div className="px-6 pt-4 lg:mx-auto lg:max-w-5xl">
           <div className="flex gap-6 border-b border-gfgk-border">
             {TABS.map((t) => {
               const active = tab === t.key
@@ -179,7 +179,7 @@ export default async function ProsjekterPage({ searchParams }: PageProps) {
           </div>
         </div>
 
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-5xl">
           {projectList.length === 0 ? (
             <EmptyState
               icon={FolderPlus}
@@ -197,7 +197,7 @@ export default async function ProsjekterPage({ searchParams }: PageProps) {
               }
             />
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
               {projectList.map((p) => (
                 <ProjectCard key={p.id} project={p} />
               ))}

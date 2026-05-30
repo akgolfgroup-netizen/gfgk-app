@@ -72,7 +72,7 @@ export default async function SjekklisterPage() {
     <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <PageHeader title="Sjekklister i dag" />
 
-        <div className="space-y-6 px-6 pt-6">
+        <div className="space-y-6 px-6 pt-6 lg:mx-auto lg:max-w-3xl">
           {myRuns.length === 0 ? (
             <EmptyState
               icon={CheckSquare}

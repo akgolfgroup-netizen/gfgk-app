@@ -43,8 +43,8 @@ export default async function AdminPage() {
     <>
         <PageHeader title="Admin" subtitle="Internt panel for daglig leder" />
 
-        <div className="px-6 pt-6">
-          <div className="grid grid-cols-2 gap-3">
+        <div className="px-6 pt-6 lg:mx-auto lg:max-w-6xl">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4 lg:gap-4">
             {ITEMS.map((item) => {
               const Icon = item.icon
               return (

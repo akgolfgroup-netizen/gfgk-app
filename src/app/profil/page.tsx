@@ -68,7 +68,7 @@ export default async function ProfilPage() {
     <AppShell role={me.role} userName={me.name ?? null}>
         <PageHeader title="Min profil" subtitle={me.email} />
 
-        <div className="space-y-8 px-6 pt-6">
+        <div className="space-y-8 px-6 pt-6 lg:mx-auto lg:max-w-2xl">
           {/* Avatar + identitet */}
           <section className="flex flex-col items-center gap-3">
             <AvatarUpload
