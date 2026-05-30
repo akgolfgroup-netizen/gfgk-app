@@ -48,6 +48,7 @@ export default async function RedigerArtikkelPage({ params }: PageProps) {
               </label>
               <Select name="category" defaultValue={article.category}>
                 <option value="medlemskap">Medlemskap</option>
+                <option value="priser">Priser</option>
                 <option value="drift">Drift</option>
                 <option value="faq">FAQ</option>
                 <option value="prosedyrer">Prosedyrer</option>

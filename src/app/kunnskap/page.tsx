@@ -17,13 +17,14 @@ interface PageProps {
 const CATEGORIES: Array<{ key: ArticleCategory | 'alle'; label: string }> = [
   { key: 'alle', label: 'Alle' },
   { key: 'medlemskap', label: 'Medlemskap' },
+  { key: 'priser', label: 'Priser' },
   { key: 'drift', label: 'Drift' },
   { key: 'faq', label: 'FAQ' },
   { key: 'prosedyrer', label: 'Prosedyrer' },
   { key: 'annet', label: 'Annet' },
 ]
 
-const VALID: ArticleCategory[] = ['medlemskap', 'drift', 'faq', 'prosedyrer', 'annet']
+const VALID: ArticleCategory[] = ['medlemskap', 'priser', 'drift', 'faq', 'prosedyrer', 'annet']
 
 export default async function KunnskapPage({ searchParams }: PageProps) {
   const session = await auth()
@@ -39,7 +40,10 @@ export default async function KunnskapPage({ searchParams }: PageProps) {
   return (
     <>
       <main className="min-h-dvh pb-24">
-        <PageHeader title="Kunnskap" subtitle="Klubbens informasjon og rutiner" />
+        <PageHeader
+          title="Kunnskap"
+          subtitle="Medlemskap, priser, rutiner og svar"
+        />
 
         <div className="space-y-4 px-6 pt-4">
           {/* Søk */}

@@ -434,6 +434,7 @@ export const activities = pgTable('activities', {
 
 export const articleCategoryEnum = pgEnum('article_category', [
   'medlemskap',
+  'priser',
   'drift',
   'faq',
   'prosedyrer',

@@ -42,6 +42,7 @@ export default async function NyArtikkelPage() {
               </label>
               <Select name="category" defaultValue="annet">
                 <option value="medlemskap">Medlemskap</option>
+                <option value="priser">Priser</option>
                 <option value="drift">Drift</option>
                 <option value="faq">FAQ</option>
                 <option value="prosedyrer">Prosedyrer</option>

@@ -14,6 +14,7 @@ interface ArticleCardProps {
 
 const CATEGORY_LABEL: Record<ArticleCategory, string> = {
   medlemskap: 'Medlemskap',
+  priser: 'Priser',
   drift: 'Drift',
   faq: 'FAQ',
   prosedyrer: 'Prosedyrer',
@@ -22,6 +23,7 @@ const CATEGORY_LABEL: Record<ArticleCategory, string> = {
 
 const CATEGORY_TONE: Record<ArticleCategory, 'gold' | 'teal' | 'red' | 'neutral'> = {
   medlemskap: 'gold',
+  priser: 'teal',
   drift: 'teal',
   faq: 'neutral',
   prosedyrer: 'red',

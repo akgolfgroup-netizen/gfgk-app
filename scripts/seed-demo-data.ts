@@ -204,6 +204,13 @@ async function main() {
   // ---- Artikler (kunnskap) ----
   await db.insert(articles).values([
     {
+      slug: 'prisliste-2026',
+      title: 'Prisliste 2026',
+      category: 'priser',
+      body: '## Greenfee 2026\n\n- **Hverdager:** 550 kr (18 hull) · 350 kr (9 hull)\n- **Helg/helligdag:** 650 kr (18 hull) · 400 kr (9 hull)\n- **Junior (u/19):** halv pris\n\n## Medlemskap\n\n- **Voksen:** 9 900 kr/år\n- **Ung voksen (19–25):** 5 400 kr/år\n- **Junior:** 2 200 kr/år\n\n## Utleie\n\n- Leiekøller: 150 kr · Tralle: 80 kr · Golfbil: 350 kr\n\n> Priser oppdateres ved sesongstart.',
+      createdBy: admin.id,
+    },
+    {
       slug: 'apningstider-sesong',
       title: 'Åpningstider i sesongen',
       category: 'drift',
