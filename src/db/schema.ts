@@ -162,6 +162,7 @@ export const tasks = pgTable('tasks', {
   description: text('description'), // markdown
   status: taskStatusEnum('status').notNull().default('todo'),
   priority: taskPriorityEnum('priority').notNull().default('medium'),
+  zone: text('zone'), // valgfri sone/sted, f.eks. «Hull 3», «Pro shop»
   startAt: timestamp('start_at', { withTimezone: true }),
   endAt: timestamp('end_at', { withTimezone: true }),
   dueDate: date('due_date'),
@@ -244,6 +245,7 @@ export const checklists = pgTable('checklists', {
   repeat: checklistRepeatEnum('repeat').notNull().default('daglig'),
   weekdays: text('weekdays').array(), // ['man','tir',...] når repeat=ukentlig
   assignedRole: checklistRoleEnum('assigned_role').notNull().default('ansatt'),
+  articleId: uuid('article_id'), // valgfri SOP-lenke til kunnskapsartikkel (FK lagt til separat)
   createdBy: uuid('created_by')
     .notNull()
     .references(() => users.id),
