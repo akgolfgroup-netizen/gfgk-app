@@ -8,6 +8,7 @@ import { BottomNav } from '@/components/BottomNav'
 import { AnnouncementBanner } from '@/components/blocks/AnnouncementBanner'
 import { ClockButton } from '@/components/blocks/ClockButton'
 import { InstallPrompt } from '@/components/blocks/InstallPrompt'
+import { Avatar } from '@/components/ui/Avatar'
 import { Card } from '@/components/ui/Card'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 import { KPI } from '@/components/ui/KPI'
@@ -20,6 +21,7 @@ import {
   shifts,
   taskAssignees,
   tasks,
+  users,
 } from '@/db/schema'
 import { getDashboardBannerItems, markAnnouncementRead } from '@/lib/announcements'
 import { clockIn, clockOut, getActiveClock, getTodayShift } from '@/lib/clock'
@@ -48,6 +50,7 @@ export default async function DashboardPage() {
     announcementItems,
     todayChecklistRuns,
     openTaskRows,
+    rosterShifts,
   ] = await Promise.all([
     db
       .select({
@@ -83,6 +86,22 @@ export default async function DashboardPage() {
       .from(tasks)
       .innerJoin(taskAssignees, eq(taskAssignees.taskId, tasks.id))
       .where(and(eq(taskAssignees.userId, userId), ne(tasks.status, 'done'))),
+    // Hvem jobber framover — alle publiserte vakter neste dager (m/ navn)
+    db
+      .select({
+        date: shifts.date,
+        startTime: shifts.startTime,
+        endTime: shifts.endTime,
+        note: shifts.note,
+        name: users.name,
+        email: users.email,
+        avatarUrl: users.avatarUrl,
+      })
+      .from(shifts)
+      .innerJoin(users, eq(users.id, shifts.userId))
+      .where(and(eq(shifts.published, true), gte(shifts.date, today)))
+      .orderBy(asc(shifts.date), asc(shifts.startTime))
+      .limit(14),
   ])
 
   // Beregn progresjon per sjekkliste
@@ -161,9 +180,9 @@ export default async function DashboardPage() {
             </Card>
             <Card padding="md">
               <KPI
-                label="Kommende vakter"
+                label="Mine vakter"
                 value={upcomingShifts.length}
-                hint="neste 7 dager"
+                hint="kommende"
               />
             </Card>
             <Card padding="md">
@@ -258,22 +277,36 @@ export default async function DashboardPage() {
           {/* Kommende vakter */}
           <section>
             <SectionLabel>Kommende vakter</SectionLabel>
-            {upcomingShifts.length === 0 ? (
+            {rosterShifts.length === 0 ? (
               <p className="text-sm text-gfgk-text-3">Ingen planlagte vakter.</p>
             ) : (
               <div className="space-y-2">
-                {upcomingShifts.map((shift, i) => (
+                {rosterShifts.map((shift, i) => (
                   <div
                     key={i}
-                    className="rounded-xl border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-4 py-3 shadow-card"
+                    className="flex items-center gap-3 rounded-xl border border-gfgk-border border-l-4 border-l-gfgk-gold bg-white px-3 py-2.5 shadow-card"
                   >
-                    <p className="text-sm font-semibold capitalize text-gfgk-text">
-                      {formatNorwegianDate(shift.date)}
-                    </p>
-                    <p className="mt-0.5 text-sm text-gfgk-text-2">
-                      {shift.startTime}–{shift.endTime}
-                      {shift.note ? ` · ${shift.note}` : ''}
-                    </p>
+                    <Avatar
+                      size="sm"
+                      src={shift.avatarUrl}
+                      name={shift.name}
+                      email={shift.email}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-gfgk-text">
+                        {shift.name ?? shift.email}
+                      </p>
+                      <p className="truncate text-[13px] text-gfgk-text-2">
+                        <span className="capitalize">
+                          {formatNorwegianDate(shift.date)}
+                        </span>
+                        {' · '}
+                        <span className="font-mono-nums">
+                          {shift.startTime}–{shift.endTime}
+                        </span>
+                        {shift.note ? ` · ${shift.note}` : ''}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
