@@ -3,7 +3,9 @@ import { CheckSquare, Plus } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { AppShell } from '@/components/AppShell'
-import { TaskBlock, type TaskBlockData } from '@/components/blocks/TaskBlock'
+import { type TaskBlockData } from '@/components/blocks/TaskBlock'
+import { TaskViews } from '@/components/blocks/TaskViews'
+import { parseTaskView } from '@/components/blocks/TaskViewSwitcher'
 import {
   BottomSheet,
   BottomSheetClose,
@@ -17,7 +19,6 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { FAB } from '@/components/ui/FAB'
 import { Input } from '@/components/ui/Input'
 import { PageHeader } from '@/components/ui/PageHeader'
-import { SectionLabel } from '@/components/ui/SectionLabel'
 import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { getDb } from '@/db'
@@ -29,12 +30,13 @@ import {
   users,
   type Task,
 } from '@/db/schema'
-import { createTask, toggleTaskDone } from '@/lib/tasks'
+import { cn } from '@/lib/cn'
+import { createTask, moveTask, toggleTaskDone } from '@/lib/tasks'
 
 type FilterKey = 'mine' | 'alle' | 'i-dag' | 'forfalt' | 'fullfort'
 
 interface PageProps {
-  searchParams: Promise<{ filter?: string }>
+  searchParams: Promise<{ filter?: string; view?: string }>
 }
 
 const FILTERS: Array<{ key: FilterKey; label: string }> = [
@@ -49,23 +51,16 @@ function todayISO(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
-function isToday(date: string | null): boolean {
-  return date === todayISO()
-}
-function isOverdue(date: string | null): boolean {
-  if (!date) return false
-  return date < todayISO()
-}
-
 export default async function OppgaverPage({ searchParams }: PageProps) {
   const session = await auth()
   if (!session?.user) redirect('/login')
 
-  const { filter: filterParam } = await searchParams
+  const { filter: filterParam, view: viewParam } = await searchParams
   const filter: FilterKey =
     (FILTERS.map((f) => f.key) as string[]).includes(filterParam ?? '')
       ? (filterParam as FilterKey)
       : 'mine'
+  const view = parseTaskView(viewParam)
 
   const db = getDb()
   const userId = session.user.id
@@ -101,9 +96,17 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
 
   const ids = accessibleTaskIds.map((r) => r.id)
 
-  // Filtrer videre basert på filter-valg
+  // Filtrer videre basert på filter-valg.
+  // For andre visninger enn liste trenger vi HELE oppgave-settet (alle statuser,
+  // inkl. ferdige) slik at tavle/tabell/kalender blir meningsfulle.
   let taskRows: Task[] = []
-  if (filter === 'mine') {
+  if (view !== 'liste') {
+    taskRows = await db
+      .select()
+      .from(tasks)
+      .where(inArray(tasks.id, ids))
+      .orderBy(asc(tasks.dueDate), asc(tasks.createdAt))
+  } else if (filter === 'mine') {
     // Alle tildelt meg, ikke fullført
     const mineIds = await db
       .selectDistinct({ id: taskAssignees.taskId })
@@ -182,14 +185,6 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
       .map((a) => ({ name: a.name, email: a.email, src: a.avatarUrl })),
   }))
 
-  // Grupper på frist
-  const groupedOverdue = blocks.filter((b) => isOverdue(b.dueDate) && b.status !== 'done')
-  const groupedToday = blocks.filter((b) => isToday(b.dueDate))
-  const groupedLater = blocks.filter(
-    (b) => b.dueDate && !isToday(b.dueDate) && !isOverdue(b.dueDate),
-  )
-  const groupedNoDue = blocks.filter((b) => !b.dueDate)
-
   // Hent prosjekter bruker er medlem av (for "Ny oppgave"-skjema)
   const memberProjects = await db
     .select({ id: projects.id, name: projects.name })
@@ -209,80 +204,31 @@ export default async function OppgaverPage({ searchParams }: PageProps) {
     <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <PageHeader title="Oppgaver" />
 
-        <div className="lg:mx-auto lg:max-w-3xl">
-        {/* Filter-chips */}
-        <div className="px-6 pt-4">
-          <ChipBar>
-            {FILTERS.map((f) => (
-              <Chip key={f.key} active={filter === f.key} href={`/oppgaver?filter=${f.key}`}>
-                {f.label}
-              </Chip>
-            ))}
-          </ChipBar>
-        </div>
-
-        <div className="space-y-6 px-6 pt-6">
-          {blocks.length === 0 ? (
-            <EmptyState
-              icon={CheckSquare}
-              title={
-                filter === 'mine'
-                  ? 'Ingen oppgaver til deg'
-                  : filter === 'i-dag'
-                    ? 'Ingen oppgaver i dag'
-                    : filter === 'forfalt'
-                      ? 'Ingen forfalte oppgaver'
-                      : filter === 'fullfort'
-                        ? 'Ingen fullførte ennå'
-                        : 'Ingen oppgaver'
-              }
-              description="Tap + nede til høyre for å lage en oppgave."
-            />
-          ) : (
-            <>
-              {groupedOverdue.length > 0 && (
-                <section>
-                  <SectionLabel>Forfalt</SectionLabel>
-                  <div className="space-y-2">
-                    {groupedOverdue.map((b) => (
-                      <TaskBlock key={b.id} task={b} onToggle={toggleTaskDone} />
-                    ))}
-                  </div>
-                </section>
-              )}
-              {groupedToday.length > 0 && (
-                <section>
-                  <SectionLabel>I dag</SectionLabel>
-                  <div className="space-y-2">
-                    {groupedToday.map((b) => (
-                      <TaskBlock key={b.id} task={b} onToggle={toggleTaskDone} />
-                    ))}
-                  </div>
-                </section>
-              )}
-              {groupedLater.length > 0 && (
-                <section>
-                  <SectionLabel>Senere</SectionLabel>
-                  <div className="space-y-2">
-                    {groupedLater.map((b) => (
-                      <TaskBlock key={b.id} task={b} onToggle={toggleTaskDone} />
-                    ))}
-                  </div>
-                </section>
-              )}
-              {groupedNoDue.length > 0 && (
-                <section>
-                  <SectionLabel>Ingen frist</SectionLabel>
-                  <div className="space-y-2">
-                    {groupedNoDue.map((b) => (
-                      <TaskBlock key={b.id} task={b} onToggle={toggleTaskDone} />
-                    ))}
-                  </div>
-                </section>
-              )}
-            </>
+        <div
+          className={cn(
+            view === 'liste' ? 'lg:mx-auto lg:max-w-3xl' : 'lg:mx-auto lg:max-w-6xl',
           )}
-        </div>
+        >
+          {/* Filter-chips gir kun mening for liste-visningen */}
+          {view === 'liste' && (
+            <div className="px-6 pt-4">
+              <ChipBar>
+                {FILTERS.map((f) => (
+                  <Chip
+                    key={f.key}
+                    active={filter === f.key}
+                    href={`/oppgaver?filter=${f.key}`}
+                  >
+                    {f.label}
+                  </Chip>
+                ))}
+              </ChipBar>
+            </div>
+          )}
+
+          <div className="px-6 pt-6">
+            <TaskViews tasks={blocks} onMove={moveTask} onToggle={toggleTaskDone} />
+          </div>
         </div>
 
       <BottomSheet>
