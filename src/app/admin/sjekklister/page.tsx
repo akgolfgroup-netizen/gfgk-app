@@ -18,7 +18,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { getDb } from '@/db'
-import { checklistItems, checklists } from '@/db/schema'
+import { articles, checklistItems, checklists } from '@/db/schema'
 import { createChecklist, deleteChecklist } from '@/lib/checklists'
 
 const REPEAT_LABEL = {
@@ -42,6 +42,10 @@ export default async function AdminSjekklisterPage() {
   if (!session?.user) return null
 
   const db = getDb()
+  const articleList = await db
+    .select({ id: articles.id, title: articles.title })
+    .from(articles)
+    .orderBy(asc(articles.title))
   const all = await db
     .select({
       id: checklists.id,
@@ -159,6 +163,20 @@ export default async function AdminSjekklisterPage() {
                 Beskrivelse (valgfri)
               </label>
               <Textarea name="description" rows={2} />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-semibold text-gfgk-text">
+                Lenke til SOP / kunnskapsartikkel (valgfri)
+              </label>
+              <Select name="articleId" defaultValue="">
+                <option value="">Ingen</option>
+                {articleList.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.title}
+                  </option>
+                ))}
+              </Select>
             </div>
 
             <div className="grid grid-cols-2 gap-3">

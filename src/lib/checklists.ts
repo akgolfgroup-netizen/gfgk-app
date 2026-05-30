@@ -50,6 +50,8 @@ export async function createChecklist(formData: FormData): Promise<void> {
   const assignedRole: 'ansatt' | 'admin' | 'alle' =
     role === 'admin' || role === 'alle' ? role : 'ansatt'
 
+  const articleId = (formData.get('articleId') as string) || null
+
   const itemsRaw = ((formData.get('items') as string) ?? '').trim()
   const itemTitles = itemsRaw
     .split('\n')
@@ -67,6 +69,7 @@ export async function createChecklist(formData: FormData): Promise<void> {
       repeat,
       weekdays: repeat === 'ukentlig' ? weekdays : null,
       assignedRole,
+      articleId,
       createdBy: admin.id,
     })
     .returning({ id: checklists.id })

@@ -1,5 +1,5 @@
 import { asc, eq, inArray } from 'drizzle-orm'
-import { CheckSquare } from 'lucide-react'
+import { BookOpen, CheckSquare } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { BottomNav } from '@/components/BottomNav'
@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { getDb } from '@/db'
 import {
+  articles,
   checklistItems,
   checklistRunItems,
   checklistRuns,
@@ -31,9 +32,11 @@ export default async function SjekklisterPage() {
       checklistName: checklists.name,
       checklistDescription: checklists.description,
       assignedRole: checklists.assignedRole,
+      articleSlug: articles.slug,
     })
     .from(checklistRuns)
     .innerJoin(checklists, eq(checklists.id, checklistRuns.checklistId))
+    .leftJoin(articles, eq(articles.id, checklists.articleId))
     .where(eq(checklistRuns.date, today))
 
   // Filtrer på rolle
@@ -93,6 +96,15 @@ export default async function SjekklisterPage() {
                       {done}/{items.length} · {pct}%
                     </span>
                   </div>
+                  {run.articleSlug && (
+                    <a
+                      href={`/kunnskap/${run.articleSlug}`}
+                      className="mb-3 inline-flex items-center gap-1 text-xs font-semibold text-gfgk-gold-deep hover:underline"
+                    >
+                      <BookOpen className="h-3.5 w-3.5" />
+                      Slik gjør du
+                    </a>
+                  )}
                   {run.checklistDescription && (
                     <p className="mb-3 text-sm text-gfgk-text-2">
                       {run.checklistDescription}
