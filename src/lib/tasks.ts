@@ -276,6 +276,7 @@ export async function toggleTaskDone(id: string): Promise<void> {
     .where(eq(tasks.id, id))
 
   revalidatePath('/oppgaver')
+  revalidatePath('/dashboard')
 }
 
 /**
