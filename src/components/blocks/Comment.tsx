@@ -1,7 +1,15 @@
 'use client'
 
-import { useTransition } from 'react'
+import { AlertTriangle } from 'lucide-react'
+import { useState, useTransition } from 'react'
 import { Avatar } from '@/components/ui/Avatar'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetDescription,
+  BottomSheetTitle,
+} from '@/components/ui/BottomSheet'
+import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/cn'
 
 export interface CommentData {
@@ -36,7 +44,13 @@ function timeAgo(date: Date): string {
 
 export function Comment({ comment, currentUserId, onDelete }: CommentProps) {
   const [isPending, startTransition] = useTransition()
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const mine = comment.author.id === currentUserId
+
+  function handleDelete() {
+    setConfirmOpen(false)
+    startTransition(() => onDelete?.(comment.id))
+  }
 
   return (
     <div className={cn('flex gap-3', mine && 'flex-row-reverse')}>
@@ -65,14 +79,49 @@ export function Comment({ comment, currentUserId, onDelete }: CommentProps) {
           {comment.body}
         </div>
         {mine && onDelete && (
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={() => startTransition(() => onDelete(comment.id))}
-            className="text-xs text-gfgk-text-3 hover:text-gfgk-red-deep disabled:opacity-50"
-          >
-            Slett
-          </button>
+          <>
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => setConfirmOpen(true)}
+              className="text-xs text-gfgk-text-3 hover:text-gfgk-red-deep disabled:opacity-50"
+            >
+              Slett
+            </button>
+            <BottomSheet open={confirmOpen} onOpenChange={setConfirmOpen}>
+              <BottomSheetContent>
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gfgk-red-light text-gfgk-red-deep">
+                    <AlertTriangle className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <BottomSheetTitle>Slette kommentar</BottomSheetTitle>
+                    <BottomSheetDescription>
+                      Denne handlingen kan ikke angres.
+                    </BottomSheetDescription>
+                  </div>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    fullWidth
+                    onClick={() => setConfirmOpen(false)}
+                  >
+                    Avbryt
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    fullWidth
+                    onClick={handleDelete}
+                  >
+                    Slett
+                  </Button>
+                </div>
+              </BottomSheetContent>
+            </BottomSheet>
+          </>
         )}
       </div>
     </div>

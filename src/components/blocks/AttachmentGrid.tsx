@@ -1,10 +1,19 @@
 'use client'
 
-import { FileText, Image as ImageIcon, Paperclip, Trash2, Video, X } from 'lucide-react'
-import { useRef, useTransition } from 'react'
+import {
+  AlertTriangle,
+  FileText,
+  Image as ImageIcon,
+  Paperclip,
+  Trash2,
+  Video,
+  X,
+} from 'lucide-react'
+import { useRef, useState, useTransition } from 'react'
 import {
   BottomSheet,
   BottomSheetContent,
+  BottomSheetDescription,
   BottomSheetTitle,
   BottomSheetTrigger,
 } from '@/components/ui/BottomSheet'
@@ -117,6 +126,12 @@ function AttachmentItem({
   onDelete: (id: string) => Promise<void>
 }) {
   const [isPending, startTransition] = useTransition()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+
+  function handleDelete() {
+    setConfirmOpen(false)
+    startTransition(() => onDelete(attachment.id))
+  }
 
   return (
     <div className="group relative aspect-square overflow-hidden rounded-lg border border-gfgk-border bg-gfgk-cream-deep">
@@ -153,15 +168,56 @@ function AttachmentItem({
       <button
         type="button"
         disabled={isPending}
-        onClick={() => startTransition(() => onDelete(attachment.id))}
+        onClick={() => setConfirmOpen(true)}
         className={cn(
-          'absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100',
-          isPending && 'opacity-100',
+          // Synlig uten hover på touch (< sm); hover-fade kun ≥ sm.
+          'absolute right-1 top-1 flex h-11 w-11 items-center justify-center rounded-full text-white',
+          'opacity-100 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100',
         )}
         aria-label="Slett vedlegg"
       >
-        {isPending ? <X className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-black/60">
+          {isPending ? (
+            <X className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Trash2 className="h-3.5 w-3.5" />
+          )}
+        </span>
       </button>
+
+      <BottomSheet open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <BottomSheetContent>
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gfgk-red-light text-gfgk-red-deep">
+              <AlertTriangle className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <BottomSheetTitle>Slette vedlegg</BottomSheetTitle>
+              <BottomSheetDescription>
+                {attachment.filename} blir slettet permanent.
+              </BottomSheetDescription>
+            </div>
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button
+              type="button"
+              variant="secondary"
+              fullWidth
+              onClick={() => setConfirmOpen(false)}
+            >
+              Avbryt
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              fullWidth
+              onClick={handleDelete}
+            >
+              Slett
+            </Button>
+          </div>
+        </BottomSheetContent>
+      </BottomSheet>
     </div>
   )
 }
