@@ -139,7 +139,7 @@ export default async function KalenderPage({ searchParams }: PageProps) {
     <AppShell role={session.user.role} userName={session.user.name ?? null}>
         <PageHeader title="Kalender" subtitle="Turneringer og aktiviteter" />
 
-        <div className="space-y-4 px-6 pt-4">
+        <div className="space-y-4 px-6 pt-4 lg:mx-auto lg:max-w-5xl">
           <div className="flex items-center justify-between gap-3">
             <ViewToggle current={view} baseHref="/kalender" />
             <div className="flex items-center gap-1">
